@@ -7,6 +7,7 @@
         @vite(['resources/css/app.css','resources/js/app.js'])
         <title>{{ config('app.name', 'Laravel') }}</title>   
         <x-inertia::head />
+        @routes
     </head>
     <body>
         <x-inertia::app />
