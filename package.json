@@ -16,7 +16,9 @@
     "dependencies": {
         "@inertiajs/vite": "^3.6.1",
         "@inertiajs/vue3": "^3.6.1",
+        "@mdi/font": "^7.4.47",
         "@vitejs/plugin-vue": "^6.0.8",
-        "vue": "^3.5.40"
+        "vue": "^3.5.40",
+        "vuetify": "^4.1.5"
     }
 }
