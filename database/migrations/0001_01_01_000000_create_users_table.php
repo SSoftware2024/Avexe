@@ -21,10 +21,10 @@ return new class extends Migration
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password')->nullable();
             $table->enum('user_type', TypeUser::toArrayValues())->default(TypeUser::CUSTOMER);
-            $table->boolean('is_register_completed');
+            $table->boolean('is_register_completed')->default(false);
             $table->date('date_of_birth')->nullable();
             $table->rememberToken();
-            $table->foreignIdFor(Company::class)->constrained();
+            $table->foreignIdFor(Company::class)->nullable()->constrained();
             $table->timestamps();
             $table->softDeletes();  
         });

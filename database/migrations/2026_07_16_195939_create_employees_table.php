@@ -22,9 +22,7 @@ return new class extends Migration
             $table->boolean('is_comission')->default(true); #recebe por comissão
             $table->double('commission_value', 6,2)->nullable();
             $table->double('is_commission_value_percentage')->nullable();
-            $table->boolean('is_activeted')->default(true);
             $table->foreignIdFor(Company::class)->constrained();
-            $table->foreignIdFor(EmployeeShift::class)->constrained();
             $table->timestamps();
             $table->softDeletes();
         });

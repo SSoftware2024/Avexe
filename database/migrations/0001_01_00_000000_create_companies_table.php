@@ -47,8 +47,6 @@ return new class extends Migration
             $table->smallInteger('cancellation_time_allowed')->nullable();
             $table->enum('cancellation_time_unit', TimeUnit::toArrayValues())->nullable();
             $table->tinyInteger('appointment_max_days_in_advance')->nullable(); #dias máximos futuros para agendar, nulo apenas no dia
-            $table->foreignIdFor(CompanySystemSetting::class)->constrained();
-            $table->foreignIdFor(CompanyOperatingHours::class)->constrained();
             $table->timestamps();
             $table->softDeletes();
         });
