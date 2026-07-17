@@ -1,8 +1,6 @@
 <?php
 
 use App\Enum\TimeUnit;
-use App\Models\CompanyOperatingHours;
-use App\Models\CompanySystemSetting;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -27,6 +25,9 @@ return new class extends Migration
             $table->string('neighborhood'); #bairro
             $table->string('complement')->nullable(); #complemento
             $table->string('number', 20); #numero estabelecimento
+            $table->string('city', 20); #cidade
+            $table->string('state', 20); #estado
+            $table->string('cep', 20); #cep
             #dados sociais
             $table->string('instagram')->nullable(); #link url
             $table->string('whatsapp')->nullable(); #link url
@@ -40,7 +41,6 @@ return new class extends Migration
             $table->double('appointment_tax_value', 5,2)->nullable();
             $table->boolean('is_percentage_appointment_tax_value')->nullable(); #porcentagem do serviço agendado
             #agendamento regras
-            $table->time('appointment_allowed_delay_time'); #tempo permitido de atraso para chegar, fazer regra para máximo tempo
             $table->boolean('is_allowed_reviews')->default(false); #permitido avaliação
             $table->boolean('is_display_employees')->default(false); #permitido exibir funcionarios
             $table->boolean('is_allowed_cancellation')->default(false); #permitido cancelamento
