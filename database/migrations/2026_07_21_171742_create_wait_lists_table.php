@@ -15,7 +15,7 @@ return new class extends Migration
     {
         Schema::create('wait_lists', function (Blueprint $table) {
             $table->id();
-            $table->datetimes('date');
+            $table->datetime('date');
             $table->integer('position');
             $table->boolean('specific_time')->default(false);
             $table->foreignIdFor(Company::class)->constrained();
