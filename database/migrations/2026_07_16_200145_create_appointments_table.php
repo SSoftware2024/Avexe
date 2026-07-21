@@ -24,6 +24,7 @@ return new class extends Migration
             $table->boolean('is_discount_percentage')->nullable();
             $table->string('guest_name'); #caso cliente não se cadastre
             $table->string('guest_whatsapp'); #numero do cliente no dia do corte
+            $table->smallInteger('rate')->nullable();
             $table->enum('status', AppointmentsStatus::toArrayValues())->default(AppointmentsStatus::WAITING->value); #numero do cliente no dia do corte
             $table->foreignIdFor(Company::class)->constrained();
             $table->foreignIdFor(Employee::class)->constrained();

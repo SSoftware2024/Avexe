@@ -6,6 +6,23 @@ import { images } from "../js/utils/files.js";
 
 <template>
     <AppLayout>
+        <!-- FILTRO DE BUSCA -->
+        <v-row>
+            <v-col cols="12">
+                <div>
+                    <v-form>
+                        <v-text-field
+                            label="Pesquise pelo nome"
+                            variant="outlined"
+                            prepend-inner-icon="mdi-magnify"
+                            clearable
+                        ></v-text-field>
+                    </v-form>
+                </div>
+            </v-col>
+        </v-row>
+        <!-- FIM FILTRO DE BUSCA -->
+        <!-- LISTA DE EMPRESAS -->
         <v-row>
             <v-col cols="12" md="6" lg="4" v-for="i in 4">
                 <v-card class="mx-auto pa-4" hover>
@@ -56,6 +73,7 @@ import { images } from "../js/utils/files.js";
                 </v-card>
             </v-col>
         </v-row>
+        <!-- FIM LISTA DE EMPRESAS -->
     </AppLayout>
 </template>
 <style scoped lang="scss">
@@ -79,7 +97,7 @@ import { images } from "../js/utils/files.js";
         text-overflow: ellipsis;
     }
 }
-.float-rate{
+.float-rate {
     position: absolute;
     top: 2px;
     right: 5px;
