@@ -10,4 +10,5 @@ enum AppointmentsStatus: string
     case WAITING   = 'waiting'; #aguardando
     case CONFIRMED   = 'confirmed'; #confirmado
     case CANCELLED   = 'cancelled'; #cancelado
+    case FINISHED   = 'finished'; #finalizado
 }

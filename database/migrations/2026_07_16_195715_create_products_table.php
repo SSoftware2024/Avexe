@@ -19,6 +19,9 @@ return new class extends Migration
             $table->decimal('value', 6,2);
             $table->boolean('is_display')->default(true);
             $table->string('photo')->nullable();
+            $table->decimal('score_value', 6,4)->default(0);
+            $table->double('commission_value', 6,2)->nullable();
+            $table->double('is_commission_value_percentage')->nullable();
             $table->timestamps();
             $table->softDeletes();
             $table->foreignIdFor(Company::class)->constrained();

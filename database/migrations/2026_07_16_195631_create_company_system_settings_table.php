@@ -18,6 +18,7 @@ return new class extends Migration
             $table->integer('max_owners')->default(1); #numero de acessos simultaneos
             $table->integer('max_employees')->default(1); #numero de acessos simultaneos
             $table->date('date_payment')->default(now()->addMonths(1)); #data pagamento
+            $table->smallInteger('interval_return_message')->nullable(); #intervalo em dias para mensagem de retorno
             $table->timestamps();
             $table->softDeletes();
             $table->foreignIdFor(Company::class)->constrained();

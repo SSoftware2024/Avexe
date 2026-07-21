@@ -47,6 +47,13 @@ return new class extends Migration
             $table->smallInteger('cancellation_time_allowed')->nullable();
             $table->enum('cancellation_time_unit', TimeUnit::toArrayValues())->nullable();
             $table->tinyInteger('appointment_max_days_in_advance')->nullable(); #dias máximos futuros para agendar, nulo apenas no dia
+            #pontuação
+            $table->decimal('score_target', 6,4)->default(0); #metas de pontuação desconto, max: 9.999,99
+            $table->integer('score_appointments', 6,4)->default(0); #quanto acada agendamento vai dar de ponto
+            $table->integer('score_product', 6,4)->default(0); #quanto cada produto vai dar de ponto, forma global
+            $table->integer('score_service', 6,4)->default(0); #quanto cada serviço vai dar de ponto, forma global
+            $table->boolean('score_is_activeted')->default(false); #quanto cada serviço vai dar de ponto, forma global
+            #dados
             $table->timestamps();
             $table->softDeletes();
         });
