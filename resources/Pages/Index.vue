@@ -9,14 +9,25 @@ import { images } from "../js/utils/files.js";
         <!-- FILTRO DE BUSCA -->
         <v-row>
             <v-col cols="12">
-                <div>
-                    <v-form>
+                <div class="w-full">
+                    <v-form class="d-flex flex-column flex-md-row ga-4 align-md-center">
                         <v-text-field
+                            class="flex-grow-1"
                             label="Pesquise pelo nome"
                             variant="outlined"
                             prepend-inner-icon="mdi-magnify"
                             clearable
+                            hide-details
                         ></v-text-field>
+                        <v-btn
+                            variant="flat"
+                            text="Buscar"
+                            append-icon="mdi-magnify"
+                            color="primary"
+                            size="x-large"
+                            class="flex-shrink-0"
+                        >
+                        </v-btn>
                     </v-form>
                 </div>
             </v-col>
@@ -77,6 +88,7 @@ import { images } from "../js/utils/files.js";
     </AppLayout>
 </template>
 <style scoped lang="scss">
+
 .content {
     display: flex;
     // align-items: center;
