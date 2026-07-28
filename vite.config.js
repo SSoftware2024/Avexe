@@ -4,6 +4,7 @@ import { bunny } from "laravel-vite-plugin/fonts";
 import tailwindcss from "@tailwindcss/vite";
 import vue from "@vitejs/plugin-vue";
 import inertia from "@inertiajs/vite";
+import { fileURLToPath, URL } from "url"; //novo
 
 export default defineConfig({
     plugins: [
@@ -22,6 +23,18 @@ export default defineConfig({
             ssr: false,
         }),
     ],
+    resolve: {
+        alias: [
+            {
+                find: "@",
+                replacement: fileURLToPath(new URL("./resources/Pages", import.meta.url)),
+            },
+            {
+                find: "@js",
+                replacement: fileURLToPath(new URL("./resources/js", import.meta.url)),
+            },
+        ],
+    },
     server: {
         watch: {
             ignored: ["**/storage/framework/views/**"],
