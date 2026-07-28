@@ -22,18 +22,6 @@ class CreateNewUser implements CreatesNewUsers
      */
     public function create(array $input): User
     {
-        //default fortify
-        // Validator::make($input, [
-        //     'name' => ['required', 'string', 'max:255'],
-        //     'email' => [
-        //         'required',
-        //         'string',
-        //         'email',
-        //         'max:255',
-        //         Rule::unique(User::class),
-        //     ],
-        //     'password' => $this->passwordRules(),
-        // ])->validate();
         Validator::make($input, [
             'name' => ['required', 'string', 'max:255'],
             'email' => [
@@ -46,7 +34,7 @@ class CreateNewUser implements CreatesNewUsers
             'password' => $this->passwordNullableRules(),
             'whatsapp' => [
                 'required',
-                'regex:/^\([1-9]{2}\)\s9\s\d{4}-\d{4}$/', // (00) 0 0000-0000
+                'regex:/^\([1-9]{2}\)\s[2-9]\s\d{4}-\d{4}$/', // (00) 0 0000-0000
             ],
             'terms_of_use' => ['accepted']
         ],[],[

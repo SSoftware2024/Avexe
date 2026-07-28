@@ -4,9 +4,9 @@ import { useDisplay } from "vuetify";
 import { images } from "../../js/utils/files.js";
 import { router, useForm } from "@inertiajs/vue3";
 import { route } from "ziggy-js"; //route ziggy
+  import { useMask } from 'vuetify'
 const drawer = ref(false);
 const { smAndDown } = useDisplay(); //responsividade -> small ou menor (xs, sm)
-
 const links_customer = [
     {
         text: "Início",
@@ -36,10 +36,11 @@ const form_register = useForm({
     whatsapp: "",
     terms_of_use: false
 });
-
+const mask_phone_br = useMask({ mask: '(##) # ####-####' })
 
 //METÓDOS
 function register() {
+    form_register.whatsapp = mask_phone_br.mask(form_register.whatsapp);
     form_register.post(route("register.store"));
 }
 </script>
