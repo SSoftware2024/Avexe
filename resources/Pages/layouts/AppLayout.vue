@@ -22,56 +22,49 @@ const links_customer = [
         to: "/url",
     },
 ];
-const logged_status = computed(() => { //logged - no_logged - partial_registered
+const logged_status = computed(() => {
+    //logged - no_logged - partial_registered
     if (!page.props?.user) {
         return "no_logged";
-    } else if (page.props.user.email && page.props.user.email) {
+    } else if (page.props.user.email) {
         return "logged";
-    } else {
+    } else if(!page.props.user.whatsapp) {
         return "partial_registered";
     }
 });
 
 const dialog = reactive({
     register: false,
-    register_complete: false,
     login: false,
 });
 
 const form_register = useForm({
     name: "",
     whatsapp: "",
+    email:'',
     terms_of_use: false,
     password: "",
     password_confirmation: "",
 });
-const form_register_complete = useForm({
-    email: "",
-});
+
 const mask_phone_br = useMask({ mask: "(##) # ####-####" });
 //PRIVADOS
 function _register() {
     form_register.whatsapp = mask_phone_br.mask(form_register.whatsapp);
     form_register.post(route("register.store"));
 }
-function _registerComplete() {
-    form_register_complete.post(route("customer.completeRegistration"), {
-        onSuccess: () => dialog.register_complete = false
-    });
-}
 
 //PÚBLICOS
 const openModalRegister = () => {
     dialog.register = true;
-}
-
+};
 
 onMounted(() => {
     console.log(logged_status.value);
 });
 
 defineExpose({
-    openModalRegister
+    openModalRegister,
 });
 </script>
 <template>
@@ -156,7 +149,6 @@ defineExpose({
                         variant="flat"
                         color="primary"
                         class="cursor-pointer"
-                        @click="dialog.register_complete = true"
                     >
                         <span class="font-weight-bold"
                             >Completar cadastro</span
@@ -236,6 +228,16 @@ defineExpose({
                             :error-messages="form_register.errors.name"
                             :hide-details="!form_register.errors.name"
                         ></v-text-field>
+                        <v-text-field
+                            label="E-mail"
+                            variant="outlined"
+                            name="email"
+                            v-model="form_register.email"
+                            :error-messages="
+                                form_register.errors.email
+                            "
+                            :hide-details="!form_register.errors.email"
+                        ></v-text-field>
                         <v-mask-input
                             mask="(##) # ####-####"
                             label="Whatsapp *"
@@ -299,50 +301,7 @@ defineExpose({
             </v-card>
         </v-dialog>
         <!-- FIM DIALOG REGISTRO -->
-        <!-- DIALOG REGISTRO COMPLETO -->
 
-        <v-dialog v-model="dialog.register_complete" width="auto" location="top center">
-            <v-card
-                title="Finalizar registro"
-                class="pa-3 position-relative dialog-auth-responsive"
-            >
-                <v-btn
-                    icon="mdi-close"
-                    color="red"
-                    variant="text"
-                    class="position-absolute"
-                    style="top: 8px; right: 8px"
-                    @click="dialog.register_complete = false"
-                ></v-btn>
-                <div>
-                    <v-form
-                        class="d-flex flex-column ga-2"
-                        @submit.prevent="_registerComplete"
-                    >
-                        <v-text-field
-                            label="E-mail"
-                            variant="outlined"
-                            name="email"
-                            v-model="form_register_complete.email"
-                            :error-messages="form_register_complete.errors.email"
-                            :hide-details="!form_register_complete.errors.email"
-                        ></v-text-field>
-                        <v-btn
-                            variant="flat"
-                            color="primary"
-                            class="align-self-end"
-                            append-icon="mdi-content-save"
-                            type="submit"
-                            :loading="form_register_complete.processing"
-                            :disabled="form_register_complete.processing"
-                        >
-                            Salvar
-                        </v-btn>
-                    </v-form>
-                </div>
-            </v-card>
-        </v-dialog>
-        <!-- FIM DIALOG COMPLETO -->
         <!-- DIALOG LOGIN -->
         <v-dialog v-model="dialog.login" width="auto" location="top center">
             <v-card
@@ -396,7 +355,11 @@ defineExpose({
                             :loading="form_register.processing"
                             :disabled="form_register.processing"
                         >
-                            {{ form_register.processing ? 'Salvando...' : 'Salvar' }}
+                            {{
+                                form_register.processing
+                                    ? "Salvando..."
+                                    : "Salvar"
+                            }}
                         </v-btn>
                     </v-form>
                 </div>

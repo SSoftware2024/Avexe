@@ -24,6 +24,13 @@ class CreateNewUser implements CreatesNewUsers
     {
         Validator::make($input, [
             'name' => ['required', 'string', 'max:255'],
+            'email' => [
+                'required',
+                'string',
+                'email',
+                'max:255',
+                Rule::unique(User::class),
+            ],
             'password' => $this->passwordBasicRules(),
             'whatsapp' => [
                 'required',
@@ -31,13 +38,14 @@ class CreateNewUser implements CreatesNewUsers
                 Rule::unique(User::class)
             ],
             'terms_of_use' => ['accepted']
-        ],[],[
+        ], [], [
             'terms_of_use' => 'termos de uso'
         ])->validate();
 
         return User::create([
             'name' => $input['name'],
             'whatsapp' => $input['whatsapp'],
+            'email' => $input['email'],
             'password' => Hash::make($input['password']),
         ]);
     }

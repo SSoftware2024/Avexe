@@ -21,19 +21,4 @@ class CustomerController extends Controller
             'user' => Auth::user()
         ]);
     }
-    public function completeRegistration(Request $request)
-    {
-        $request->validate([
-            'email' => [
-                'required',
-                'string',
-                'email',
-                'max:255',
-                Rule::unique(User::class),
-            ],
-        ]);
-        $user = Auth::user();
-        $user->email = $request->email;
-        $user->save();
-    }
 }
