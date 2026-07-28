@@ -2,7 +2,11 @@
 
 namespace App\Http\Controllers;
 
+
+use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Validation\Rule;
 use Inertia\Inertia;
 
 class CustomerController extends Controller
@@ -13,6 +17,23 @@ class CustomerController extends Controller
     }
     public function appointmentsView()
     {
-        return Inertia::render('user/AppointmentsCustomer');
+        return Inertia::render('user/AppointmentsCustomer', [
+            'user' => Auth::user()
+        ]);
+    }
+    public function completeRegistration(Request $request)
+    {
+        $request->validate([
+            'email' => [
+                'required',
+                'string',
+                'email',
+                'max:255',
+                Rule::unique(User::class),
+            ],
+        ]);
+        $user = Auth::user();
+        $user->email = $request->email;
+        $user->save();
     }
 }

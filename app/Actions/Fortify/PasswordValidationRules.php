@@ -16,8 +16,8 @@ trait PasswordValidationRules
     {
         return ['required', 'string', Password::default(), 'confirmed'];
     }
-    protected function passwordNullableRules(): array
+    protected function passwordBasicRules(): array
     {
-        return ['nullable', 'string', Password::min(8), 'confirmed'];
+        return ['required', 'string', Password::min(8), 'confirmed'];
     }
 }
