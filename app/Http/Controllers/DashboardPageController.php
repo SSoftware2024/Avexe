@@ -14,9 +14,7 @@ class DashboardPageController extends Controller
         $user_type = Auth::user()->user_type;
         switch ($user_type) {
             case TypeUser::CUSTOMER->value:
-                return Inertia::render('user/DashboardCustomer', [
-                    'user' => Auth::user(),
-                ]);
+                return redirect()->route('customer.profileView');
                 break;
 
             default:

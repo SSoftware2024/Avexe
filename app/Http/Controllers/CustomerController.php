@@ -3,10 +3,9 @@
 namespace App\Http\Controllers;
 
 
-use App\Models\User;
+use App\Services\GoogleLoginService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Validation\Rule;
 use Inertia\Inertia;
 
 class CustomerController extends Controller
@@ -20,5 +19,20 @@ class CustomerController extends Controller
         return Inertia::render('user/AppointmentsCustomer', [
             'user' => Auth::user()
         ]);
+    }
+    public function profileView()
+    {
+        return Inertia::render('user/Profile', [
+            'user' => Auth::user(),
+        ]);
+    }
+
+    public function loginGoogle(GoogleLoginService $googleService)
+    {
+        return $googleService->redirect();
+    }
+    public function loginGoogleCallback(GoogleLoginService $googleService)
+    {
+        return $googleService->callback();
     }
 }

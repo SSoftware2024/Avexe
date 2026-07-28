@@ -35,7 +35,7 @@ const toggle = ref("left");
                         </v-btn>
                     </v-form>
                 </div>
-                <div class="w-full mt-2 d-flex flex-row justify-space-between">
+                <div class="w-full mt-2 d-flex flex-column flex-md-row justify-md-space-between">
                     <div>
                         <v-btn-toggle
                             v-model="toggle"

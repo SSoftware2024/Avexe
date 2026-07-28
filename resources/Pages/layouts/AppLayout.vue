@@ -26,10 +26,10 @@ const logged_status = computed(() => {
     //logged - no_logged - partial_registered
     if (!page.props?.user) {
         return "no_logged";
+    } else if (!page.props.user.whatsapp) {
+        return "partial_registered";
     } else if (page.props.user.email) {
         return "logged";
-    } else if(!page.props.user.whatsapp) {
-        return "partial_registered";
     }
 });
 
@@ -41,17 +41,34 @@ const dialog = reactive({
 const form_register = useForm({
     name: "",
     whatsapp: "",
-    email:'',
+    email: "",
     terms_of_use: false,
     password: "",
     password_confirmation: "",
 });
 
 const mask_phone_br = useMask({ mask: "(##) # ####-####" });
+
+const snackbar = reactive({
+    show: false,
+    message: "",
+});
+
 //PRIVADOS
 function _register() {
     form_register.whatsapp = mask_phone_br.mask(form_register.whatsapp);
     form_register.post(route("register.store"));
+}
+
+function google_auth(operation) {
+    if (operation == "register" && !form_register.terms_of_use) {
+        snackbar.message =
+            "É necessário aceitar os termos de uso para continuar com Google.";
+        snackbar.show = true;
+        return;
+    } else {
+        window.location.href = route("customer.loginGoogle");
+    }
 }
 
 //PÚBLICOS
@@ -60,7 +77,7 @@ const openModalRegister = () => {
 };
 
 onMounted(() => {
-    console.log(logged_status.value);
+   
 });
 
 defineExpose({
@@ -98,17 +115,32 @@ defineExpose({
                 <v-btn
                     v-if="!smAndDown"
                     :variant="
-                        route().current('customer.appoint') ? 'flat' : 'text'
+                        route().current('customer.appointmentsView') ? 'flat' : 'text'
                     "
                     :color="
-                        route().current('customer.appoint') ? 'orange' : 'black'
+                        route().current('customer.appointmentsView') ? 'orange' : 'black'
                     "
-                    @click="router.visit(route('customer.appoint'))"
+                    @click="router.visit(route('customer.appointmentsView'))"
                     :class="[
                         'cursor-pointer',
-                        route().current('customer.appoint') ? 'text-white' : '',
+                        route().current('customer.appointmentsView') ? 'text-white' : '',
                     ]"
                     >Meus agendamentos</v-btn
+                >
+                <v-btn
+                    v-if="!smAndDown"
+                    :variant="
+                        route().current('customer.profileView') ? 'flat' : 'text'
+                    "
+                    :color="
+                        route().current('customer.profileView') ? 'orange' : 'black'
+                    "
+                    @click="router.visit(route('customer.profileView'))"
+                    :class="[
+                        'cursor-pointer',
+                        route().current('customer.profileView') ? 'text-white' : '',
+                    ]"
+                    >Perfil</v-btn
                 >
                 <v-btn
                     v-if="!smAndDown"
@@ -196,6 +228,26 @@ defineExpose({
 
             <v-main>
                 <v-container>
+                    <v-alert
+                        v-if="logged_status == 'partial_registered'"
+                        type="warning"
+                        variant="tonal"
+                        class="mb-4"
+                        icon="mdi-alert-circle-outline"
+                        closable
+                    >
+                        <template #title> Cadastro incompleto </template>
+                        Complete seu cadastro com whatsapp afim de receber mensagens para melhor atendimento.
+                        <v-btn
+                            variant="flat"
+                            color="warning"
+                            size="small"
+                            class="mt-2"
+                            @click="router.visit(route('register'))"
+                        >
+                            Completar cadastro
+                        </v-btn>
+                    </v-alert>
                     <slot :logged-status="logged_status"></slot>
                 </v-container>
             </v-main>
@@ -233,9 +285,7 @@ defineExpose({
                             variant="outlined"
                             name="email"
                             v-model="form_register.email"
-                            :error-messages="
-                                form_register.errors.email
-                            "
+                            :error-messages="form_register.errors.email"
                             :hide-details="!form_register.errors.email"
                         ></v-text-field>
                         <v-mask-input
@@ -296,6 +346,17 @@ defineExpose({
                             append-icon="mdi-content-save "
                             type="submit"
                         ></v-btn>
+                        <v-divider class="my-2"></v-divider>
+                        <v-btn
+                            variant="flat"
+                            color="#4285F4"
+                            class="align-self-center text-white"
+                            block
+                            prepend-icon="mdi-google"
+                            @click="google_auth('register')"
+                        >
+                            Continuar com Google
+                        </v-btn>
                     </v-form>
                 </div>
             </v-card>
@@ -305,7 +366,7 @@ defineExpose({
         <!-- DIALOG LOGIN -->
         <v-dialog v-model="dialog.login" width="auto" location="top center">
             <v-card
-                title="Entrar"
+                title="Login Cliente"
                 class="pa-3 position-relative dialog-auth-responsive"
             >
                 <v-btn
@@ -361,11 +422,40 @@ defineExpose({
                                     : "Salvar"
                             }}
                         </v-btn>
+                        <v-divider class="my-2"></v-divider>
+                        <v-btn
+                            variant="flat"
+                            color="#4285F4"
+                            class="text-white"
+                            block
+                            prepend-icon="mdi-google"
+                            @click="google_auth('login')"
+                        >
+                            Continuar com Google
+                        </v-btn>
                     </v-form>
                 </div>
             </v-card>
         </v-dialog>
         <!-- FIM DIALOG LOGIN -->
+
+        <v-snackbar
+            v-model="snackbar.show"
+            color="error"
+            location="top"
+            :timeout="5000"
+        >
+            {{ snackbar.message }}
+            <template #actions>
+                <v-btn
+                    color="white"
+                    variant="text"
+                    @click="snackbar.show = false"
+                >
+                    FECHAR
+                </v-btn>
+            </template>
+        </v-snackbar>
     </v-app>
 </template>
 <style scoped lang="scss">

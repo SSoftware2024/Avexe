@@ -9,6 +9,11 @@ Route::get('/', [CustomerController::class, 'index'])->name('index');
 
 Route::prefix('customer')->name('customer.')->group(function () {
     //rotas
-    Route::get('/appoint', [CustomerController::class, 'appointmentsView'])->name('appoint');
+    Route::get('/appointmentsView', [CustomerController::class, 'appointmentsView'])->name('appointmentsView');
+    Route::get('/profileView', [CustomerController::class, 'profileView'])->name('profileView');
+
+    //login google
+    Route::get('/loginGoogle', [CustomerController::class, 'loginGoogle'])->name('loginGoogle');
+    Route::get('/loginGoogleCallback', [CustomerController::class, 'loginGoogleCallback'])->name('loginGoogleCallback');
 });
 Route::get('/home', [DashboardPageController::class, 'index'])->name('home');

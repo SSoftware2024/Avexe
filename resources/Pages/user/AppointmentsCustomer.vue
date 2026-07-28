@@ -51,29 +51,6 @@ const appLayout = ref(null);
 
                 <!-- LOGADO (PARCIAL OU TOTAL) -->
                 <div v-else>
-                    <!-- AVISO CADASTRO PARCIAL -->
-                    <v-alert
-                        v-if="loggedStatus == 'partial_registered'"
-                        type="warning"
-                        variant="tonal"
-                        class="mb-4"
-                        icon="mdi-alert-circle-outline"
-                        closable
-                    >
-                        <template #title> Cadastro incompleto </template>
-                        Complete seu cadastro com e-mail e senha em até
-                        <strong>24 horas</strong>, caso contrário sua conta será
-                        excluída.
-                        <v-btn
-                            variant="flat"
-                            color="warning"
-                            size="small"
-                            class="mt-2"
-                            @click="router.visit(route('register'))"
-                        >
-                            Completar cadastro
-                        </v-btn>
-                    </v-alert>
 
                     <!-- CONTEÚDO AGENDAMENTOS -->
                     <v-card class="pa-6" elevation="2">
