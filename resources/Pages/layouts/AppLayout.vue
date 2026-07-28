@@ -1,10 +1,11 @@
 <script setup>
-import { reactive, ref } from "vue";
+import { onMounted, reactive, ref, computed } from "vue";
 import { useDisplay } from "vuetify";
 import { images } from "../../js/utils/files.js";
-import { router, useForm } from "@inertiajs/vue3";
+import { router, useForm, usePage } from "@inertiajs/vue3";
 import { route } from "ziggy-js"; //route ziggy
-  import { useMask } from 'vuetify'
+import { useMask } from "vuetify";
+const page = usePage();
 const drawer = ref(false);
 const { smAndDown } = useDisplay(); //responsividade -> small ou menor (xs, sm)
 const links_customer = [
@@ -21,7 +22,16 @@ const links_customer = [
         to: "/url",
     },
 ];
-const logged_status = ref("no_logged"); //logged - no_logged - partial_registered
+const logged_status = computed(() => {
+    if (!page.props?.user) {
+        return "no_logged";
+    } else if (page.props.user.email && page.props.user.email) {
+        return "logged";
+    } else {
+        return "partial_registered";
+    }
+});
+// const logged_status = ref("no_logged"); //logged - no_logged - partial_registered
 
 const dialog = reactive({
     register: false,
@@ -34,15 +44,22 @@ const form_register = useForm({
     password: "",
     password_confirmation: "",
     whatsapp: "",
-    terms_of_use: false
+    terms_of_use: false,
 });
-const mask_phone_br = useMask({ mask: '(##) # ####-####' })
+const mask_phone_br = useMask({ mask: "(##) # ####-####" });
 
 //METÓDOS
-function register() {
+function _register() {
     form_register.whatsapp = mask_phone_br.mask(form_register.whatsapp);
     form_register.post(route("register.store"));
 }
+
+
+function _getStatusLogin() {}
+
+onMounted(() => {
+    console.log(logged_status.value);
+});
 </script>
 <template>
     <v-app>
@@ -74,12 +91,16 @@ function register() {
                 </v-btn>
                 <v-btn
                     v-if="!smAndDown"
-                    :variant="route().current('appoint') ? 'flat' : 'text'"
-                    :color="route().current('appoint') ? 'orange' : 'black'"
-                    @click="router.visit(route('appoint'))"
+                    :variant="
+                        route().current('customer.appoint') ? 'flat' : 'text'
+                    "
+                    :color="
+                        route().current('customer.appoint') ? 'orange' : 'black'
+                    "
+                    @click="router.visit(route('customer.appoint'))"
                     :class="[
                         'cursor-pointer',
-                        route().current('appoint') ? 'text-white' : '',
+                        route().current('customer.appoint') ? 'text-white' : '',
                     ]"
                     >Meus agendamentos</v-btn
                 >
@@ -141,13 +162,16 @@ function register() {
 
                         <v-list>
                             <v-list-item
-                                v-for="(i, index) in 4"
+                                v-for="(i, index) in 2"
                                 :key="index"
                                 :value="index"
                             >
                                 <v-list-item-title
                                     >teste opções</v-list-item-title
                                 >
+                            </v-list-item>
+                            <v-list-item @click="router.post(route('logout'))">
+                                <v-list-item-title>SAIR</v-list-item-title>
                             </v-list-item>
                         </v-list>
                     </v-menu>
@@ -167,7 +191,7 @@ function register() {
 
             <v-main>
                 <v-container>
-                    <slot></slot>
+                    <slot :logged-status="logged_status"></slot>
                 </v-container>
             </v-main>
         </v-layout>
@@ -189,7 +213,7 @@ function register() {
                 <div>
                     <v-form
                         class="d-flex flex-column ga-2"
-                        @submit.prevent="register"
+                        @submit.prevent="_register"
                     >
                         <v-text-field
                             label="Nome *"
@@ -199,6 +223,15 @@ function register() {
                             :error-messages="form_register.errors.name"
                             :hide-details="!form_register.errors.name"
                         ></v-text-field>
+                        <v-mask-input
+                            mask="(##) # ####-####"
+                            label="Whatsapp *"
+                            variant="outlined"
+                            name="whatsapp"
+                            v-model="form_register.whatsapp"
+                            :error-messages="form_register.errors.whatsapp"
+                            :hide-details="!form_register.errors.whatsapp"
+                        ></v-mask-input>
                         <v-text-field
                             label="E-mail"
                             variant="outlined"
@@ -208,7 +241,7 @@ function register() {
                             :hide-details="!form_register.errors.email"
                         ></v-text-field>
                         <v-text-field
-                            label="Senha *"
+                            label="Senha"
                             variant="outlined"
                             type="password"
                             name="password"
@@ -224,15 +257,7 @@ function register() {
                             v-model="form_register.password_confirmation"
                             hide-details
                         ></v-text-field>
-                        <v-mask-input
-                            mask="(##) # ####-####"
-                            label="Whatsapp *"
-                            variant="outlined"
-                            name="whatsapp"
-                            v-model="form_register.whatsapp"
-                            :error-messages="form_register.errors.whatsapp"
-                            :hide-details="!form_register.errors.whatsapp"
-                        ></v-mask-input>
+
                         <div
                             class="w-full d-flex flex-row align-content-center"
                         >
@@ -241,8 +266,12 @@ function register() {
                                     label="Aceito os termos de uso"
                                     color="primary"
                                     v-model="form_register.terms_of_use"
-                                    :error-messages="form_register.errors.terms_of_use"
-                                    :hide-details="!form_register.errors.terms_of_use"
+                                    :error-messages="
+                                        form_register.errors.terms_of_use
+                                    "
+                                    :hide-details="
+                                        !form_register.errors.terms_of_use
+                                    "
                                 ></v-checkbox>
                             </div>
                             <div

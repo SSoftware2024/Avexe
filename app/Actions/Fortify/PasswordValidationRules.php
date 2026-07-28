@@ -18,6 +18,6 @@ trait PasswordValidationRules
     }
     protected function passwordNullableRules(): array
     {
-        return ['nullable', 'string', Password::min(8)->uncompromised(), 'confirmed'];
+        return ['nullable', 'string', Password::min(8), 'confirmed'];
     }
 }

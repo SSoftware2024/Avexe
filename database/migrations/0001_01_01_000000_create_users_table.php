@@ -16,11 +16,11 @@ return new class extends Migration
         Schema::create('users', function (Blueprint $table) {
             $table->id();
             $table->string('name');
-            $table->string('whatsapp');
+            $table->string('whatsapp')->unique();
             $table->string('email')->nullable()->unique();
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password')->nullable();
-            $table->enum('user_type', TypeUser::toArrayValues())->default(TypeUser::CUSTOMER);
+            $table->enum('user_type', TypeUser::toArrayValues())->default(TypeUser::CUSTOMER->value);
             $table->boolean('is_register_completed')->default(false);
             $table->date('date_of_birth')->nullable();
             $table->decimal('latitude', 10, 8)->nullable(); #valor max & min 90.00000000 (ou mínimo -90.00000000)

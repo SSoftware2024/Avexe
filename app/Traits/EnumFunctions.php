@@ -13,7 +13,7 @@ trait EnumFunctions
     public static function toArrayValues(): array
     {
         return array_map(
-            fn($value) => $value->name,
+            fn($value) => $value->value,
             self::cases()
         );
     }

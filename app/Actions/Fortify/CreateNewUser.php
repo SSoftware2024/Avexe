@@ -31,7 +31,7 @@ class CreateNewUser implements CreatesNewUsers
                 'max:255',
                 Rule::unique(User::class),
             ],
-            'password' => $this->passwordNullableRules(),
+            'password' => ['required_with:email', ...$this->passwordNullableRules()],
             'whatsapp' => [
                 'required',
                 'regex:/^\([1-9]{2}\)\s[2-9]\s\d{4}-\d{4}$/', // (00) 0 0000-0000
@@ -43,6 +43,7 @@ class CreateNewUser implements CreatesNewUsers
 
         return User::create([
             'name' => $input['name'],
+            'whatsapp' => $input['whatsapp'],
             'email' => $input['email'],
             'password' => Hash::make($input['password']),
         ]);
