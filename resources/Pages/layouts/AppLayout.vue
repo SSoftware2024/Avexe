@@ -2,7 +2,7 @@
 import { reactive, ref } from "vue";
 import { useDisplay } from "vuetify";
 import { images } from "../../js/utils/files.js";
-import { router } from "@inertiajs/vue3";
+import { router, useForm } from "@inertiajs/vue3";
 import { route } from "ziggy-js"; //route ziggy
 const drawer = ref(false);
 const { smAndDown } = useDisplay(); //responsividade -> small ou menor (xs, sm)
@@ -27,6 +27,21 @@ const dialog = reactive({
     register: false,
     login: false,
 });
+
+const form_register = useForm({
+    name: "",
+    email: "",
+    password: "",
+    password_confirmation: "",
+    whatsapp: "",
+    terms_of_use: false
+});
+
+
+//METÓDOS
+function register() {
+    form_register.post(route("register.store"));
+}
 </script>
 <template>
     <v-app>
@@ -46,19 +61,25 @@ const dialog = reactive({
                 />
 
                 <v-btn
-                    :variant="route().current('index') ? 'flat':'text'"
-                    :color="route().current('index') ? 'orange':'black'"
+                    :variant="route().current('index') ? 'flat' : 'text'"
+                    :color="route().current('index') ? 'orange' : 'black'"
                     v-if="!smAndDown"
                     @click="router.visit(route('index'))"
-                    :class="['cursor-pointer', route().current('index') ? 'text-white' : '']"
+                    :class="[
+                        'cursor-pointer',
+                        route().current('index') ? 'text-white' : '',
+                    ]"
                     >Início
                 </v-btn>
                 <v-btn
                     v-if="!smAndDown"
-                    :variant="route().current('appoint') ? 'flat':'text'"
-                    :color="route().current('appoint') ? 'orange':'black'"
+                    :variant="route().current('appoint') ? 'flat' : 'text'"
+                    :color="route().current('appoint') ? 'orange' : 'black'"
                     @click="router.visit(route('appoint'))"
-                    :class="['cursor-pointer', route().current('appoint') ? 'text-white' : '']"
+                    :class="[
+                        'cursor-pointer',
+                        route().current('appoint') ? 'text-white' : '',
+                    ]"
                     >Meus agendamentos</v-btn
                 >
                 <v-btn
@@ -165,28 +186,52 @@ const dialog = reactive({
                     @click="dialog.register = false"
                 ></v-btn>
                 <div>
-                    <v-form class="d-flex flex-column ga-2">
+                    <v-form
+                        class="d-flex flex-column ga-2"
+                        @submit.prevent="register"
+                    >
                         <v-text-field
                             label="Nome *"
                             variant="outlined"
-                            hide-details
+                            name="name"
+                            v-model="form_register.name"
+                            :error-messages="form_register.errors.name"
+                            :hide-details="!form_register.errors.name"
                         ></v-text-field>
                         <v-text-field
                             label="E-mail"
                             variant="outlined"
-                            hide-details
+                            name="email"
+                            v-model="form_register.email"
+                            :error-messages="form_register.errors.email"
+                            :hide-details="!form_register.errors.email"
                         ></v-text-field>
                         <v-text-field
                             label="Senha *"
                             variant="outlined"
                             type="password"
-                            hide-details
+                            name="password"
+                            v-model="form_register.password"
+                            :error-messages="form_register.errors.password"
+                            :hide-details="!form_register.errors.password"
                         ></v-text-field>
                         <v-text-field
-                            label="Whatsapp *"
+                            label="Confirmar senha"
                             variant="outlined"
+                            type="password"
+                            name="password_confirmation"
+                            v-model="form_register.password_confirmation"
                             hide-details
                         ></v-text-field>
+                        <v-mask-input
+                            mask="(##) # ####-####"
+                            label="Whatsapp *"
+                            variant="outlined"
+                            name="whatsapp"
+                            v-model="form_register.whatsapp"
+                            :error-messages="form_register.errors.whatsapp"
+                            :hide-details="!form_register.errors.whatsapp"
+                        ></v-mask-input>
                         <div
                             class="w-full d-flex flex-row align-content-center"
                         >
@@ -194,6 +239,9 @@ const dialog = reactive({
                                 <v-checkbox
                                     label="Aceito os termos de uso"
                                     color="primary"
+                                    v-model="form_register.terms_of_use"
+                                    :error-messages="form_register.errors.terms_of_use"
+                                    :hide-details="!form_register.errors.terms_of_use"
                                 ></v-checkbox>
                             </div>
                             <div
@@ -209,7 +257,7 @@ const dialog = reactive({
                             text="Salvar"
                             class="align-self-end"
                             append-icon="mdi-content-save "
-                            @click="dialog.register = false"
+                            type="submit"
                         ></v-btn>
                     </v-form>
                 </div>
