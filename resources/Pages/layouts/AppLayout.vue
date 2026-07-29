@@ -70,7 +70,7 @@ function google_auth(operation) {
 
 //PÚBLICOS
 const openModalRegister = () => {
-    modal_type.value = 'register';
+    modal_type.value = "register";
     dialog_register_login = true;
 };
 
@@ -127,8 +127,9 @@ defineExpose({
                             ? 'text-white'
                             : '',
                     ]"
-                    >Meus agendamentos</v-btn
                 >
+                    Meus agendamentos
+                </v-btn>
                 <v-btn
                     v-if="!smAndDown"
                     :variant="
@@ -148,8 +149,8 @@ defineExpose({
                             ? 'text-white'
                             : '',
                     ]"
-                    >Perfil</v-btn
-                >
+                    >Perfil
+                </v-btn>
                 <v-btn
                     v-if="!smAndDown"
                     @click="router.visit('/')"
@@ -157,8 +158,8 @@ defineExpose({
                     color="primary"
                     class="cursor-pointer"
                 >
-                    <span class="font-weight-bold">Sou empresário</span></v-btn
-                >
+                    <span class="font-weight-bold">Sou empresário</span>
+                </v-btn>
                 <v-spacer />
                 <div v-if="logged_status == 'no_logged'" class="mr-2">
                     <v-btn
@@ -168,8 +169,8 @@ defineExpose({
                         class="cursor-pointer"
                         @click="dialog_register_login = true"
                     >
-                        <span class="font-weight-bold">Cadastro / Login</span></v-btn
-                    >
+                        <span class="font-weight-bold">Cadastro / Login</span>
+                    </v-btn>
                 </div>
                 <div
                     v-else-if="logged_status == 'partial_registered'"
@@ -202,9 +203,9 @@ defineExpose({
                                 :key="index"
                                 :value="index"
                             >
-                                <v-list-item-title
-                                    >teste opções</v-list-item-title
-                                >
+                                <v-list-item-title>
+                                    teste opções
+                                </v-list-item-title>
                             </v-list-item>
                             <v-list-item @click="router.post(route('logout'))">
                                 <v-list-item-title>SAIR</v-list-item-title>
@@ -254,7 +255,11 @@ defineExpose({
         </v-layout>
         <!-- DIALOG REGISTRO - LOGIN -->
 
-        <v-dialog v-model="dialog_register_login" width="auto" location="top center">
+        <v-dialog
+            v-model="dialog_register_login"
+            width="auto"
+            location="top center"
+        >
             <v-card
                 :title="modal_type == 'login' ? 'Login' : 'Cadastro cliente'"
                 class="pa-3 position-relative dialog-auth-responsive"
@@ -277,13 +282,13 @@ defineExpose({
                         <v-btn value="register">
                             <span>Cadastrar</span>
 
-                            <v-icon end> mdi-account-plus  </v-icon>
+                            <v-icon end> mdi-account-plus </v-icon>
                         </v-btn>
 
                         <v-btn value="login">
                             <span>Entrar</span>
 
-                            <v-icon end> mdi-login  </v-icon>
+                            <v-icon end> mdi-login </v-icon>
                         </v-btn>
                     </v-btn-toggle>
                 </div>
@@ -441,7 +446,6 @@ defineExpose({
         </v-dialog>
         <!-- FIM DIALOG REGISTRO - LOGIN -->
 
-
         <v-snackbar
             v-model="snackbar.show"
             color="error"
@@ -467,17 +471,22 @@ defineExpose({
         max-width: 100%;
     }
 }
+
 .dialog-auth-responsive {
     width: 500px;
+
     @media (max-width: 532px) {
         width: 450px;
     }
+
     @media (max-width: 476px) {
         width: 380px;
     }
+
     @media (max-width: 406px) {
         width: 320px;
     }
+
     @media (max-width: 344px) {
         width: 290px;
     }

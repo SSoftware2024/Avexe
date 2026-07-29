@@ -53,6 +53,10 @@ return new class extends Migration
             $table->decimal('score_product', 6,4)->default(0); #quanto cada produto vai dar de ponto, forma global
             $table->decimal('score_service', 6,4)->default(0); #quanto cada serviço vai dar de ponto, forma global
             $table->boolean('score_is_activeted')->default(false); #quanto cada serviço vai dar de ponto, forma global
+            #taxa agendamento
+            $table->boolean('is_have_appointments_fee')->default(false); #tem taxa de agendamento
+            $table->boolean('is_fee_per_service')->default(false); #taxa é igual valor do serviço
+            $table->boolean('is_discount_fee')->default(true); #desconta taxa
             #dados
             $table->timestamps();
             $table->softDeletes();

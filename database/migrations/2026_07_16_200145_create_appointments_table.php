@@ -24,6 +24,7 @@ return new class extends Migration
             $table->boolean('is_discount_percentage')->nullable();
             $table->smallInteger('rate')->nullable();
             $table->enum('status', AppointmentsStatus::toArrayValues())->default(AppointmentsStatus::WAITING->value); #numero do cliente no dia do corte
+            $table->decimal('amount_fee', 6,2)->nullable();
             $table->foreignIdFor(Company::class)->constrained();
             $table->foreignIdFor(Employee::class)->constrained();
             $table->foreignIdFor(User::class)->constrained();
