@@ -22,21 +22,8 @@ const links_customer = [
         to: "/url",
     },
 ];
-const logged_status = computed(() => {
-    //logged - no_logged - partial_registered
-    if (!page.props?.user) {
-        return "no_logged";
-    } else if (!page.props.user.whatsapp) {
-        return "partial_registered";
-    } else if (page.props.user.email) {
-        return "logged";
-    }
-});
-
-const dialog = reactive({
-    register: false,
-    login: false,
-});
+const modal_type = ref("register"); //login
+const dialog_register_login = ref(false);
 
 const form_register = useForm({
     name: "",
@@ -53,7 +40,17 @@ const snackbar = reactive({
     show: false,
     message: "",
 });
-
+//COMPUTEDS
+const logged_status = computed(() => {
+    //logged - no_logged - partial_registered
+    if (!page.props?.user) {
+        return "no_logged";
+    } else if (!page.props.user.whatsapp) {
+        return "partial_registered";
+    } else if (page.props.user.email) {
+        return "logged";
+    }
+});
 //PRIVADOS
 function _register() {
     form_register.whatsapp = mask_phone_br.mask(form_register.whatsapp);
@@ -73,12 +70,11 @@ function google_auth(operation) {
 
 //PÚBLICOS
 const openModalRegister = () => {
-    dialog.register = true;
+    modal_type.value = 'register';
+    dialog_register_login = true;
 };
 
-onMounted(() => {
-   
-});
+onMounted(() => {});
 
 defineExpose({
     openModalRegister,
@@ -115,30 +111,42 @@ defineExpose({
                 <v-btn
                     v-if="!smAndDown"
                     :variant="
-                        route().current('customer.appointmentsView') ? 'flat' : 'text'
+                        route().current('customer.appointmentsView')
+                            ? 'flat'
+                            : 'text'
                     "
                     :color="
-                        route().current('customer.appointmentsView') ? 'orange' : 'black'
+                        route().current('customer.appointmentsView')
+                            ? 'orange'
+                            : 'black'
                     "
                     @click="router.visit(route('customer.appointmentsView'))"
                     :class="[
                         'cursor-pointer',
-                        route().current('customer.appointmentsView') ? 'text-white' : '',
+                        route().current('customer.appointmentsView')
+                            ? 'text-white'
+                            : '',
                     ]"
                     >Meus agendamentos</v-btn
                 >
                 <v-btn
                     v-if="!smAndDown"
                     :variant="
-                        route().current('customer.profileView') ? 'flat' : 'text'
+                        route().current('customer.profileView')
+                            ? 'flat'
+                            : 'text'
                     "
                     :color="
-                        route().current('customer.profileView') ? 'orange' : 'black'
+                        route().current('customer.profileView')
+                            ? 'orange'
+                            : 'black'
                     "
                     @click="router.visit(route('customer.profileView'))"
                     :class="[
                         'cursor-pointer',
-                        route().current('customer.profileView') ? 'text-white' : '',
+                        route().current('customer.profileView')
+                            ? 'text-white'
+                            : '',
                     ]"
                     >Perfil</v-btn
                 >
@@ -157,19 +165,10 @@ defineExpose({
                         v-if="!smAndDown"
                         variant="flat"
                         color="primary"
-                        class="cursor-pointer mr-1"
-                        @click="dialog.login = true"
-                    >
-                        <span class="font-weight-bold">Entrar</span></v-btn
-                    >
-                    <v-btn
-                        v-if="!smAndDown"
-                        variant="flat"
-                        color="primary"
                         class="cursor-pointer"
-                        @click="dialog.register = true"
+                        @click="dialog_register_login = true"
                     >
-                        <span class="font-weight-bold">Cadastrar</span></v-btn
+                        <span class="font-weight-bold">Cadastro / Login</span></v-btn
                     >
                 </div>
                 <div
@@ -237,7 +236,8 @@ defineExpose({
                         closable
                     >
                         <template #title> Cadastro incompleto </template>
-                        Complete seu cadastro com whatsapp afim de receber mensagens para melhor atendimento.
+                        Complete seu cadastro com whatsapp afim de receber
+                        mensagens para melhor atendimento.
                         <v-btn
                             variant="flat"
                             color="warning"
@@ -252,11 +252,11 @@ defineExpose({
                 </v-container>
             </v-main>
         </v-layout>
-        <!-- DIALOG REGISTRO -->
+        <!-- DIALOG REGISTRO - LOGIN -->
 
-        <v-dialog v-model="dialog.register" width="auto" location="top center">
+        <v-dialog v-model="dialog_register_login" width="auto" location="top center">
             <v-card
-                title="Registrar-se"
+                :title="modal_type == 'login' ? 'Login' : 'Cadastro cliente'"
                 class="pa-3 position-relative dialog-auth-responsive"
             >
                 <v-btn
@@ -265,9 +265,29 @@ defineExpose({
                     variant="text"
                     class="position-absolute"
                     style="top: 8px; right: 8px"
-                    @click="dialog.register = false"
+                    @click="dialog_register_login = false"
                 ></v-btn>
-                <div>
+                <div class="mb-2">
+                    <v-btn-toggle
+                        v-model="modal_type"
+                        divided
+                        variant="outlined"
+                        color="primary"
+                    >
+                        <v-btn value="register">
+                            <span>Cadastrar</span>
+
+                            <v-icon end> mdi-account-plus  </v-icon>
+                        </v-btn>
+
+                        <v-btn value="login">
+                            <span>Entrar</span>
+
+                            <v-icon end> mdi-login  </v-icon>
+                        </v-btn>
+                    </v-btn-toggle>
+                </div>
+                <div v-if="modal_type == 'register'">
                     <v-form
                         class="d-flex flex-column ga-2"
                         @submit.prevent="_register"
@@ -359,25 +379,7 @@ defineExpose({
                         </v-btn>
                     </v-form>
                 </div>
-            </v-card>
-        </v-dialog>
-        <!-- FIM DIALOG REGISTRO -->
-
-        <!-- DIALOG LOGIN -->
-        <v-dialog v-model="dialog.login" width="auto" location="top center">
-            <v-card
-                title="Login Cliente"
-                class="pa-3 position-relative dialog-auth-responsive"
-            >
-                <v-btn
-                    icon="mdi-close"
-                    color="red"
-                    variant="text"
-                    class="position-absolute"
-                    style="top: 8px; right: 8px"
-                    @click="dialog.login = false"
-                ></v-btn>
-                <div>
+                <div v-else>
                     <v-form class="d-flex flex-column ga-2">
                         <v-text-field
                             label="E-mail *"
@@ -437,7 +439,8 @@ defineExpose({
                 </div>
             </v-card>
         </v-dialog>
-        <!-- FIM DIALOG LOGIN -->
+        <!-- FIM DIALOG REGISTRO - LOGIN -->
+
 
         <v-snackbar
             v-model="snackbar.show"
