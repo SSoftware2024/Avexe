@@ -42,11 +42,13 @@ class CreateNewUser implements CreatesNewUsers
             'terms_of_use' => 'termos de uso'
         ])->validate();
 
-        return User::create([
+        $user = User::create([
             'name' => $input['name'],
             'whatsapp' => $input['whatsapp'],
             'email' => $input['email'],
             'password' => Hash::make($input['password']),
         ]);
+        // $user->sendEmailVerificationNotification();
+        return $user;
     }
 }

@@ -1,0 +1,3 @@
+<template>
+    Validar email
+</template>

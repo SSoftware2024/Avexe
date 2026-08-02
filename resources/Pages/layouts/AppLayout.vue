@@ -29,6 +29,7 @@ const links_customer = [
         action: openModalRegister
     },
 ];
+const modal_type = ref('register'); //login
 const dialog_register_login = ref(false);
 
 const form_register = useForm({
@@ -91,6 +92,7 @@ function _sideLinkOrAction(link){
 
 //PÚBLICOS
 function openModalRegister() {
+    modal_type.value = 'register';
     dialog_register_login.value = true;
 }
 
