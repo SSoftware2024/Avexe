@@ -33,17 +33,9 @@ const appLayout = ref(null);
                                 variant="flat"
                                 color="primary"
                                 size="large"
-                                @click="router.visit(route('login'))"
-                            >
-                                Entrar
-                            </v-btn>
-                            <v-btn
-                                variant="outlined"
-                                color="primary"
-                                size="large"
                                 @click="appLayout.openModalRegister()"
                             >
-                                Cadastrar
+                                Cadastrar / Entrar
                             </v-btn>
                         </v-row>
                     </v-card>

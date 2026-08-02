@@ -21,7 +21,7 @@ class DatabaseSeeder extends Seeder
 
         User::create([
             'name' => 'Tiago Alves',
-            'whatsapp' => '88 994135616',
+            'whatsapp' => '88994135616',
             'email' => 'test@example.com',
             'email_verified_at' => now(),
             'user_type' => TypeUser::DEVELOPER->value,

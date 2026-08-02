@@ -4,25 +4,31 @@ import { useDisplay } from "vuetify";
 import { images } from "../../js/utils/files.js";
 import { router, useForm, usePage } from "@inertiajs/vue3";
 import { route } from "ziggy-js"; //route ziggy
-import { useMask } from "vuetify";
 const page = usePage();
 const drawer = ref(false);
 const { smAndDown } = useDisplay(); //responsividade -> small ou menor (xs, sm)
 const links_customer = [
     {
         text: "Início",
-        to: "/url",
+        to: route('index'),
+        action: '', //callback
     },
     {
         text: "Meus agendamentos",
-        to: "/url",
+        to: route('customer.appointmentsView'),
+        action: '',
     },
     {
         text: "Sou empresário",
         to: "/url",
+        action: '',
+    },
+    {
+        text: "Cadastrar / Entrar",
+        to: "#",
+        action: openModalRegister
     },
 ];
-const modal_type = ref("register"); //login
 const dialog_register_login = ref(false);
 
 const form_register = useForm({
@@ -33,8 +39,12 @@ const form_register = useForm({
     password: "",
     password_confirmation: "",
 });
-
-const mask_phone_br = useMask({ mask: "(##) # ####-####" });
+const form_login = useForm({
+    username: null,
+    password: null,
+    remember: false,
+    toggle_visible_password: false,
+});
 
 const snackbar = reactive({
     show: false,
@@ -53,11 +63,14 @@ const logged_status = computed(() => {
 });
 //PRIVADOS
 function _register() {
-    form_register.whatsapp = mask_phone_br.mask(form_register.whatsapp);
     form_register.post(route("register.store"));
 }
 
-function google_auth(operation) {
+function _login() {
+    form_login.post(route("login.store"));
+}
+
+function _google_auth(operation) {
     if (operation == "register" && !form_register.terms_of_use) {
         snackbar.message =
             "É necessário aceitar os termos de uso para continuar com Google.";
@@ -68,11 +81,18 @@ function google_auth(operation) {
     }
 }
 
+function _sideLinkOrAction(link){
+    if(link.to == '#'){
+        link.action();
+    }else{
+        router.visit(link.to);
+    }
+}
+
 //PÚBLICOS
-const openModalRegister = () => {
-    modal_type.value = "register";
-    dialog_register_login = true;
-};
+function openModalRegister() {
+    dialog_register_login.value = true;
+}
 
 onMounted(() => {});
 
@@ -132,27 +152,6 @@ defineExpose({
                 </v-btn>
                 <v-btn
                     v-if="!smAndDown"
-                    :variant="
-                        route().current('customer.profileView')
-                            ? 'flat'
-                            : 'text'
-                    "
-                    :color="
-                        route().current('customer.profileView')
-                            ? 'orange'
-                            : 'black'
-                    "
-                    @click="router.visit(route('customer.profileView'))"
-                    :class="[
-                        'cursor-pointer',
-                        route().current('customer.profileView')
-                            ? 'text-white'
-                            : '',
-                    ]"
-                    >Perfil
-                </v-btn>
-                <v-btn
-                    v-if="!smAndDown"
                     @click="router.visit('/')"
                     variant="outlined"
                     color="primary"
@@ -198,14 +197,9 @@ defineExpose({
                         </template>
 
                         <v-list>
-                            <v-list-item
-                                v-for="(i, index) in 2"
-                                :key="index"
-                                :value="index"
-                            >
-                                <v-list-item-title>
-                                    teste opções
-                                </v-list-item-title>
+
+                            <v-list-item @click="router.visit(route('customer.profileView'))">
+                                <v-list-item-title>PERFIL</v-list-item-title>
                             </v-list-item>
                             <v-list-item @click="router.post(route('logout'))">
                                 <v-list-item-title>SAIR</v-list-item-title>
@@ -221,7 +215,7 @@ defineExpose({
                         v-for="link in links_customer"
                         :key="link.text"
                         :title="link.text"
-                        @click="router.visit(link.to)"
+                        @click="_sideLinkOrAction(link)"
                     ></v-list-item>
                 </v-list>
             </v-navigation-drawer>
@@ -370,6 +364,8 @@ defineExpose({
                             class="align-self-end"
                             append-icon="mdi-content-save "
                             type="submit"
+                            :loading="form_register.processing"
+                            :disabled="form_register.processing"
                         ></v-btn>
                         <v-divider class="my-2"></v-divider>
                         <v-btn
@@ -378,25 +374,35 @@ defineExpose({
                             class="align-self-center text-white"
                             block
                             prepend-icon="mdi-google"
-                            @click="google_auth('register')"
+                            @click="_google_auth('register')"
                         >
                             Continuar com Google
                         </v-btn>
                     </v-form>
                 </div>
                 <div v-else>
-                    <v-form class="d-flex flex-column ga-2">
+                    <v-form
+                        class="d-flex flex-column ga-2"
+                        @submit.prevent="_login"
+                    >
                         <v-text-field
-                            label="E-mail *"
+                            label="E-mail / Whatsapp *"
                             variant="outlined"
-                            type="email"
-                            hide-details
+                            type="text"
+                            v-model="form_login.username"
+                            :error-messages="form_login.errors.username"
+                            persistent-hint
+                            hint="Exemplo caso whatsapp: 86994567898"
                         ></v-text-field>
                         <v-text-field
                             label="Senha *"
                             variant="outlined"
-                            type="password"
-                            hide-details
+                            v-model="form_login.password"
+                            :type="form_login.toggle_visible_password ? 'text' : 'password'"
+                            :append-inner-icon="form_login.toggle_visible_password ? 'mdi-eye-off' : 'mdi-eye'"
+                            @click:append-inner="form_login.toggle_visible_password = !form_login.toggle_visible_password"
+                            :error-messages="form_login.errors.password"
+                            :hide-details="!form_login.errors.password"
                         ></v-text-field>
                         <div
                             class="w-full d-flex flex-row align-content-center"
@@ -405,6 +411,7 @@ defineExpose({
                                 <v-checkbox
                                     label="Lembrar de mim"
                                     color="primary"
+                                    v-model="form_login.remember"
                                 ></v-checkbox>
                             </div>
                             <div
@@ -420,14 +427,9 @@ defineExpose({
                             class="align-self-end"
                             append-icon="mdi-content-save"
                             type="submit"
-                            :loading="form_register.processing"
-                            :disabled="form_register.processing"
-                        >
-                            {{
-                                form_register.processing
-                                    ? "Salvando..."
-                                    : "Salvar"
-                            }}
+                            :loading="form_login.processing"
+                            :disabled="form_login.processing"
+                            >Salvar
                         </v-btn>
                         <v-divider class="my-2"></v-divider>
                         <v-btn
@@ -436,7 +438,7 @@ defineExpose({
                             class="text-white"
                             block
                             prepend-icon="mdi-google"
-                            @click="google_auth('login')"
+                            @click="_google_auth('login')"
                         >
                             Continuar com Google
                         </v-btn>

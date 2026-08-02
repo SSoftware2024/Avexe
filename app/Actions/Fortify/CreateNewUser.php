@@ -34,7 +34,7 @@ class CreateNewUser implements CreatesNewUsers
             'password' => $this->passwordBasicRules(),
             'whatsapp' => [
                 'required',
-                'regex:/^\([1-9]{2}\)\s[2-9]\s\d{4}-\d{4}$/', // (00) 0 0000-0000
+                'digits:11',
                 Rule::unique(User::class)
             ],
             'terms_of_use' => ['accepted']

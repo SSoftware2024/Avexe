@@ -6,12 +6,13 @@ use App\Actions\Fortify\CreateNewUser;
 use App\Actions\Fortify\ResetUserPassword;
 use App\Actions\Fortify\UpdateUserPassword;
 use App\Actions\Fortify\UpdateUserProfileInformation;
+use App\Models\User;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Str;
-use Inertia\Inertia;
 use Laravel\Fortify\Actions\RedirectIfTwoFactorAuthenticatable;
 use Laravel\Fortify\Fortify;
 
@@ -54,8 +55,30 @@ class FortifyServiceProvider extends ServiceProvider
             );
         });
 
-        // Fortify::loginView(function () {
-        //     return Inertia::render();
-        // });
+        Fortify::authenticateUsing(function (Request $request) {
+            $username = $request->username;
+
+            $rule_email_whatsapp = [];
+            $column_name = 'email';
+
+            if (!Str::contains($username, '@') && preg_match('/\d/', $username)) {
+                $rule_email_whatsapp = ['string', 'digits:11', 'exists:users,whatsapp'];
+                $column_name = 'whatsapp';
+            } else {
+                $rule_email_whatsapp = ['email', 'exists:users,email'];
+            }
+
+            $request->validate([
+                'username' => ['required', ...$rule_email_whatsapp],
+                'password' => ['required'],
+            ], [], [
+                'username' => 'email|whatsapp',
+            ]);
+
+            $user = User::where($column_name, $username)->first();
+            if ($user && Hash::check($request->password, $user->password)) {
+                return $user;
+            }
+        });
     }
 }
