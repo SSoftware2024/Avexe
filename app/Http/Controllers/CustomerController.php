@@ -16,13 +16,13 @@ class CustomerController extends Controller
     }
     public function appointmentsView()
     {
-        return Inertia::render('user/AppointmentsCustomer', [
+        return Inertia::render('User/AppointmentsCustomer', [
             'user' => Auth::user()
         ]);
     }
     public function profileView()
     {
-        return Inertia::render('user/Profile', [
+        return Inertia::render('User/Profile', [
             'user' => Auth::user(),
         ]);
     }

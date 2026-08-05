@@ -56,7 +56,7 @@ class FortifyServiceProvider extends ServiceProvider
             );
         });
         Fortify::verifyEmailView(function () {
-            return Inertia::render('auth/VerifyEmail');
+            return Inertia::render('Auth/VerifyEmail');
         });
         Fortify::authenticateUsing(function (Request $request) {
             $username = $request->username;
