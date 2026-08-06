@@ -1,5 +1,6 @@
 <script setup>
 import { reactive, ref, watch } from "vue";
+import { getCurrentLocation } from "@js/utils/functions.js";
 
 const props = defineProps({
     user: {
@@ -13,10 +14,13 @@ const form = reactive({
     email: props.user?.email || "",
     whatsapp: props.user?.whatsapp || "",
     photo: null,
-    new_password: "",
-    confirm_password: "",
     latitude: props.user?.latitude || null,
     longitude: props.user?.longitude || null,
+});
+
+const password_form = reactive({
+    new_password: "",
+    confirm_password: "",
 });
 
 const photo_preview = ref(props.user?.profile || null);
@@ -27,6 +31,8 @@ const recovery_codes = ref([]);
 const show_recovery_codes = ref(false);
 const test_code = ref("");
 const test_processing = ref(false);
+
+//localização
 const loading_location = ref(false);
 const location_error = ref("");
 
@@ -117,42 +123,28 @@ function _onPhotoChange(event) {
     photo_preview.value = URL.createObjectURL(file);
 }
 
+
 function _getCurrentLocation() {
-    if (!navigator.geolocation) {
-        location_error.value = "Geolocalização não suportada no seu navegador.";
-        return;
-    }
     loading_location.value = true;
     location_error.value = "";
-    navigator.geolocation.getCurrentPosition(
-        (position) => {
-            form.latitude = Number(position.coords.latitude.toFixed(8));
-            form.longitude = Number(position.coords.longitude.toFixed(8));
-            loading_location.value = false;
-        },
-        (error) => {
-            loading_location.value = false;
-            switch (error.code) {
-                case error.PERMISSION_DENIED:
-                    location_error.value =
-                        "Permissão de localização negada. Habilite para usar esse recurso.";
-                    break;
-                case error.POSITION_UNAVAILABLE:
-                    location_error.value = "Localização indisponível no momento.";
-                    break;
-                case error.TIMEOUT:
-                    location_error.value = "Tempo esgotado ao buscar localização.";
-                    break;
-                default:
-                    location_error.value = "Erro ao obter localização.";
-            }
-        },
-        { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
-    );
+    getCurrentLocation().then((location) => {
+        loading_location.value = false;
+        if (location.error_message) {
+            location_error.value = location.error_message;
+        } else {
+            form.latitude = location.latitude;
+            form.longitude = location.longitude;
+        }
+    });
 }
 
 function _save() {
     snackbar.message = "Dados salvos (front-end).";
+    snackbar.show = true;
+}
+
+function _savePassword() {
+    snackbar.message = "Senha atualizada (front-end).";
     snackbar.show = true;
 }
 </script>
@@ -225,22 +217,6 @@ function _save() {
                                     v-model="form.whatsapp"
                                 ></v-mask-input>
                             </v-col>
-                            <v-col cols="12" md="6">
-                                <v-text-field
-                                    label="Nova senha"
-                                    variant="outlined"
-                                    type="password"
-                                    v-model="form.new_password"
-                                ></v-text-field>
-                            </v-col>
-                            <v-col cols="12" md="6">
-                                <v-text-field
-                                    label="Confirmar nova senha"
-                                    variant="outlined"
-                                    type="password"
-                                    v-model="form.confirm_password"
-                                ></v-text-field>
-                            </v-col>
                         </v-row>
 
                         <v-divider class="my-4"></v-divider>
@@ -300,8 +276,56 @@ function _save() {
                 </v-card>
             </v-col>
 
-            <!-- AUTENTICAÇÃO 2 FATORES -->
+            <!-- SENHA -->
             <v-col cols="12" md="5">
+                <v-card class="pa-6" elevation="2">
+                    <div class="d-flex align-center mb-4">
+                        <v-icon
+                            icon="mdi-lock-reset"
+                            size="28"
+                            color="primary"
+                            class="mr-3"
+                        ></v-icon>
+                        <h2 class="text-h5 font-weight-bold">Alterar senha</h2>
+                    </div>
+                    <v-divider class="mb-4"></v-divider>
+
+                    <v-form @submit.prevent="_savePassword">
+                        <v-row>
+                            <v-col cols="12">
+                                <v-text-field
+                                    label="Nova senha"
+                                    variant="outlined"
+                                    type="password"
+                                    v-model="password_form.new_password"
+                                ></v-text-field>
+                            </v-col>
+                            <v-col cols="12">
+                                <v-text-field
+                                    label="Confirmar nova senha"
+                                    variant="outlined"
+                                    type="password"
+                                    v-model="password_form.confirm_password"
+                                ></v-text-field>
+                            </v-col>
+                        </v-row>
+
+                        <div class="d-flex justify-end mt-4">
+                            <v-btn
+                                variant="flat"
+                                color="primary"
+                                type="submit"
+                                prepend-icon="mdi-content-save"
+                            >
+                                Atualizar senha
+                            </v-btn>
+                        </div>
+                    </v-form>
+                </v-card>
+            </v-col>
+
+            <!-- AUTENTICAÇÃO 2 FATORES -->
+            <v-col cols="12">
                 <v-card class="pa-6" elevation="2">
                     <div class="d-flex align-center mb-4">
                         <v-icon
