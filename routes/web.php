@@ -9,9 +9,12 @@ Route::get('/', [CustomerController::class, 'index'])->name('index');
 
 Route::prefix('customer')->name('customer.')->group(function () {
     //rotas
-    Route::middleware('verified')->group(function () {
+    Route::middleware(['auth','verified'])->group(function () {
         Route::get('/appointmentsView', [CustomerController::class, 'appointmentsView'])->name('appointmentsView');
         Route::get('/profileView', [CustomerController::class, 'profileView'])->name('profileView');
+    });
+    Route::middleware('auth')->group(function () {
+        Route::get('/appointmentsView', [CustomerController::class, 'appointmentsView'])->name('appointmentsView');
     });
 
 

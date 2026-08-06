@@ -12,7 +12,9 @@ class CustomerController extends Controller
 {
     public function index()
     {
-        return Inertia::render('Index');
+        return Inertia::render('Index', [
+            'user' => Auth::user()
+        ]);
     }
     public function appointmentsView()
     {

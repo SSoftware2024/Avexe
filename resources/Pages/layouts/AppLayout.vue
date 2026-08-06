@@ -182,6 +182,7 @@ defineExpose({
                         variant="flat"
                         color="primary"
                         class="cursor-pointer"
+                        @click="router.visit(route('customer.profileView'))"
                     >
                         <span class="font-weight-bold"
                             >Completar cadastro</span
@@ -240,7 +241,7 @@ defineExpose({
                             color="warning"
                             size="small"
                             class="mt-2"
-                            @click="router.visit(route('register'))"
+                            @click="router.visit(route('customer.profileView'))"
                         >
                             Completar cadastro
                         </v-btn>
