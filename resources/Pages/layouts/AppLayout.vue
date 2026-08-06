@@ -169,7 +169,7 @@ defineExpose({
                         <span class="font-weight-bold">Cadastrar</span>
                     </v-btn>
                 </div>
-                <div v-else class="mr-4">
+                <div v-else-if="!smAndDown" class="mr-4">
                     <v-menu offset-y location="bottom end">
                         <template v-slot:activator="{ props }">
                             <v-avatar

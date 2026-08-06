@@ -1,6 +1,7 @@
 <script setup>
 import { reactive, ref, watch } from "vue";
 import { getCurrentLocation } from "@js/utils/functions.js";
+import { useForm } from "@inertiajs/vue3";
 
 const props = defineProps({
     user: {
@@ -18,9 +19,10 @@ const form = reactive({
     longitude: props.user?.longitude || null,
 });
 
-const password_form = reactive({
-    new_password: "",
-    confirm_password: "",
+const form_password = useForm({
+    current_password: "",
+    password: "",
+    password_confirmation: "",
 });
 
 const photo_preview = ref(props.user?.profile || null);
@@ -72,7 +74,7 @@ function _buildQrCodeUrl() {
     const secret = _generateSecret();
     const otpauth = `otpauth://totp/Avexe:${label}?secret=${secret}&issuer=Avexe`;
     return `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(
-        otpauth
+        otpauth,
     )}`;
 }
 
@@ -109,7 +111,8 @@ function _test2fa() {
             snackbar.message = "2FA validado com sucesso!";
             snackbar.color = "success";
         } else {
-            snackbar.message = "Código inválido. Digite o código de 6 dígitos do autenticador.";
+            snackbar.message =
+                "Código inválido. Digite o código de 6 dígitos do autenticador.";
             snackbar.color = "error";
         }
         snackbar.show = true;
@@ -122,7 +125,6 @@ function _onPhotoChange(event) {
     form.photo = file;
     photo_preview.value = URL.createObjectURL(file);
 }
-
 
 function _getCurrentLocation() {
     loading_location.value = true;
@@ -144,8 +146,13 @@ function _save() {
 }
 
 function _savePassword() {
-    snackbar.message = "Senha atualizada (front-end).";
-    snackbar.show = true;
+    form_password.put(route("user-password.update"), {
+        onSuccess: () => {
+            snackbar.message = "Senha atualizada";
+            snackbar.show = true;
+            form_password.reset();
+        },
+    });
 }
 </script>
 <template>
@@ -174,7 +181,11 @@ function _savePassword() {
                                         :src="photo_preview"
                                         cover
                                     ></v-img>
-                                    <v-icon v-else icon="mdi-account" size="40"></v-icon>
+                                    <v-icon
+                                        v-else
+                                        icon="mdi-account"
+                                        size="40"
+                                    ></v-icon>
                                 </v-avatar>
                                 <div>
                                     <v-btn
@@ -294,10 +305,34 @@ function _savePassword() {
                         <v-row>
                             <v-col cols="12">
                                 <v-text-field
+                                    label="Senha atual"
+                                    variant="outlined"
+                                    type="password"
+                                    v-model="form_password.current_password"
+                                    :error-messages="
+                                        form_password.errors?.updatePassword
+                                            ?.current_password
+                                    "
+                                    :hide-details="
+                                        !form_password.errors?.updatePassword
+                                            ?.current_password
+                                    "
+                                ></v-text-field>
+                            </v-col>
+                            <v-col cols="12">
+                                <v-text-field
                                     label="Nova senha"
                                     variant="outlined"
                                     type="password"
-                                    v-model="password_form.new_password"
+                                    v-model="form_password.password"
+                                    :error-messages="
+                                        form_password.errors?.updatePassword
+                                            ?.password
+                                    "
+                                    :hide-details="
+                                        !form_password.errors?.updatePassword
+                                            ?.password
+                                    "
                                 ></v-text-field>
                             </v-col>
                             <v-col cols="12">
@@ -305,7 +340,9 @@ function _savePassword() {
                                     label="Confirmar nova senha"
                                     variant="outlined"
                                     type="password"
-                                    v-model="password_form.confirm_password"
+                                    v-model="
+                                        form_password.password_confirmation
+                                    "
                                 ></v-text-field>
                             </v-col>
                         </v-row>
@@ -316,6 +353,8 @@ function _savePassword() {
                                 color="primary"
                                 type="submit"
                                 prepend-icon="mdi-content-save"
+                                :loading="form_password.processing"
+                                :disabled="form_password.processing"
                             >
                                 Atualizar senha
                             </v-btn>
@@ -363,9 +402,7 @@ function _savePassword() {
                     </p>
                     <v-switch
                         :label="
-                            two_fa_active
-                                ? '2FA ativado'
-                                : '2FA desativado'
+                            two_fa_active ? '2FA ativado' : '2FA desativado'
                         "
                         :color="two_fa_active ? 'success' : 'grey'"
                         v-model="two_fa_active"
@@ -475,7 +512,8 @@ function _savePassword() {
                             class="mt-3"
                             icon="mdi-shield-check"
                         >
-                            2FA confirmado com sucesso! Sua conta está protegida.
+                            2FA confirmado com sucesso! Sua conta está
+                            protegida.
                         </v-alert>
                     </template>
                 </v-card>
