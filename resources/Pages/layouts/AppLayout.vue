@@ -7,29 +7,7 @@ import { route } from "ziggy-js"; //route ziggy
 const page = usePage();
 const drawer = ref(false);
 const { smAndDown } = useDisplay(); //responsividade -> small ou menor (xs, sm)
-const links_customer = [
-    {
-        text: "Início",
-        to: route('index'),
-        action: '', //callback
-    },
-    {
-        text: "Meus agendamentos",
-        to: route('customer.appointmentsView'),
-        action: '',
-    },
-    {
-        text: "Sou empresário",
-        to: "/url",
-        action: '',
-    },
-    {
-        text: "Cadastrar / Entrar",
-        to: "#",
-        action: openModalRegister
-    },
-];
-const modal_type = ref('register'); //login
+const modal_type = ref("register"); //login
 const dialog_register_login = ref(false);
 
 const form_register = useForm({
@@ -56,7 +34,11 @@ const logged_status = computed(() => {
     //logged - no_logged - partial_registered
     if (!page.props?.user) {
         return "no_logged";
-    } else if (!page.props.user.whatsapp) {
+    } else if (
+        !page.props.user.whatsapp ||
+        !page.props.user.latitude ||
+        !page.props.user.longitude
+    ) {
         return "partial_registered";
     } else if (page.props.user.email) {
         return "logged";
@@ -82,17 +64,22 @@ function _google_auth(operation) {
     }
 }
 
-function _sideLinkOrAction(link){
-    if(link.to == '#'){
+function _sideLinkOrAction(link) {
+    if (link.to == "#") {
         link.action();
-    }else{
+    } else {
         router.visit(link.to);
     }
 }
 
 //PÚBLICOS
 function openModalRegister() {
-    modal_type.value = 'register';
+    modal_type.value = "register";
+    dialog_register_login.value = true;
+}
+
+function openModalLogin() {
+    modal_type.value = "login";
     dialog_register_login.value = true;
 }
 
@@ -162,50 +149,90 @@ defineExpose({
                     <span class="font-weight-bold">Sou empresário</span>
                 </v-btn>
                 <v-spacer />
-                <div v-if="logged_status == 'no_logged'" class="mr-2">
+                <div v-if="logged_status == 'no_logged'" class="mr-4 d-flex ga-2">
+                    <v-btn
+                        v-if="!smAndDown"
+                        variant="text"
+                        color="primary"
+                        class="cursor-pointer"
+                        @click="openModalLogin"
+                    >
+                        Entrar
+                    </v-btn>
                     <v-btn
                         v-if="!smAndDown"
                         variant="flat"
                         color="primary"
                         class="cursor-pointer"
-                        @click="dialog_register_login = true"
+                        @click="openModalRegister"
                     >
-                        <span class="font-weight-bold">Cadastro / Login</span>
+                        <span class="font-weight-bold">Cadastrar</span>
                     </v-btn>
                 </div>
-                <div
-                    v-else-if="logged_status == 'partial_registered'"
-                    class="mr-2"
-                >
-                    <v-btn
-                        v-if="!smAndDown"
-                        variant="flat"
-                        color="primary"
-                        class="cursor-pointer"
-                        @click="router.visit(route('customer.profileView'))"
-                    >
-                        <span class="font-weight-bold"
-                            >Completar cadastro</span
-                        ></v-btn
-                    >
-                </div>
-                <div v-else class="mr-2">
-                    <v-menu offset-y>
+                <div v-else class="mr-4">
+                    <v-menu offset-y location="bottom end">
                         <template v-slot:activator="{ props }">
-                            <v-icon-btn
-                                icon="mdi-account-badge "
+                            <v-avatar
+                                size="40"
                                 color="primary"
+                                class="cursor-pointer"
                                 v-bind="props"
-                            ></v-icon-btn>
+                            >
+                                <v-img
+                                    v-if="page.props.user?.profile"
+                                    :src="page.props.user.profile"
+                                    cover
+                                ></v-img>
+                                <v-icon
+                                    v-else
+                                    icon="mdi-account"
+                                    color="white"
+                                ></v-icon>
+                            </v-avatar>
                         </template>
 
-                        <v-list>
-
-                            <v-list-item @click="router.visit(route('customer.profileView'))">
-                                <v-list-item-title>PERFIL</v-list-item-title>
+                        <v-list min-width="220">
+                            <v-list-item class="py-2">
+                                <v-list-item-title class="font-weight-bold">
+                                    {{ page.props.user?.name }}
+                                </v-list-item-title>
+                                <v-list-item-subtitle>
+                                    {{ page.props.user?.email }}
+                                </v-list-item-subtitle>
                             </v-list-item>
+                            <v-divider></v-divider>
+                            <v-list-item
+                                @click="
+                                    router.visit(route('customer.profileView'))
+                                "
+                            >
+                                <template v-slot:prepend>
+                                    <v-icon icon="mdi-account-circle"></v-icon>
+                                </template>
+                                <v-list-item-title>Perfil</v-list-item-title>
+                            </v-list-item>
+                            <v-list-item
+                                @click="
+                                    router.visit(
+                                        route('customer.appointmentsView'),
+                                    )
+                                "
+                            >
+                                <template v-slot:prepend>
+                                    <v-icon icon="mdi-calendar-text"></v-icon>
+                                </template>
+                                <v-list-item-title>
+                                    Meus agendamentos
+                                </v-list-item-title>
+                            </v-list-item>
+                            <v-divider></v-divider>
                             <v-list-item @click="router.post(route('logout'))">
-                                <v-list-item-title>SAIR</v-list-item-title>
+                                <template v-slot:prepend>
+                                    <v-icon icon="mdi-logout"></v-icon>
+                                </template>
+                                <v-list-item-title class="text-error">
+                                    Sair
+                                </v-list-item-title>
                             </v-list-item>
                         </v-list>
                     </v-menu>
@@ -213,13 +240,114 @@ defineExpose({
             </v-app-bar>
 
             <v-navigation-drawer v-model="drawer" temporary>
+                <template v-if="logged_status != 'no_logged'">
+                    <v-list-item class="py-3">
+                        <template v-slot:prepend>
+                            <v-avatar size="40" color="primary" class="mr-2">
+                                <v-img
+                                    v-if="page.props.user?.profile"
+                                    :src="page.props.user.profile"
+                                    cover
+                                ></v-img>
+                                <v-icon
+                                    v-else
+                                    icon="mdi-account"
+                                    color="white"
+                                ></v-icon>
+                            </v-avatar>
+                        </template>
+                        <v-list-item-title class="font-weight-bold">
+                            {{ page.props.user?.name }}
+                        </v-list-item-title>
+                        <v-list-item-subtitle>
+                            {{ page.props.user?.email }}
+                        </v-list-item-subtitle>
+                    </v-list-item>
+                    <v-divider></v-divider>
+                </template>
                 <v-list>
-                    <v-list-item
-                        v-for="link in links_customer"
-                        :key="link.text"
-                        :title="link.text"
-                        @click="_sideLinkOrAction(link)"
-                    ></v-list-item>
+                    <template v-if="logged_status == 'no_logged'">
+                        <v-list-item
+                            @click="router.visit(route('index'))"
+                        >
+                            <template v-slot:prepend>
+                                <v-icon icon="mdi-home"></v-icon>
+                            </template>
+                            <v-list-item-title>Início</v-list-item-title>
+                        </v-list-item>
+                        <v-list-item
+                            @click="router.visit(route('customer.appointmentsView'))"
+                        >
+                            <template v-slot:prepend>
+                                <v-icon icon="mdi-calendar-text"></v-icon>
+                            </template>
+                            <v-list-item-title>
+                                Meus agendamentos
+                            </v-list-item-title>
+                        </v-list-item>
+                        <v-list-item @click="router.visit('/')">
+                            <template v-slot:prepend>
+                                <v-icon icon="mdi-domain"></v-icon>
+                            </template>
+                            <v-list-item-title>
+                                Sou empresário
+                            </v-list-item-title>
+                        </v-list-item>
+                        <v-divider class="my-2"></v-divider>
+                        <v-list-item @click="openModalLogin">
+                            <template v-slot:prepend>
+                                <v-icon icon="mdi-login"></v-icon>
+                            </template>
+                            <v-list-item-title>Entrar</v-list-item-title>
+                        </v-list-item>
+                        <v-list-item @click="openModalRegister">
+                            <template v-slot:prepend>
+                                <v-icon icon="mdi-account-plus"></v-icon>
+                            </template>
+                            <v-list-item-title class="text-primary font-weight-bold">
+                                Cadastrar
+                            </v-list-item-title>
+                        </v-list-item>
+                    </template>
+                    <template v-else>
+                        <v-list-item
+                            @click="router.visit(route('customer.profileView'))"
+                        >
+                            <template v-slot:prepend>
+                                <v-icon icon="mdi-account-circle"></v-icon>
+                            </template>
+                            <v-list-item-title>Perfil</v-list-item-title>
+                        </v-list-item>
+                        <v-list-item
+                            @click="
+                                router.visit(route('customer.appointmentsView'))
+                            "
+                        >
+                            <template v-slot:prepend>
+                                <v-icon icon="mdi-calendar-text"></v-icon>
+                            </template>
+                            <v-list-item-title>
+                                Meus agendamentos
+                            </v-list-item-title>
+                        </v-list-item>
+                        <v-list-item @click="router.visit('/')">
+                            <template v-slot:prepend>
+                                <v-icon icon="mdi-domain"></v-icon>
+                            </template>
+                            <v-list-item-title>
+                                Sou empresário
+                            </v-list-item-title>
+                        </v-list-item>
+                        <v-divider class="my-2"></v-divider>
+                        <v-list-item @click="router.post(route('logout'))">
+                            <template v-slot:prepend>
+                                <v-icon icon="mdi-logout"></v-icon>
+                            </template>
+                            <v-list-item-title class="text-error">
+                                Sair
+                            </v-list-item-title>
+                        </v-list-item>
+                    </template>
                 </v-list>
             </v-navigation-drawer>
 
@@ -234,8 +362,9 @@ defineExpose({
                         closable
                     >
                         <template #title> Cadastro incompleto </template>
-                        Complete seu cadastro com whatsapp afim de receber
-                        mensagens para melhor atendimento.
+                        Complete seu cadastro com whatsapp e localização afim de
+                        receber mensagens para melhor atendimento e
+                        estabelcimentos pro proximidade.
                         <v-btn
                             variant="flat"
                             color="warning"
@@ -401,9 +530,20 @@ defineExpose({
                             label="Senha *"
                             variant="outlined"
                             v-model="form_login.password"
-                            :type="form_login.toggle_visible_password ? 'text' : 'password'"
-                            :append-inner-icon="form_login.toggle_visible_password ? 'mdi-eye-off' : 'mdi-eye'"
-                            @click:append-inner="form_login.toggle_visible_password = !form_login.toggle_visible_password"
+                            :type="
+                                form_login.toggle_visible_password
+                                    ? 'text'
+                                    : 'password'
+                            "
+                            :append-inner-icon="
+                                form_login.toggle_visible_password
+                                    ? 'mdi-eye-off'
+                                    : 'mdi-eye'
+                            "
+                            @click:append-inner="
+                                form_login.toggle_visible_password =
+                                    !form_login.toggle_visible_password
+                            "
                             :error-messages="form_login.errors.password"
                             :hide-details="!form_login.errors.password"
                         ></v-text-field>

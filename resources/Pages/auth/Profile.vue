@@ -157,7 +157,7 @@ function _save() {
 }
 </script>
 <template>
-    <v-container class="mt-4">
+    <v-container>
         <v-row>
             <!-- DADOS PESSOAIS -->
             <v-col cols="12" md="7">
