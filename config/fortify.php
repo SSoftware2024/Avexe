@@ -77,6 +77,21 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Fortify Redirects
+    |--------------------------------------------------------------------------
+    |
+    | Here you may specify custom redirect URIs for the various Fortify
+    | actions. If a redirect is not defined, Fortify will fall back to the
+    | "home" path configured above.
+    |
+    */
+
+    'redirects' => [
+        'password-reset' => '/?action_js=open_modal_login',
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
     | Fortify Routes Prefix / Subdomain
     |--------------------------------------------------------------------------
     |

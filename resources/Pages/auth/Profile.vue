@@ -1,3 +1,4 @@
+<!-- PARTIAL PAGE -->
 <script setup>
 import { reactive, ref, watch } from "vue";
 import { getCurrentLocation } from "@js/utils/functions.js";

@@ -24,6 +24,9 @@ const form_login = useForm({
     remember: false,
     toggle_visible_password: false,
 });
+const form_forgot_password = useForm({
+    email: null,
+});
 
 const snackbar = reactive({
     show: false,
@@ -53,7 +56,18 @@ function _login() {
     form_login.post(route("login.store"));
 }
 
-function _google_auth(operation) {
+function _forgotPassword() {
+    form_forgot_password.post(route("password.email"), {
+        onSuccess: () => {
+            form_forgot_password.reset();
+            openModalLogin();
+            snackbar.message = "E-mail de recuperação enviado com sucesso.";
+            snackbar.show = true;
+        },
+    });
+}
+
+function _googleAuth(operation) {
     if (operation == "register" && !form_register.terms_of_use) {
         snackbar.message =
             "É necessário aceitar os termos de uso para continuar com Google.";
@@ -72,6 +86,19 @@ function _sideLinkOrAction(link) {
     }
 }
 
+function _checkActionJs(){
+    const url = new URL(window.location.href);
+    const action_js = url.searchParams.get("action_js");
+    switch (action_js) {
+        case 'open_modal_login':
+            openModalLogin();
+            break;
+    
+        default:
+            break;
+    }
+}
+
 //PÚBLICOS
 function openModalRegister() {
     modal_type.value = "register";
@@ -83,7 +110,15 @@ function openModalLogin() {
     dialog_register_login.value = true;
 }
 
-onMounted(() => {});
+function openModalForgotPassword() {
+    modal_type.value = "forgot-password";
+    form_forgot_password.reset();
+    dialog_register_login.value = true;
+}
+
+onMounted(() => {
+    _checkActionJs();
+});
 
 defineExpose({
     openModalRegister,
@@ -149,7 +184,10 @@ defineExpose({
                     <span class="font-weight-bold">Sou empresário</span>
                 </v-btn>
                 <v-spacer />
-                <div v-if="logged_status == 'no_logged'" class="mr-4 d-flex ga-2">
+                <div
+                    v-if="logged_status == 'no_logged'"
+                    class="mr-4 d-flex ga-2"
+                >
                     <v-btn
                         v-if="!smAndDown"
                         variant="text"
@@ -267,16 +305,16 @@ defineExpose({
                 </template>
                 <v-list>
                     <template v-if="logged_status == 'no_logged'">
-                        <v-list-item
-                            @click="router.visit(route('index'))"
-                        >
+                        <v-list-item @click="router.visit(route('index'))">
                             <template v-slot:prepend>
                                 <v-icon icon="mdi-home"></v-icon>
                             </template>
                             <v-list-item-title>Início</v-list-item-title>
                         </v-list-item>
                         <v-list-item
-                            @click="router.visit(route('customer.appointmentsView'))"
+                            @click="
+                                router.visit(route('customer.appointmentsView'))
+                            "
                         >
                             <template v-slot:prepend>
                                 <v-icon icon="mdi-calendar-text"></v-icon>
@@ -304,7 +342,9 @@ defineExpose({
                             <template v-slot:prepend>
                                 <v-icon icon="mdi-account-plus"></v-icon>
                             </template>
-                            <v-list-item-title class="text-primary font-weight-bold">
+                            <v-list-item-title
+                                class="text-primary font-weight-bold"
+                            >
                                 Cadastrar
                             </v-list-item-title>
                         </v-list-item>
@@ -379,7 +419,7 @@ defineExpose({
                 </v-container>
             </v-main>
         </v-layout>
-        <!-- DIALOG REGISTRO - LOGIN -->
+        <!-- DIALOG REGISTRO - LOGIN - RECUPERAR SENHA -->
 
         <v-dialog
             v-model="dialog_register_login"
@@ -387,7 +427,13 @@ defineExpose({
             location="top center"
         >
             <v-card
-                :title="modal_type == 'login' ? 'Login' : 'Cadastro cliente'"
+                :title="
+                    modal_type == 'login'
+                        ? 'Login'
+                        : modal_type == 'forgot-password'
+                          ? 'Recuperar senha'
+                          : 'Cadastro cliente'
+                "
                 class="pa-3 position-relative dialog-auth-responsive"
             >
                 <v-btn
@@ -398,7 +444,7 @@ defineExpose({
                     style="top: 8px; right: 8px"
                     @click="dialog_register_login = false"
                 ></v-btn>
-                <div class="mb-2">
+                <div class="mb-2" v-if="modal_type != 'forgot-password'">
                     <v-btn-toggle
                         v-model="modal_type"
                         divided
@@ -418,6 +464,7 @@ defineExpose({
                         </v-btn>
                     </v-btn-toggle>
                 </div>
+                <!-- FORM REGISTRO  -->
                 <div v-if="modal_type == 'register'">
                     <v-form
                         class="d-flex flex-column ga-2"
@@ -506,13 +553,15 @@ defineExpose({
                             class="align-self-center text-white"
                             block
                             prepend-icon="mdi-google"
-                            @click="_google_auth('register')"
+                            @click="_googleAuth('register')"
                         >
                             Continuar com Google
                         </v-btn>
                     </v-form>
                 </div>
-                <div v-else>
+                <!-- FIM FORM REGISTRO  -->
+                <!-- FORM LOGIN  -->
+                <div v-else-if="modal_type == 'login'">
                     <v-form
                         class="d-flex flex-column ga-2"
                         @submit.prevent="_login"
@@ -561,7 +610,11 @@ defineExpose({
                                 class="align-self-center position-relative"
                                 style="flex-grow: 0; top: -10px"
                             >
-                                <a href="#">Esqueceu sua senha!?</a>
+                                <a
+                                    href="#"
+                                    @click.prevent="openModalForgotPassword"
+                                    >Esqueceu sua senha!?</a
+                                >
                             </div>
                         </div>
                         <v-btn
@@ -581,15 +634,58 @@ defineExpose({
                             class="text-white"
                             block
                             prepend-icon="mdi-google"
-                            @click="_google_auth('login')"
+                            @click="_googleAuth('login')"
                         >
                             Continuar com Google
                         </v-btn>
                     </v-form>
                 </div>
+                <!-- FIM FORM LOGIN  -->
+                <!-- FORM ESQUECEU A SENHA  -->
+                <div v-else-if="modal_type == 'forgot-password'">
+                    <v-form
+                        class="d-flex flex-column ga-2"
+                        @submit.prevent="_forgotPassword"
+                    >
+                        <p class="text-body-2">
+                            Informe seu e-mail cadastrado e enviaremos um link
+                            para redefinição da senha.
+                        </p>
+                        <v-text-field
+                            label="E-mail *"
+                            variant="outlined"
+                            type="email"
+                            name="email"
+                            v-model="form_forgot_password.email"
+                            :error-messages="form_forgot_password.errors.email"
+                            :hide-details="!form_forgot_password.errors.email"
+                        ></v-text-field>
+                        <v-btn
+                            variant="flat"
+                            color="primary"
+                            class="align-self-end"
+                            append-icon="mdi-send"
+                            type="submit"
+                            :loading="form_forgot_password.processing"
+                            :disabled="form_forgot_password.processing"
+                            >Enviar link
+                        </v-btn>
+                        <v-divider class="my-2"></v-divider>
+                        <div class="d-flex align-center justify-center">
+                            <span class="text-body-2">Lembrou sua senha?</span>
+                            <a
+                                href="#"
+                                class="text-primary font-weight-bold ml-2"
+                                @click.prevent="openModalLogin"
+                                >Entrar</a
+                            >
+                        </div>
+                    </v-form>
+                </div>
+                <!-- FIM FORM ESQUECEU A SENHA  -->
             </v-card>
         </v-dialog>
-        <!-- FIM DIALOG REGISTRO - LOGIN -->
+        <!-- FIM DIALOG REGISTRO - LOGIN - RECUPERAR SENHA-->
 
         <v-snackbar
             v-model="snackbar.show"
