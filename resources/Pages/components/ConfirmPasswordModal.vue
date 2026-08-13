@@ -7,6 +7,10 @@ const props = defineProps({
     successFunction: {
         type: Function,
         required: true
+    },
+    cancelFunction: {
+        type: Function,
+        default: () => {}
     }
 });
 const emit = defineEmits(["update:modelValue", "confirm"]);
@@ -17,6 +21,10 @@ const form = useForm({
 function _close() {
     emit("update:modelValue", false);
     form.reset();
+}
+function _cancel() {
+    _close();
+    props.cancelFunction();
 }
 
 function _submit() {
@@ -38,6 +46,7 @@ function _submit() {
         @update:model-value="emit('update:modelValue', $event)"
         width="auto"
         max-width="520"
+        persistent
     >
         <v-card class="pa-4">
             <v-card-title class="d-flex align-center">
@@ -49,7 +58,7 @@ function _submit() {
                     color="red"
                     variant="text"
                     size="small"
-                    @click="_close"
+                    @click="_cancel"
                 ></v-btn>
             </v-card-title>
             <v-card-text>
@@ -67,7 +76,7 @@ function _submit() {
                         autofocus
                     ></v-text-field>
                     <div class="d-flex justify-end gap-2">
-                        <v-btn variant="text" color="grey" @click="_close"
+                        <v-btn variant="text" color="grey" @click="_cancel"
                             >Cancelar</v-btn
                         >
                         <v-btn type="submit" variant="flat" color="primary" :loading="form.processing"
