@@ -195,5 +195,6 @@
   "Log in to your account": "Entrar na sua conta",
   "Enter your email and password below to log in": "Digite seu e-mail e senha abaixo para entrar",
   "Don't have an account?": "Não tem uma conta?",
-  "The provided password does not match your current password." : "A senha fornecida não corresponde à sua senha atual."
+  "The provided password does not match your current password." : "A senha fornecida não corresponde à sua senha atual.",
+  "The provided password was incorrect." : "A senha fornecida estava incorreta."
 }

@@ -19,7 +19,7 @@ const form_register = useForm({
     password_confirmation: "",
 });
 const form_login = useForm({
-    username: null,
+    email: null,
     password: null,
     remember: false,
     toggle_visible_password: false,
@@ -37,11 +37,7 @@ const logged_status = computed(() => {
     //logged - no_logged - partial_registered
     if (!page.props?.user) {
         return "no_logged";
-    } else if (
-        !page.props.user.whatsapp ||
-        !page.props.user.latitude ||
-        !page.props.user.longitude
-    ) {
+    } else if (!page.props.user.whatsapp) {
         return "partial_registered";
     } else if (page.props.user.email) {
         return "logged";
@@ -86,14 +82,14 @@ function _sideLinkOrAction(link) {
     }
 }
 
-function _checkActionJs(){
+function _checkActionJs() {
     const url = new URL(window.location.href);
     const action_js = url.searchParams.get("action_js");
     switch (action_js) {
-        case 'open_modal_login':
+        case "open_modal_login":
             openModalLogin();
             break;
-    
+
         default:
             break;
     }
@@ -570,8 +566,8 @@ defineExpose({
                             label="E-mail / Whatsapp *"
                             variant="outlined"
                             type="text"
-                            v-model="form_login.username"
-                            :error-messages="form_login.errors.username"
+                            v-model="form_login.email"
+                            :error-messages="form_login.errors.email"
                             persistent-hint
                             hint="Exemplo caso whatsapp: 86994567898"
                         ></v-text-field>

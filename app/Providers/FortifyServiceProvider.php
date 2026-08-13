@@ -70,7 +70,7 @@ class FortifyServiceProvider extends ServiceProvider
             ]);
         });
         Fortify::authenticateUsing(function (Request $request) {
-            $username = $request->username;
+            $username = $request->email;
 
             $rule_email_whatsapp = [];
             $column_name = 'email';
@@ -83,7 +83,7 @@ class FortifyServiceProvider extends ServiceProvider
             }
 
             $request->validate([
-                'username' => ['required', ...$rule_email_whatsapp],
+                'email' => ['required', ...$rule_email_whatsapp],
                 'password' => ['required'],
             ], [], [
                 'username' => 'email|whatsapp',

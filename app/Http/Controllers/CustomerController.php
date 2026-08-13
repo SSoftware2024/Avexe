@@ -12,21 +12,15 @@ class CustomerController extends Controller
 {
     public function index()
     {
-        return Inertia::render('Index', [
-            'user' => Auth::user()
-        ]);
+        return Inertia::render('Index');
     }
     public function appointmentsView()
     {
-        return Inertia::render('User/AppointmentsCustomer', [
-            'user' => Auth::user()
-        ]);
+        return Inertia::render('User/AppointmentsCustomer');
     }
     public function profileView()
     {
-        return Inertia::render('User/Profile', [
-            'user' => Auth::user(),
-        ]);
+        return Inertia::render('User/Profile');
     }
 
     public function loginGoogle(GoogleLoginService $googleService)

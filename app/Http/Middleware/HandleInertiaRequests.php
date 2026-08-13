@@ -37,7 +37,11 @@ class HandleInertiaRequests extends Middleware
     {
         return [
             ...parent::share($request),
-            //
+            'user' => $request->user(),
+            'twofa' => [
+                'is_enabled' => $request->user()->hasEnabledTwoFactorAuthentication(),
+                'status' => session('status') ?? null
+            ]
         ];
     }
 }

@@ -9,6 +9,7 @@ use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
 use Laravel\Fortify\Contracts\UpdatesUserProfileInformation;
 
+
 class UpdateUserProfileInformation implements UpdatesUserProfileInformation
 {
     /**
@@ -30,7 +31,26 @@ class UpdateUserProfileInformation implements UpdatesUserProfileInformation
                 'max:255',
                 Rule::unique('users')->ignore($user->id),
             ],
+            'whatsapp' => [
+                'required',
+                'digits:11',
+                Rule::unique(User::class)->ignore($user->id),
+            ],
+            'latitude' => [
+                'nullable',
+                'numeric',
+                'between:-90,90',
+                'regex:/^-?\d{1,2}(\.\d{1,8})?$/',
+            ],
+            'longitude' => [
+                'nullable',
+                'numeric',
+                'between:-180,180',
+                'regex:/^-?\d{1,3}(\.\d{1,8})?$/',
+            ],
         ])->validateWithBag('updateProfileInformation');
+
+        // validação de whatsapp
 
         if ($input['email'] !== $user->email &&
             $user instanceof MustVerifyEmail) {
@@ -39,6 +59,10 @@ class UpdateUserProfileInformation implements UpdatesUserProfileInformation
             $user->forceFill([
                 'name' => $input['name'],
                 'email' => $input['email'],
+                'whatsapp' => $input['whatsapp'],
+                'latitude' => $input['latitude'] ?? null,
+                'longitude' => $input['longitude'] ?? null,
+                'profile' => $input['profile'] ?? null,
             ])->save();
         }
     }

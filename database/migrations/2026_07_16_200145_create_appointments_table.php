@@ -25,6 +25,8 @@ return new class extends Migration
             $table->smallInteger('rate')->nullable();
             $table->enum('status', AppointmentsStatus::toArrayValues())->default(AppointmentsStatus::WAITING->value); #numero do cliente no dia do corte
             $table->decimal('amount_fee', 6,2)->nullable();
+            $table->string('guest_name')->nullable();
+            $table->string('guest_whatsapp')->nullable();
             $table->foreignIdFor(Company::class)->constrained();
             $table->foreignIdFor(Employee::class)->constrained();
             $table->foreignIdFor(User::class)->constrained();

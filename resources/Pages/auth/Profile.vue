@@ -1,9 +1,11 @@
 <!-- PARTIAL PAGE -->
 <script setup>
-import { reactive, ref, watch } from "vue";
+import { onMounted, reactive, ref, watch } from "vue";
 import { getCurrentLocation } from "@js/utils/functions.js";
-import { useForm } from "@inertiajs/vue3";
+import { useForm, router, usePage } from "@inertiajs/vue3";
+import ConfirmPasswordModal from "@/components/ConfirmPasswordModal.vue";
 
+const page = usePage();
 const props = defineProps({
     user: {
         type: Object,
@@ -11,7 +13,9 @@ const props = defineProps({
     },
 });
 
-const form = reactive({
+const confirm_password_dialog = ref(false);
+
+const form = useForm({
     name: props.user?.name || "",
     email: props.user?.email || "",
     whatsapp: props.user?.whatsapp || "",
@@ -25,16 +29,23 @@ const form_password = useForm({
     password: "",
     password_confirmation: "",
 });
+const twofa = reactive({
+    setupKey: "",
+    qrcode: {
+        url: "",
+        svg: "",
+    },
+    recovery_codes: [],
+});
+const twofa_test_code = ref("");
+const twofa_test_code_processing = ref(false);
 
-const photo_preview = ref(props.user?.profile || null);
+//campos opcionais
+const show_recovery_codes = ref(false);
 const two_fa_active = ref(false);
 const two_fa_confirmed = ref(false);
-const qr_code_url = ref("");
-const recovery_codes = ref([]);
-const show_recovery_codes = ref(false);
-const test_code = ref("");
-const test_processing = ref(false);
 
+const photo_preview = ref(props.user?.profile || null);
 //localização
 const loading_location = ref(false);
 const location_error = ref("");
@@ -45,79 +56,108 @@ const snackbar = reactive({
     color: "success",
 });
 
-function _generateRecoveryCodes() {
-    const codes = [];
-    for (let i = 0; i < 8; i++) {
-        const random = (length) => {
-            let value = "";
-            const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-            for (let j = 0; j < length; j++) {
-                value += chars.charAt(Math.floor(Math.random() * chars.length));
-            }
-            return value;
-        };
-        codes.push(`${random(4)}-${random(4)}`);
+function _enable2fa() {
+    axios.post(route("two-factor.enable")).then(function (response) {
+        if (response.status == 200) {
+            _loadDataTwoFa();
+            two_fa_active.value = true;
+        }
+    });
+}
+function _disable2fa() {
+    router.post(route("two-factor.disable"), {
+        onSuccess: (page) => {
+            two_fa_active.value = false;
+        },
+    });
+}
+
+function _loadDataTwoFa() {
+    _getRecoveryCodes();
+    _getQrcode();
+    _getSetupKey();
+    two_fa_active.value = true;
+}
+function _getRecoveryCodes() {
+    axios.get(route("two-factor.recovery-codes")).then(function (response) {
+        show_recovery_codes.value = true;
+        twofa.recovery_codes = response.data;
+    });
+}
+
+function _getQrcode() {
+    axios.get(route("two-factor.qr-code")).then(function (response) {
+        twofa.qrcode.svg = response.data.svg;
+        twofa.qrcode.url = response.data.url;
+    });
+}
+
+function _getSetupKey() {
+    return axios.get(route("two-factor.secret-key")).then((response) => {
+        twofa.setupKey = response.data.secretKey;
+    });
+}
+
+function _newRecoveryCodes() {
+    router.post(
+        route("two-factor.regenerate-recovery-codes"),
+        {},
+        {
+            onSuccess: () => {
+                _getRecoveryCodes();
+            },
+        },
+    );
+}
+
+function _downloadRecoveryCodes() {
+    try {
+        axios.get(route("two-factor.recovery-codes")).then((response) => {
+            const codes = response.data;
+
+            const blob = new Blob([codes.join("\n")], {
+                type: "text/plain",
+            });
+
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement("a");
+            a.href = url;
+            a.download = "2fa-recovery-codes.txt";
+            document.body.appendChild(a);
+            a.click();
+            a.remove();
+
+            window.URL.revokeObjectURL(url);
+        });
+    } catch (error) {
+        console.error("Erro ao baixar códigos", error);
     }
-    return codes;
-}
-
-function _generateSecret() {
-    const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ234567";
-    let secret = "";
-    for (let i = 0; i < 32; i++) {
-        secret += chars.charAt(Math.floor(Math.random() * chars.length));
-    }
-    return secret;
-}
-
-function _buildQrCodeUrl() {
-    const label = encodeURIComponent(props.user?.email || "avexe");
-    const secret = _generateSecret();
-    const otpauth = `otpauth://totp/Avexe:${label}?secret=${secret}&issuer=Avexe`;
-    return `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(
-        otpauth,
-    )}`;
-}
-
-function _toggle2fa() {
-    if (two_fa_active.value) {
-        qr_code_url.value = _buildQrCodeUrl();
-        recovery_codes.value = _generateRecoveryCodes();
-        two_fa_confirmed.value = false;
-        show_recovery_codes.value = false;
-        test_code.value = "";
-    } else {
-        qr_code_url.value = "";
-        recovery_codes.value = [];
-        two_fa_confirmed.value = false;
-        show_recovery_codes.value = false;
-        test_code.value = "";
-    }
-}
-
-function _regenerateRecoveryCodes() {
-    recovery_codes.value = _generateRecoveryCodes();
-    show_recovery_codes.value = true;
-    snackbar.message = "Novos códigos de recuperação gerados.";
-    snackbar.color = "success";
-    snackbar.show = true;
 }
 
 function _test2fa() {
-    test_processing.value = true;
-    setTimeout(() => {
-        test_processing.value = false;
-        if (test_code.value.trim().length === 6) {
+    twofa_test_code_processing.value = true;
+    router.post(route("two-factor.confirm"), {
+        code: twofa_test_code.value
+    }, {
+        preserveScroll: true,
+        onSuccess: () => {
+            twofa_test_code_processing.value = false;
             two_fa_confirmed.value = true;
-            snackbar.message = "2FA validado com sucesso!";
-            snackbar.color = "success";
-        } else {
+        },
+        onError: (error) => {
+            twofa_test_code_processing.value = false;
             snackbar.message =
                 "Código inválido. Digite o código de 6 dígitos do autenticador.";
             snackbar.color = "error";
-        }
-        snackbar.show = true;
-    }, 800);
+        },
+    });
+
+
+
+}
+
+function _toggle2fa() {
+    two_fa_active.value ? _enable2fa() : _disable2fa();
 }
 
 function _onPhotoChange(event) {
@@ -142,8 +182,13 @@ function _getCurrentLocation() {
 }
 
 function _save() {
-    snackbar.message = "Dados salvos (front-end).";
-    snackbar.show = true;
+    form.put(route("user-profile-information.update"), {
+        onSuccess: () => {
+            snackbar.message = "Perfil salvo";
+            snackbar.show = true;
+            form_password.reset();
+        },
+    });
 }
 
 function _savePassword() {
@@ -157,6 +202,10 @@ function _savePassword() {
 }
 </script>
 <template>
+    <ConfirmPasswordModal
+        v-model="confirm_password_dialog"
+        :successFunction="_toggle2fa"
+    ></ConfirmPasswordModal>
     <v-container>
         <v-row>
             <!-- DADOS PESSOAIS -->
@@ -211,6 +260,14 @@ function _savePassword() {
                                     label="Nome *"
                                     variant="outlined"
                                     v-model="form.name"
+                                    :error-messages="
+                                        form.errors?.updateProfileInformation
+                                            ?.name
+                                    "
+                                    :hide-details="
+                                        !form.errors?.updateProfileInformation
+                                            ?.name
+                                    "
                                 ></v-text-field>
                             </v-col>
                             <v-col cols="12" md="6">
@@ -219,6 +276,14 @@ function _savePassword() {
                                     variant="outlined"
                                     type="email"
                                     v-model="form.email"
+                                    :error-messages="
+                                        form.errors?.updateProfileInformation
+                                            ?.email
+                                    "
+                                    :hide-details="
+                                        !form.errors?.updateProfileInformation
+                                            ?.email
+                                    "
                                 ></v-text-field>
                             </v-col>
                             <v-col cols="12">
@@ -227,6 +292,14 @@ function _savePassword() {
                                     label="Whatsapp *"
                                     variant="outlined"
                                     v-model="form.whatsapp"
+                                    :error-messages="
+                                        form.errors?.updateProfileInformation
+                                            ?.whatsapp
+                                    "
+                                    :hide-details="
+                                        !form.errors?.updateProfileInformation
+                                            ?.whatsapp
+                                    "
                                 ></v-mask-input>
                             </v-col>
                         </v-row>
@@ -242,6 +315,14 @@ function _savePassword() {
                                     label="Latitude"
                                     variant="outlined"
                                     v-model="form.latitude"
+                                    :error-messages="
+                                        form.errors?.updateProfileInformation
+                                            ?.latitude
+                                    "
+                                    :hide-details="
+                                        !form.errors?.updateProfileInformation
+                                            ?.latitude
+                                    "
                                 ></v-text-field>
                             </v-col>
                             <v-col cols="12" md="6">
@@ -249,6 +330,14 @@ function _savePassword() {
                                     label="Longitude"
                                     variant="outlined"
                                     v-model="form.longitude"
+                                    :error-messages="
+                                        form.errors?.updateProfileInformation
+                                            ?.longitude
+                                    "
+                                    :hide-details="
+                                        !form.errors?.updateProfileInformation
+                                            ?.longitude
+                                    "
                                 ></v-text-field>
                             </v-col>
                             <v-col cols="12">
@@ -280,6 +369,8 @@ function _savePassword() {
                                 color="primary"
                                 type="submit"
                                 prepend-icon="mdi-content-save"
+                                :loading="form.processing"
+                                :disabled="form.processing"
                             >
                                 Salvar alterações
                             </v-btn>
@@ -390,7 +481,7 @@ function _savePassword() {
                                     variant="tonal"
                                     color="primary"
                                     v-bind="props"
-                                    @click="_regenerateRecoveryCodes"
+                                    @click="_newRecoveryCodes"
                                 ></v-btn>
                             </template>
                         </v-tooltip>
@@ -409,7 +500,11 @@ function _savePassword() {
                         v-model="two_fa_active"
                         inset
                         hide-details
-                        @change="_toggle2fa"
+                        @click="
+                            () => {
+                                confirm_password_dialog = true;
+                            }
+                        "
                     ></v-switch>
 
                     <!-- ÁREA ATIVAÇÃO -->
@@ -419,20 +514,19 @@ function _savePassword() {
                         <!-- QR CODE -->
                         <p class="text-subtitle-1 font-weight-bold mb-2">
                             Escaneie o QR Code
+                            <span v-if="twofa.setupKey"
+                                >Setup key: {{ twofa.setupKey }}</span
+                            >
                         </p>
                         <p class="text-body-2 text-medium-emphasis mb-3">
                             Use um aplicativo autenticador (Google
                             Authenticator, etc.) para escanear o código abaixo.
                         </p>
-                        <div class="d-flex justify-center mb-4">
-                            <v-img
-                                :src="qr_code_url"
-                                width="200"
-                                height="200"
-                                contain
-                                class="rounded-lg border"
-                            ></v-img>
-                        </div>
+                        <div
+                            class="d-flex justify-center mb-4"
+                            v-if="twofa.qrcode.svg"
+                            v-html="twofa.qrcode.svg"
+                        ></div>
 
                         <!-- CÓDIGOS DE RECUPERAÇÃO -->
                         <v-btn
@@ -440,7 +534,7 @@ function _savePassword() {
                             color="primary"
                             block
                             prepend-icon="mdi-key-chain"
-                            @click="show_recovery_codes = !show_recovery_codes"
+                            @click="_getRecoveryCodes"
                         >
                             {{
                                 show_recovery_codes
@@ -465,7 +559,9 @@ function _savePassword() {
                             </p>
                             <div class="d-flex flex-wrap ga-2">
                                 <v-chip
-                                    v-for="(code, index) in recovery_codes"
+                                    v-for="(
+                                        code, index
+                                    ) in twofa.recovery_codes"
                                     :key="index"
                                     variant="outlined"
                                     class="font-weight-bold"
@@ -473,6 +569,16 @@ function _savePassword() {
                                     {{ code }}
                                 </v-chip>
                             </div>
+                            <v-btn
+                                variant="tonal"
+                                color="primary"
+                                size="small"
+                                class="mt-3"
+                                prepend-icon="mdi-download"
+                                @click="_downloadRecoveryCodes"
+                            >
+                                Baixar
+                            </v-btn>
                         </v-alert>
 
                         <!-- TESTE FINAL -->
@@ -487,7 +593,7 @@ function _savePassword() {
                         </p>
                         <div class="d-flex ga-2 align-center">
                             <v-text-field
-                                v-model="test_code"
+                                v-model="twofa_test_code"
                                 label="Código do autenticador"
                                 variant="outlined"
                                 dense
@@ -498,10 +604,10 @@ function _savePassword() {
                                 variant="flat"
                                 color="primary"
                                 prepend-icon="mdi-send"
-                                :loading="test_processing"
-                                :disabled="test_processing"
+                                :loading="twofa_test_code_processing"
+                                :disabled="twofa_test_code_processing"
                                 class="flex-shrink-0"
-                                @click="_test2fa"
+                                @click.prevent="_test2fa"
                             >
                                 Enviar
                             </v-btn>
