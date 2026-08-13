@@ -1,6 +1,6 @@
 <!-- PARTIAL PAGE -->
 <script setup>
-import { onMounted, reactive, ref, watch } from "vue";
+import { computed, onMounted, reactive, ref } from "vue";
 import { getCurrentLocation } from "@js/utils/functions.js";
 import { useForm, router, usePage } from "@inertiajs/vue3";
 import ConfirmPasswordModal from "@/components/ConfirmPasswordModal.vue";
@@ -12,8 +12,6 @@ const props = defineProps({
         required: true,
     },
 });
-
-const confirm_password_dialog = ref(false);
 
 const form = useForm({
     name: props.user?.name || "",
@@ -29,6 +27,7 @@ const form_password = useForm({
     password: "",
     password_confirmation: "",
 });
+//twofa
 const twofa = reactive({
     setupKey: "",
     qrcode: {
@@ -39,44 +38,50 @@ const twofa = reactive({
 });
 const twofa_test_code = ref("");
 const twofa_test_code_processing = ref(false);
-
+const setup_key_copied = ref(false);
 //campos opcionais
 const show_recovery_codes = ref(false);
-const two_fa_active = ref(false);
-const two_fa_confirmed = ref(false);
-
+const twofa_active = ref(false);
+const twofa_confirmed = ref(false);
+const twofa_loading = ref(false);
+//dialogs
+const confirm_password_dialog = ref(false);
+//variados
 const photo_preview = ref(props.user?.profile || null);
-//localização
 const loading_location = ref(false);
 const location_error = ref("");
-
 const snackbar = reactive({
     show: false,
     message: "",
     color: "success",
 });
-
+//COMPUTEDS
+const formattedSetupKey = computed(() =>
+    twofa.setupKey
+        ? twofa.setupKey.match(/.{1,4}/g)?.join(" ") || twofa.setupKey
+        : "",
+);
+//FUNCTIONS
 function _enable2fa() {
-    axios.post(route("two-factor.enable")).then(function (response) {
+    twofa_loading.value = true;
+    axios.post(route("two-factor.enable")).then(async function (response) {
         if (response.status == 200) {
-            _loadDataTwoFa();
-            two_fa_active.value = true;
+            twofa_active.value = true;
+            await _loadDataTwoFa();
+            twofa_loading.value = false;
         }
     });
 }
 function _disable2fa() {
-    console.log("try disable");
     router.delete(route("two-factor.disable"), {
         onSuccess: (page) => {
-            two_fa_active.value = false;
+            twofa_active.value = false;
         },
     });
 }
 
-function _loadDataTwoFa() {
-    _getRecoveryCodes();
-    _getQrcode();
-    _getSetupKey();
+async function _loadDataTwoFa() {
+    await Promise.all([_getRecoveryCodes(), _getQrcode(), _getSetupKey()]);
 }
 function _getRecoveryCodes() {
     //false, muda para true, depois de ter os codigos para exibir
@@ -141,6 +146,33 @@ function _downloadRecoveryCodes() {
     }
 }
 
+function _copySetupKey() {
+    if (!twofa.setupKey) return;
+
+    const key = twofa.setupKey;
+
+    if (navigator.clipboard?.writeText) {
+        navigator.clipboard.writeText(key).then(_setupKeyCopied);
+    } else {
+        const textarea = document.createElement("textarea");
+        textarea.value = key;
+        textarea.style.position = "fixed";
+        textarea.style.opacity = "0";
+        document.body.appendChild(textarea);
+        textarea.select();
+        document.execCommand("copy");
+        document.body.removeChild(textarea);
+        _setupKeyCopied();
+    }
+}
+
+function _setupKeyCopied() {
+    setup_key_copied.value = true;
+    setTimeout(() => {
+        setup_key_copied.value = false;
+    }, 2000);
+}
+
 function _test2fa() {
     twofa_test_code_processing.value = true;
     router.post(
@@ -152,7 +184,7 @@ function _test2fa() {
             preserveScroll: true,
             onSuccess: () => {
                 twofa_test_code_processing.value = false;
-                two_fa_confirmed.value = true;
+                twofa_confirmed.value = true;
             },
             onError: (error) => {
                 twofa_test_code_processing.value = false;
@@ -165,7 +197,7 @@ function _test2fa() {
 }
 
 function _toggle2fa() {
-    two_fa_active.value ? _enable2fa() : _disable2fa();
+    twofa_active.value ? _enable2fa() : _disable2fa();
 }
 
 function _onPhotoChange(event) {
@@ -210,14 +242,14 @@ function _savePassword() {
 }
 
 onMounted(() => {
-    two_fa_active.value = page.props.twofa.is_enabled;
+    twofa_active.value = page.props.twofa.is_enabled;
 });
 </script>
 <template>
     <ConfirmPasswordModal
         v-model="confirm_password_dialog"
         :successFunction="_toggle2fa"
-        :cancelFunction="() => (two_fa_active = !two_fa_active)"
+        :cancelFunction="() => (twofa_active = !twofa_active)"
     ></ConfirmPasswordModal>
     <v-container>
         <v-row>
@@ -506,11 +538,9 @@ onMounted(() => {
                         habilitando a autenticação de dois fatores.
                     </p>
                     <v-switch
-                        :label="
-                            two_fa_active ? '2FA ativado' : '2FA desativado'
-                        "
-                        :color="two_fa_active ? 'success' : 'grey'"
-                        v-model="two_fa_active"
+                        :label="twofa_active ? '2FA ativado' : '2FA desativado'"
+                        :color="twofa_active ? 'success' : 'grey'"
+                        v-model="twofa_active"
                         inset
                         hide-details
                         @click="
@@ -521,85 +551,151 @@ onMounted(() => {
                     ></v-switch>
 
                     <!-- ÁREA ATIVAÇÃO -->
-                    <template v-if="two_fa_active">
+                    <template v-if="twofa_active">
                         <v-divider class="my-4"></v-divider>
 
-                        <div v-if="twofa.qrcode.svg">
-                            <!-- QR CODE -->
-                            <p class="text-subtitle-1 font-weight-bold mb-2">
-                                Escaneie o QR Code
-                                <span v-if="twofa.setupKey"
-                                    >Setup key: {{ twofa.setupKey }}</span
-                                >
-                            </p>
-                            <p class="text-body-2 text-medium-emphasis mb-3">
-                                Use um aplicativo autenticador (Google
-                                Authenticator, etc.) para escanear o código
-                                abaixo.
-                            </p>
-                            <div
-                                class="d-flex justify-center mb-4"
-                                v-if="twofa.qrcode.svg"
-                                v-html="twofa.qrcode.svg"
-                            ></div>
+                        <!-- LOADING SKELETON -->
+                        <v-skeleton-loader
+                            v-if="twofa_loading"
+                            type="image, article, actions"
+                            class="mb-4"
+                        ></v-skeleton-loader>
 
-                            <!-- TESTE FINAL -->
-                            <v-divider class="my-4"></v-divider>
-                            <p class="text-subtitle-1 font-weight-bold mb-2">
-                                Teste final de ativação
-                            </p>
-                            <p class="text-body-2 text-medium-emphasis mb-3">
-                                Digite o código de 6 dígitos gerado no
-                                aplicativo autenticador para confirmar que o 2FA
-                                está funcionando.
-                            </p>
-                            <div class="d-flex ga-2 align-center">
-                                <v-text-field
-                                    v-model="twofa_test_code"
-                                    label="Código do autenticador"
-                                    variant="outlined"
-                                    dense
-                                    hide-details
-                                    maxlength="6"
-                                ></v-text-field>
-                                <v-btn
-                                    variant="flat"
-                                    color="primary"
-                                    prepend-icon="mdi-send"
-                                    :loading="twofa_test_code_processing"
-                                    :disabled="twofa_test_code_processing"
-                                    class="flex-shrink-0"
-                                    @click.prevent="_test2fa"
+                        <template v-else>
+                            <div v-if="twofa.qrcode.svg">
+                                <!-- QR CODE -->
+                                <p
+                                    class="text-subtitle-1 font-weight-bold mb-2"
                                 >
-                                    Enviar
-                                </v-btn>
+                                    Escaneie o QR Code
+                                </p>
+                                <p
+                                    class="text-body-2 text-medium-emphasis mb-3"
+                                >
+                                    Use um aplicativo autenticador (Google
+                                    Authenticator, etc.) para escanear o código
+                                    abaixo.
+                                </p>
+                                <div
+                                    class="d-flex justify-center mb-4"
+                                    v-if="twofa.qrcode.svg"
+                                    v-html="twofa.qrcode.svg"
+                                ></div>
+
+                                <!-- SETUP KEY MANUAL -->
+                                <div
+                                    v-if="twofa.setupKey"
+                                    class="setup-key-card"
+                                >
+                                    <div
+                                        class="d-flex align-center justify-space-between mb-1"
+                                    >
+                                        <span
+                                            class="text-subtitle-2 font-weight-bold text-primary"
+                                        >
+                                            <v-icon
+                                                size="16"
+                                                class="mr-1"
+                                                icon="mdi-keyboard-outline"
+                                            ></v-icon>
+                                            Chave manual
+                                        </span>
+                                        <v-btn
+                                            variant="tonal"
+                                            color="primary"
+                                            size="small"
+                                            :prepend-icon="
+                                                setup_key_copied
+                                                    ? 'mdi-check'
+                                                    : 'mdi-content-copy'
+                                            "
+                                            :disabled="setup_key_copied"
+                                            @click="_copySetupKey"
+                                        >
+                                            {{
+                                                setup_key_copied
+                                                    ? "Copiada!"
+                                                    : "Copiar"
+                                            }}
+                                        </v-btn>
+                                    </div>
+                                    <p
+                                        class="text-body-2 text-medium-emphasis mb-2"
+                                    >
+                                        Não consegue escanear? Digite esta chave
+                                        manualmente no seu aplicativo
+                                        autenticador.
+                                    </p>
+                                    <div
+                                        class="setup-key-value"
+                                        title="Clique para copiar"
+                                        @click="_copySetupKey"
+                                    >
+                                        {{ formattedSetupKey }}
+                                    </div>
+                                </div>
+
+                                <!-- TESTE FINAL -->
+                                <v-divider class="my-4"></v-divider>
+                                <p
+                                    class="text-subtitle-1 font-weight-bold mb-2"
+                                >
+                                    Teste final de ativação
+                                </p>
+                                <p
+                                    class="text-body-2 text-medium-emphasis mb-3"
+                                >
+                                    Digite o código de 6 dígitos gerado no
+                                    aplicativo autenticador para confirmar que o
+                                    2FA está funcionando.
+                                </p>
+                                <div class="d-flex ga-2 align-center">
+                                    <v-text-field
+                                        v-model="twofa_test_code"
+                                        label="Código do autenticador"
+                                        variant="outlined"
+                                        dense
+                                        maxlength="6"
+                                        :error-messages="
+                                            $page.props.errors
+                                            ?.confirmTwoFactorAuthentication
+                                            ?.code
+                                        "
+                                        :hide-details="
+                                            !$page.props.errors
+                                            ?.confirmTwoFactorAuthentication
+                                            ?.code
+                                        "
+                                    ></v-text-field>
+                                    <v-btn
+                                        variant="flat"
+                                        color="primary"
+                                        prepend-icon="mdi-send"
+                                        :loading="twofa_test_code_processing"
+                                        :disabled="twofa_test_code_processing"
+                                        class="flex-shrink-0"
+                                        @click.prevent="_test2fa"
+                                    >
+                                        Enviar
+                                    </v-btn>
+                                </div>
                             </div>
-                            <span
-                                v-if="
-                                    $page.props.errors
-                                        ?.confirmTwoFactorAuthentication?.code
-                                "
+                            <v-alert
+                                v-if="twofa_confirmed"
+                                type="success"
+                                variant="tonal"
+                                class="mt-3"
+                                icon="mdi-shield-check"
                             >
-                                {{
-                                    $page.props.errors
-                                        ?.confirmTwoFactorAuthentication?.code
-                                }}
-                            </span>
-                        </div>
-                        <v-alert
-                            v-if="two_fa_confirmed"
-                            type="success"
-                            variant="tonal"
-                            class="mt-3"
-                            icon="mdi-shield-check"
-                        >
-                            2FA confirmado com sucesso! Sua conta está
-                            protegida.
-                        </v-alert>
+                                2FA confirmado com sucesso! Sua conta está
+                                protegida.
+                            </v-alert>
+                        </template>
                     </template>
                     <!-- CÓDIGOS DE RECUPERAÇÃO -->
                     <div
-                        v-if="twofa.qrcode.svg || $page.props.twofa.is_enabled"
+                        v-if="twofa.qrcode.svg || Object.keys(twofa.recovery_codes).length > 0"
+                        class="mt-2"
                     >
                         <v-btn
                             variant="tonal"
@@ -676,3 +772,29 @@ onMounted(() => {
         </v-snackbar>
     </v-container>
 </template>
+<style scoped lang="scss">
+.setup-key-card {
+    border: 1px dashed rgba(var(--v-theme-primary), 0.45);
+    border-radius: 8px;
+    padding: 12px 16px;
+    background-color: rgba(var(--v-theme-primary), 0.05);
+    margin-bottom: 16px;
+}
+
+.setup-key-value {
+    font-family: "Roboto Mono", "Courier New", monospace;
+    font-size: 16px;
+    font-weight: 600;
+    letter-spacing: 2px;
+    text-align: center;
+    padding: 10px 12px;
+    border-radius: 6px;
+    background-color: rgba(var(--v-theme-on-surface-variant), 0.06);
+    cursor: pointer;
+    user-select: all;
+
+    &:hover {
+        background-color: rgba(var(--v-theme-primary), 0.12);
+    }
+}
+</style>

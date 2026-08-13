@@ -38,10 +38,8 @@ class FortifyServiceProvider extends ServiceProvider
         Fortify::resetUserPasswordsUsing(ResetUserPassword::class);
         Fortify::redirectUserForTwoFactorAuthenticationUsing(RedirectIfTwoFactorAuthenticatable::class);
 
-        
-
         RateLimiter::for('login', function (Request $request) {
-            $throttleKey = Str::transliterate(Str::lower($request->input(Fortify::username())) . '|' . $request->ip());
+            $throttleKey = Str::transliterate(Str::lower($request->input(Fortify::username())).'|'.$request->ip());
 
             return Limit::perMinute(5)->by($throttleKey);
         });
@@ -54,11 +52,14 @@ class FortifyServiceProvider extends ServiceProvider
             $credentialId = $request->input('credential.id');
 
             return Limit::perMinute(10)->by(
-                ($credentialId ?: $request->session()->getId()) . '|' . $request->ip()
+                ($credentialId ?: $request->session()->getId()).'|'.$request->ip()
             );
         });
         Fortify::loginView(function () {
             return redirect()->route('index');
+        });
+        Fortify::confirmPasswordView(function () {
+            return Inertia::render('Auth/ConfirmPassword');
         });
         Fortify::verifyEmailView(function () {
             return Inertia::render('Auth/VerifyEmail');
@@ -69,13 +70,16 @@ class FortifyServiceProvider extends ServiceProvider
                 'email' => $request->email,
             ]);
         });
+        Fortify::twoFactorChallengeView(function () {
+            return Inertia::render('Auth/TwoFaChallenger');
+        });
         Fortify::authenticateUsing(function (Request $request) {
             $username = $request->email;
 
             $rule_email_whatsapp = [];
             $column_name = 'email';
 
-            if (!Str::contains($username, '@') && preg_match('/\d/', $username)) {
+            if (! Str::contains($username, '@') && preg_match('/\d/', $username)) {
                 $rule_email_whatsapp = ['string', 'digits:11', 'exists:users,whatsapp'];
                 $column_name = 'whatsapp';
             } else {
