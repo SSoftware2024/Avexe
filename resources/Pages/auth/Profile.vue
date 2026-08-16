@@ -17,7 +17,7 @@ const form = useForm({
     name: props.user?.name || "",
     email: props.user?.email || "",
     whatsapp: props.user?.whatsapp || "",
-    photo: null,
+    profile: null,
     latitude: props.user?.latitude || null,
     longitude: props.user?.longitude || null,
 });
@@ -37,18 +37,22 @@ const twofa = reactive({
     recovery_codes: [],
 });
 const twofa_test_code = ref("");
-const twofa_test_code_processing = ref(false);
 const setup_key_copied = ref(false);
 //campos opcionais
 const show_recovery_codes = ref(false);
 const twofa_active = ref(false);
 const twofa_confirmed = ref(false);
-const twofa_loading = ref(false);
 //dialogs
 const confirm_password_dialog = ref(false);
+//loads que não são de forms
+const loading = reactive({
+    location: false,
+    remove_photo: false,
+    twofa: false,
+    twofa_test: false,
+});
 //variados
-const photo_preview = ref(props.user?.profile || null);
-const loading_location = ref(false);
+const profile_preview = ref(props.user?.profile || null);
 const location_error = ref("");
 const snackbar = reactive({
     show: false,
@@ -63,12 +67,12 @@ const formattedSetupKey = computed(() =>
 );
 //FUNCTIONS
 function _enable2fa() {
-    twofa_loading.value = true;
+    loading.twofa = true;
     axios.post(route("two-factor.enable")).then(async function (response) {
         if (response.status == 200) {
             twofa_active.value = true;
             await _loadDataTwoFa();
-            twofa_loading.value = false;
+            loading.twofa = false;
         }
     });
 }
@@ -174,7 +178,7 @@ function _setupKeyCopied() {
 }
 
 function _test2fa() {
-    twofa_test_code_processing.value = true;
+    loading.twofa_test = true;
     router.post(
         route("two-factor.confirm"),
         {
@@ -183,11 +187,11 @@ function _test2fa() {
         {
             preserveScroll: true,
             onSuccess: () => {
-                twofa_test_code_processing.value = false;
+                loading.twofa_test = false;
                 twofa_confirmed.value = true;
             },
             onError: (error) => {
-                twofa_test_code_processing.value = false;
+                loading.twofa_test = false;
                 snackbar.message =
                     "Código inválido. Digite o código de 6 dígitos do autenticador.";
                 snackbar.color = "error";
@@ -203,15 +207,25 @@ function _toggle2fa() {
 function _onPhotoChange(event) {
     const file = event.target.files[0];
     if (!file) return;
-    form.photo = file;
-    photo_preview.value = URL.createObjectURL(file);
+    form.profile = file;
+    profile_preview.value = URL.createObjectURL(file);
+}
+
+function _removePhoto() {
+    loading.remove_photo = true;
+    router.delete(route('customer.removeProfile'), {
+        preserveState: false,
+        onFinish: () => {
+            loading.remove_photo = false;
+        }
+    });
 }
 
 function _getCurrentLocation() {
-    loading_location.value = true;
+    loading.location = true;
     location_error.value = "";
     getCurrentLocation().then((location) => {
-        loading_location.value = false;
+        loading.location = false;
         if (location.error_message) {
             location_error.value = location.error_message;
         } else {
@@ -243,6 +257,7 @@ function _savePassword() {
 
 onMounted(() => {
     twofa_active.value = page.props.twofa.is_enabled;
+    profile_preview.value = page.props.user.profile_url;
 });
 </script>
 <template>
@@ -272,8 +287,8 @@ onMounted(() => {
                             <v-col cols="12" class="d-flex align-center">
                                 <v-avatar size="72" class="mr-4">
                                     <v-img
-                                        v-if="photo_preview"
-                                        :src="photo_preview"
+                                        v-if="profile_preview"
+                                        :src="profile_preview"
                                         cover
                                     ></v-img>
                                     <v-icon
@@ -286,18 +301,39 @@ onMounted(() => {
                                     <v-btn
                                         variant="outlined"
                                         color="primary"
-                                        @click="$refs.photo_input.click()"
+                                        @click="$refs.profile_input.click()"
                                     >
                                         <v-icon start>mdi-camera</v-icon>
                                         Alterar foto
                                     </v-btn>
+                                    <v-btn
+                                        v-if="$page.props.user.profile"
+                                        variant="tonal"
+                                        color="error"
+                                        class="ml-2"
+                                        prepend-icon="mdi-trash-can-outline"
+                                        :loading="loading.remove_photo"
+                                        :disabled="loading.remove_photo"
+                                        @click="_removePhoto"
+                                    >
+                                        Remover foto
+                                    </v-btn>
                                     <input
-                                        ref="photo_input"
+                                        ref="profile_input"
                                         type="file"
                                         accept="image/*"
                                         class="d-none"
                                         @change="_onPhotoChange"
                                     />
+                                    <p
+                                        v-if="form.errors?.updateProfileInformation?.profile"
+                                        class="text-error text-caption mt-2 mb-0"
+                                    >
+                                        {{
+                                            form.errors.updateProfileInformation
+                                                .profile
+                                        }}
+                                    </p>
                                 </div>
                             </v-col>
                             <v-col cols="12" md="6">
@@ -399,8 +435,8 @@ onMounted(() => {
                                     variant="tonal"
                                     color="primary"
                                     prepend-icon="mdi-crosshairs-gps"
-                                    :loading="loading_location"
-                                    :disabled="loading_location"
+                                    :loading="loading.location"
+                                    :disabled="loading.location"
                                     @click="_getCurrentLocation"
                                 >
                                     Pegar localização atual
@@ -556,7 +592,7 @@ onMounted(() => {
 
                         <!-- LOADING SKELETON -->
                         <v-skeleton-loader
-                            v-if="twofa_loading"
+                            v-if="loading.twofa"
                             type="image, article, actions"
                             class="mb-4"
                         ></v-skeleton-loader>
@@ -671,8 +707,8 @@ onMounted(() => {
                                         variant="flat"
                                         color="primary"
                                         prepend-icon="mdi-send"
-                                        :loading="twofa_test_code_processing"
-                                        :disabled="twofa_test_code_processing"
+                                        :loading="loading.twofa_test"
+                                        :disabled="loading.twofa_test"
                                         class="flex-shrink-0"
                                         @click.prevent="_test2fa"
                                     >

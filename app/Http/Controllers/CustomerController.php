@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-
+use App\Services\CustomerService;
 use App\Services\GoogleLoginService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -21,6 +21,10 @@ class CustomerController extends Controller
     public function profileView()
     {
         return Inertia::render('User/Profile');
+    }
+    public function removeProfile(CustomerService $customer_service)
+    {
+        $customer_service->removeProfile(Auth::user());
     }
 
     public function loginGoogle(GoogleLoginService $googleService)

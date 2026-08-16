@@ -203,6 +203,7 @@ defineExpose({
                         <span class="font-weight-bold">Cadastrar</span>
                     </v-btn>
                 </div>
+                <!-- DROPDOWN NAVBAR USER -->
                 <div v-else-if="!smAndDown" class="mr-4">
                     <v-menu offset-y location="bottom end">
                         <template v-slot:activator="{ props }">
@@ -214,7 +215,7 @@ defineExpose({
                             >
                                 <v-img
                                     v-if="page.props.user?.profile"
-                                    :src="page.props.user.profile"
+                                    :src="page.props.user.profile_url"
                                     cover
                                 ></v-img>
                                 <v-icon
@@ -235,6 +236,14 @@ defineExpose({
                                 </v-list-item-subtitle>
                             </v-list-item>
                             <v-divider></v-divider>
+                            <v-list-item
+                                @click="router.visit(route('index'))"
+                            >
+                                <template v-slot:prepend>
+                                    <v-icon icon="mdi-home"></v-icon>
+                                </template>
+                                <v-list-item-title>Início</v-list-item-title>
+                            </v-list-item>
                             <v-list-item
                                 @click="
                                     router.visit(route('customer.profileView'))
@@ -271,8 +280,9 @@ defineExpose({
                         </v-list>
                     </v-menu>
                 </div>
+                 <!-- FIM DROPDOWN NAVBAR USER -->
             </v-app-bar>
-
+            <!-- SIDEBAR -->
             <v-navigation-drawer v-model="drawer" temporary>
                 <template v-if="logged_status != 'no_logged'">
                     <v-list-item class="py-3">
@@ -280,7 +290,7 @@ defineExpose({
                             <v-avatar size="40" color="primary" class="mr-2">
                                 <v-img
                                     v-if="page.props.user?.profile"
-                                    :src="page.props.user.profile"
+                                    :src="page.props.user.profile_url"
                                     cover
                                 ></v-img>
                                 <v-icon
@@ -346,6 +356,12 @@ defineExpose({
                         </v-list-item>
                     </template>
                     <template v-else>
+                        <v-list-item @click="router.visit(route('index'))">
+                            <template v-slot:prepend>
+                                <v-icon icon="mdi-home"></v-icon>
+                            </template>
+                            <v-list-item-title>Início</v-list-item-title>
+                        </v-list-item>
                         <v-list-item
                             @click="router.visit(route('customer.profileView'))"
                         >
@@ -386,6 +402,7 @@ defineExpose({
                     </template>
                 </v-list>
             </v-navigation-drawer>
+            <!-- FIM SIDEBAR -->
 
             <v-main>
                 <v-container>

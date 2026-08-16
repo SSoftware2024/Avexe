@@ -6,8 +6,6 @@ import vue from "@vitejs/plugin-vue";
 import inertia from "@inertiajs/vite";
 import { fileURLToPath, URL } from "url"; //novo
 
-const LOCAL_IP = "192.168.18.16";
-
 export default defineConfig({
     plugins: [
         laravel({
@@ -44,14 +42,6 @@ export default defineConfig({
     server: {
         watch: {
             ignored: ["**/storage/framework/views/**"],
-        },
-        host: "0.0.0.0",
-        port: 5173,
-        strictPort: true,
-        origin: `http://${LOCAL_IP}:5173`, // <- força a URL correta dos assets
-        cors:true,
-        hmr: {
-            host: "192.168.18.16",
         },
     },
 });

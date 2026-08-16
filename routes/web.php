@@ -12,6 +12,7 @@ Route::prefix('customer')->name('customer.')->group(function () {
     Route::middleware(['auth','verified'])->group(function () {
         Route::get('/appointmentsView', [CustomerController::class, 'appointmentsView'])->name('appointmentsView');
         Route::get('/profileView', [CustomerController::class, 'profileView'])->name('profileView');
+        Route::delete('/removeProfile', [CustomerController::class, 'removeProfile'])->name('removeProfile');
     });
     Route::middleware('auth')->group(function () {
         Route::get('/appointmentsView', [CustomerController::class, 'appointmentsView'])->name('appointmentsView');

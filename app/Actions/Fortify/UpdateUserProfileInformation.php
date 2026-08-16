@@ -9,13 +9,13 @@ use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
 use Laravel\Fortify\Contracts\UpdatesUserProfileInformation;
 
-
 class UpdateUserProfileInformation implements UpdatesUserProfileInformation
 {
     /**
      * Validate and update the given user's profile information.
      *
-     * @param  array<string, string>  $input
+     *
+     * @param  array<string, mixed>  $input
      *
      * @throws ValidationException
      */
@@ -23,7 +23,7 @@ class UpdateUserProfileInformation implements UpdatesUserProfileInformation
     {
         Validator::make($input, [
             'name' => ['required', 'string', 'max:255'],
-
+            'profile' => ['nullable', 'image', 'mimes:png,jpg', 'max:3072'],
             'email' => [
                 'required',
                 'string',
@@ -56,13 +56,15 @@ class UpdateUserProfileInformation implements UpdatesUserProfileInformation
             $user instanceof MustVerifyEmail) {
             $this->updateVerifiedUser($user, $input);
         } else {
+            if (!empty($input['profile'])) {
+                $user->uploadProfile($input['profile']);
+            }
             $user->forceFill([
                 'name' => $input['name'],
                 'email' => $input['email'],
                 'whatsapp' => $input['whatsapp'],
                 'latitude' => $input['latitude'] ?? null,
                 'longitude' => $input['longitude'] ?? null,
-                'profile' => $input['profile'] ?? null,
             ])->save();
         }
     }
