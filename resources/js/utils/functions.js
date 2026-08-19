@@ -2,8 +2,7 @@ function getCurrentLocation() {
     return new Promise((resolve) => {
         if (!navigator.geolocation) {
             resolve({
-                error_message:
-                    "Geolocalização não suportada no seu navegador.",
+                error_message: "Geolocalização não suportada no seu navegador.",
                 latitude: "",
                 longitude: "",
             });
@@ -25,12 +24,10 @@ function getCurrentLocation() {
                             "Permissão de localização negada. Habilite para usar esse recurso.";
                         break;
                     case error.POSITION_UNAVAILABLE:
-                        error_message =
-                            "Localização indisponível no momento.";
+                        error_message = "Localização indisponível no momento.";
                         break;
                     case error.TIMEOUT:
-                        error_message =
-                            "Tempo esgotado ao buscar localização.";
+                        error_message = "Tempo esgotado ao buscar localização.";
                         break;
                     default:
                         error_message = "Erro ao obter localização.";
@@ -45,6 +42,20 @@ function getCurrentLocation() {
         );
     });
 }
-export {
-    getCurrentLocation,
+
+function copyText(value) {
+    if (navigator.clipboard?.writeText) {
+       return navigator.clipboard.writeText(value);
+    } else {
+        const textarea = document.createElement("textarea");
+        textarea.value = value;
+        textarea.style.position = "fixed";
+        textarea.style.opacity = "0";
+        document.body.appendChild(textarea);
+        textarea.select();
+        document.execCommand("copy");
+        document.body.removeChild(textarea);
+        return Promise.resolve();
+    }
 }
+export { getCurrentLocation, copyText };

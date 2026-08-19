@@ -20,7 +20,7 @@ class CustomerController extends Controller
     }
     public function profileView()
     {
-        return Inertia::render('User/Profile');
+        return Inertia::render('Auth/Profile');
     }
     public function removeProfile(CustomerService $customer_service)
     {

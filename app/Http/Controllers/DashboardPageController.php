@@ -17,7 +17,10 @@ class DashboardPageController extends Controller
                 return redirect()->route('customer.profileView');
                 break;
             case TypeUser::DEVELOPER->value:
-                return redirect()->route('customer.profileView');
+                return redirect()->route('developer');
+                break;
+            case TypeUser::OWNER->value:
+                return redirect()->route('owner');
                 break;
 
             default:
