@@ -110,7 +110,7 @@ const toggle = ref("left");
                             <v-chip
                                 append-icon="mdi-star"
                                 class="ma-2"
-                                color="orange"
+                                color="primary"
                             >
                                 5,0
                             </v-chip>

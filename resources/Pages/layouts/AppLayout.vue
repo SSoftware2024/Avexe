@@ -139,7 +139,7 @@ defineExpose({
 
                 <v-btn
                     :variant="route().current('index') ? 'flat' : 'text'"
-                    :color="route().current('index') ? 'orange' : 'black'"
+                    :color="route().current('index') ? 'primary' : '#212E40'"
                     v-if="!smAndDown"
                     @click="router.visit(route('index'))"
                     :class="[
@@ -157,8 +157,8 @@ defineExpose({
                     "
                     :color="
                         route().current('customer.appointmentsView')
-                            ? 'orange'
-                            : 'black'
+                            ? 'primary'
+                            : '#212E40'
                     "
                     @click="router.visit(route('customer.appointmentsView'))"
                     :class="[

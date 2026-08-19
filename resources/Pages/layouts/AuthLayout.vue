@@ -207,6 +207,9 @@ function mark_as_read(notification) {
                                         :title="child.title"
                                         :prepend-icon="child.icon"
                                         :active="is_active(child)"
+                                        :variant="
+                                            is_active(child) ? 'flat' : undefined
+                                        "
                                         color="primary"
                                         @click="navigate(child)"
                                     ></v-list-item>
@@ -216,6 +219,9 @@ function mark_as_read(notification) {
                                     :title="item.title"
                                     :prepend-icon="item.icon"
                                     :active="is_active(item)"
+                                    :variant="
+                                        is_active(item) ? 'flat' : undefined
+                                    "
                                     color="primary"
                                     @click="navigate(item)"
                                 ></v-list-item>
@@ -230,7 +236,7 @@ function mark_as_read(notification) {
                         <v-list-item
                             title="Sair"
                             prepend-icon="mdi-logout"
-                            color="error"
+                            class="mx-2 my-2 logout-item"
                             @click="logout"
                         ></v-list-item>
                     </v-list>
@@ -400,13 +406,11 @@ function mark_as_read(notification) {
                             <v-list-item-title>Início</v-list-item-title>
                         </v-list-item>
                         <v-divider></v-divider>
-                        <v-list-item @click="logout">
+                        <v-list-item @click="logout" class="logout-item">
                             <template v-slot:prepend>
                                 <v-icon icon="mdi-logout"></v-icon>
                             </template>
-                            <v-list-item-title class="text-error">
-                                Sair
-                            </v-list-item-title>
+                            <v-list-item-title>Sair</v-list-item-title>
                         </v-list-item>
                     </v-list>
                 </v-menu>
@@ -423,6 +427,8 @@ function mark_as_read(notification) {
 </template>
 <style scoped lang="scss">
 .auth-sidebar {
+    background-color: var(--v-theme-surface-variant);
+
     :deep(.sidebar-scroll) {
         flex: 1;
         overflow-y: auto;
@@ -433,9 +439,22 @@ function mark_as_read(notification) {
         font-weight: 700;
         letter-spacing: 1.2px;
         text-transform: uppercase;
-        color: rgb(var(--v-theme-primary));
-        opacity: 0.7;
+        color: rgb(var(--v-theme-secondary));
     }
+
+    :deep(.v-list-item:not(.logout-item):not(.v-list-item--active):hover) {
+        background-color: rgba(var(--v-theme-secondary), 0.15);
+        color: #f25922;
+
+        .v-list-item-title,
+        .v-icon {
+            color: #f25922;
+        }
+    }
+}
+
+:deep(.v-main) {
+    background-color: var(--v-theme-surface-variant);
 }
 
 .notification-content {
@@ -448,5 +467,20 @@ function mark_as_read(notification) {
 .notification-unread {
     background-color: rgba(var(--v-theme-primary), 0.06);
     cursor: pointer;
+}
+
+.logout-item {
+    background-color: rgb(var(--v-theme-error));
+    border-radius: 8px;
+    color: #fff;
+
+    :deep(.v-list-item-title),
+    :deep(.v-icon) {
+        color: #fff !important;
+    }
+
+    &:hover {
+        background-color: #ff1744;
+    }
 }
 </style>

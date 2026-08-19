@@ -268,7 +268,7 @@ onMounted(() => {
                             <v-icon
                                 icon="mdi-account-circle"
                                 size="28"
-                                color="primary"
+                                color="secondary"
                                 class="mr-3"
                             ></v-icon>
                             <h2 class="text-h5 font-weight-bold">
@@ -475,7 +475,7 @@ onMounted(() => {
                             <v-icon
                                 icon="mdi-lock-reset"
                                 size="28"
-                                color="primary"
+                                color="secondary"
                                 class="mr-3"
                             ></v-icon>
                             <h2 class="text-h5 font-weight-bold">
@@ -554,7 +554,7 @@ onMounted(() => {
                             <v-icon
                                 icon="mdi-two-factor-authentication"
                                 size="28"
-                                color="primary"
+                                color="secondary"
                                 class="mr-3"
                             ></v-icon>
                             <h2 class="text-h5 font-weight-bold">
