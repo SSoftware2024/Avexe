@@ -213,7 +213,7 @@ function _onPhotoChange(event) {
 
 function _removePhoto() {
     loading.remove_photo = true;
-    router.delete(route("customer.removeProfile"), {
+    router.delete(route("auth.removeProfile"), {
         preserveState: false,
         onFinish: () => {
             loading.remove_photo = false;

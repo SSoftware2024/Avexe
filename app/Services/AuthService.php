@@ -4,7 +4,7 @@ namespace App\Services;
 
 use App\Models\User;
 
-final class CustomerService
+final class AuthService
 {
 
     public function removeProfile(User $user)

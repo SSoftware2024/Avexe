@@ -1,13 +1,17 @@
 <script setup>
-import { ref, computed, onMounted, watch } from 'vue';
-import { useDisplay } from 'vuetify';
-import { router, usePage } from '@inertiajs/vue3';
-import { route } from 'ziggy-js';
-import { images } from '@js/utils/files.js';
+import { ref, computed, onMounted, watch } from "vue";
+import { useDisplay } from "vuetify";
+import { router, usePage } from "@inertiajs/vue3";
+import { route } from "ziggy-js";
+import { images } from "@js/utils/files.js";
 
 const page = usePage();
 const { mdAndUp } = useDisplay();
-
+const props = defineProps({
+    user: {
+        type: Object,
+    },
+});
 const drawer = ref(false);
 
 onMounted(() => {
@@ -26,24 +30,26 @@ watch(
 const fake_notifications = [
     {
         id: 1,
-        title: 'Novo agendamento',
-        content: 'Maria Silva acabou de agendar uma consulta para amanhã às 14h.',
+        title: "Novo agendamento",
+        content:
+            "Maria Silva acabou de agendar uma consulta para amanhã às 14h.",
         is_read: false,
-        created_at: '2026-08-19 10:30:00',
+        created_at: "2026-08-19 10:30:00",
     },
     {
         id: 2,
-        title: 'Pagamento recebido',
-        content: 'O pagamento do serviço Corte de cabelo foi confirmado com sucesso.',
+        title: "Pagamento recebido",
+        content:
+            "O pagamento do serviço Corte de cabelo foi confirmado com sucesso.",
         is_read: false,
-        created_at: '2026-08-18 16:45:00',
+        created_at: "2026-08-18 16:45:00",
     },
     {
         id: 3,
-        title: 'Avaliação recebida',
-        content: 'João Pedro avaliou sua empresa com 5 estrelas.',
+        title: "Avaliação recebida",
+        content: "João Pedro avaliou sua empresa com 5 estrelas.",
         is_read: true,
-        created_at: '2026-08-18 09:15:00',
+        created_at: "2026-08-18 09:15:00",
     },
 ];
 
@@ -51,7 +57,7 @@ const notifications = computed(() => {
     const list = page.props.notifications ?? fake_notifications;
 
     return [...list]
-        .sort((a, b) => (b.created_at ?? '') > (a.created_at ?? '') ? 1 : -1)
+        .sort((a, b) => ((b.created_at ?? "") > (a.created_at ?? "") ? 1 : -1))
         .slice(0, 3);
 });
 
@@ -60,92 +66,165 @@ const unread_count = computed(
 );
 
 const notifications_link = computed(
-    () => page.props.notifications_link ?? route('index'),
+    () => page.props.notifications_link ?? route("index"),
 );
 
 const dashboard_link = computed(() => {
     const user_type = page.props.user?.user_type;
 
-    if (user_type == 'developer') {
-        return route('developer');
+    if (user_type == "developer") {
+        return route("developer");
     }
 
-    return route('owner');
+    return route("owner");
 });
 
-const nav_sections = computed(() => [
-    {
-        title: 'Gerenciamento',
-        items: [
+const nav_sections = computed(() => {
+    return {
+        developer: [
             {
-                title: 'Dashboard',
-                icon: 'mdi-view-dashboard-outline',
-                to: dashboard_link.value,
-                active_names: ['owner', 'developer'],
-            },
-            {
-                title: 'Agendamentos',
-                icon: 'mdi-calendar-week-outline',
-                children: [
+                title: "Gerenciamento",
+                items: [
                     {
-                        title: 'Hoje',
-                        icon: 'mdi-calendar-today',
+                        title: "Dashboard",
+                        icon: "mdi-view-dashboard-outline",
+                        to: dashboard_link.value,
+                        active_names: ["owner", "developer"],
                     },
                     {
-                        title: 'Próximos',
-                        icon: 'mdi-calendar-month',
+                        title: "Empresas",
+                        icon: "mdi-account-group-outline",
+                        children: [
+                            {
+                                title: "Empresas",
+                                icon: "mdi-account-plus-outline",
+                            },
+                            {
+                                title: "Listar clientes",
+                                icon: "mdi-account-multiple-outline",
+                            },
+                        ],
                     },
                     {
-                        title: 'Histórico',
-                        icon: 'mdi-calendar-check',
+                        title: "Developers",
+                        icon: "mdi-account-group-outline",
+                        children: [
+                            {
+                                title: "Novo cliente",
+                                icon: "mdi-account-plus-outline",
+                            },
+                            {
+                                title: "Listar clientes",
+                                icon: "mdi-account-multiple-outline",
+                            },
+                            
+                        ],
                     },
                 ],
             },
             {
-                title: 'Clientes',
-                icon: 'mdi-account-group-outline',
-                children: [
+                title: "Relatórios",
+                items: [
+                    { title: "Financeiro", icon: "mdi-cash-multiple" },
+                ],
+            },
+            {
+                title: "Configurações",
+                items: [
                     {
-                        title: 'Listar clientes',
-                        icon: 'mdi-account-multiple-outline',
+                        title: "Perfil",
+                        icon: "mdi-account-circle-outline",
+                        to: route("auth.profileView"),
+                        active_names: ["auth.profileView"],
+                    },
+                ],
+            },
+        ],
+        owner: [
+            {
+                title: "Gerenciamento owner",
+                items: [
+                    {
+                        title: "Dashboard",
+                        icon: "mdi-view-dashboard-outline",
+                        to: dashboard_link.value,
+                        active_names: ["owner", "developer"],
                     },
                     {
-                        title: 'Novo cliente',
-                        icon: 'mdi-account-plus-outline',
+                        title: "Agendamentos",
+                        icon: "mdi-calendar-week-outline",
+                        children: [
+                            {
+                                title: "Hoje",
+                                icon: "mdi-calendar-today",
+                            },
+                            {
+                                title: "Próximos",
+                                icon: "mdi-calendar-month",
+                            },
+                            {
+                                title: "Histórico",
+                                icon: "mdi-calendar-check",
+                            },
+                        ],
+                    },
+                    {
+                        title: "Clientes",
+                        icon: "mdi-account-group-outline",
+                        children: [
+                            {
+                                title: "Listar clientes",
+                                icon: "mdi-account-multiple-outline",
+                            },
+                            {
+                                title: "Novo cliente",
+                                icon: "mdi-account-plus-outline",
+                            },
+                        ],
+                    },
+                    {
+                        title: "Serviços",
+                        icon: "mdi-content-cut",
+                        children: [
+                            {
+                                title: "Serviços e preços",
+                                icon: "mdi-tag-outline",
+                            },
+                            {
+                                title: "Produtos",
+                                icon: "mdi-package-variant",
+                            },
+                        ],
                     },
                 ],
             },
             {
-                title: 'Serviços',
-                icon: 'mdi-content-cut',
-                children: [
+                title: "Relatórios",
+                items: [
+                    { title: "Relatórios", icon: "mdi-chart-box-outline" },
+                    { title: "Financeiro", icon: "mdi-cash-multiple" },
+                ],
+            },
+            {
+                title: "Configurações",
+                items: [
                     {
-                        title: 'Serviços e preços',
-                        icon: 'mdi-tag-outline',
+                        title: "Perfil",
+                        icon: "mdi-account-circle-outline",
+                        to: route("auth.profileView"),
+                        active_names: ["auth.profileView"],
                     },
                     {
-                        title: 'Produtos',
-                        icon: 'mdi-package-variant',
+                        title: "Início",
+                        icon: "mdi-home-outline",
+                        to: route("index"),
+                        active_names: ["index"],
                     },
                 ],
             },
         ],
-    },
-    {
-        title: 'Relatórios',
-        items: [
-            { title: 'Relatórios', icon: 'mdi-chart-box-outline' },
-            { title: 'Financeiro', icon: 'mdi-cash-multiple' },
-        ],
-    },
-    {
-        title: 'Configurações',
-        items: [
-            { title: 'Perfil', icon: 'mdi-account-circle-outline', to: route('customer.profileView'), active_names: ['customer.profileView'] },
-            { title: 'Início', icon: 'mdi-home-outline', to: route('index'), active_names: ['index'] },
-        ],
-    },
-]);
+    };
+});
 
 function is_active(item) {
     return item.active_names?.some((name) => route().current(name)) ?? false;
@@ -158,7 +237,7 @@ function navigate(item) {
 }
 
 function logout() {
-    router.post(route('logout'));
+    router.post(route("logout"));
 }
 
 function mark_as_read(notification) {
@@ -180,7 +259,7 @@ function mark_as_read(notification) {
                 <div class="sidebar-scroll">
                     <v-list nav density="compact">
                         <template
-                            v-for="section in nav_sections"
+                            v-for="section in nav_sections[page.props.user.user_type]"
                             :key="section.title"
                         >
                             <div class="sidebar-section-title px-4 pt-3 pb-1">
@@ -208,7 +287,9 @@ function mark_as_read(notification) {
                                         :prepend-icon="child.icon"
                                         :active="is_active(child)"
                                         :variant="
-                                            is_active(child) ? 'flat' : undefined
+                                            is_active(child)
+                                                ? 'flat'
+                                                : undefined
                                         "
                                         color="primary"
                                         @click="navigate(child)"
@@ -266,7 +347,11 @@ function mark_as_read(notification) {
                 >
                     <template v-slot:activator="{ props }">
                         <v-btn variant="text" class="mr-2" v-bind="props">
-                            <v-badge :content="unread_count" color="error" location="top end">
+                            <v-badge
+                                :content="unread_count"
+                                color="error"
+                                location="top end"
+                            >
                                 <v-icon icon="mdi-bell-outline"></v-icon>
                             </v-badge>
                         </v-btn>
@@ -348,7 +433,9 @@ function mark_as_read(notification) {
                                 size="48"
                                 color="grey-lighten-1"
                             ></v-icon>
-                            <p class="text-subtitle-1 mt-3 text-medium-emphasis">
+                            <p
+                                class="text-subtitle-1 mt-3 text-medium-emphasis"
+                            >
                                 Nenhuma notificação no momento
                             </p>
                         </div>
@@ -392,7 +479,7 @@ function mark_as_read(notification) {
                             <v-list-item-title>Dashboard</v-list-item-title>
                         </v-list-item>
                         <v-list-item
-                            @click="router.visit(route('customer.profileView'))"
+                            @click="router.visit(route('auth.profileView'))"
                         >
                             <template v-slot:prepend>
                                 <v-icon icon="mdi-account-circle"></v-icon>

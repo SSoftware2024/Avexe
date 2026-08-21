@@ -18,14 +18,6 @@ class CustomerController extends Controller
     {
         return Inertia::render('User/AppointmentsCustomer');
     }
-    public function profileView()
-    {
-        return Inertia::render('Auth/Profile');
-    }
-    public function removeProfile(CustomerService $customer_service)
-    {
-        $customer_service->removeProfile(Auth::user());
-    }
 
     public function loginGoogle(GoogleLoginService $googleService)
     {

@@ -246,7 +246,7 @@ defineExpose({
                             </v-list-item>
                             <v-list-item
                                 @click="
-                                    router.visit(route('customer.profileView'))
+                                    router.visit(route('auth.profileView'))
                                 "
                             >
                                 <template v-slot:prepend>
@@ -363,7 +363,7 @@ defineExpose({
                             <v-list-item-title>Início</v-list-item-title>
                         </v-list-item>
                         <v-list-item
-                            @click="router.visit(route('customer.profileView'))"
+                            @click="router.visit(route('auth.profileView'))"
                         >
                             <template v-slot:prepend>
                                 <v-icon icon="mdi-account-circle"></v-icon>
@@ -423,7 +423,7 @@ defineExpose({
                             color="warning"
                             size="small"
                             class="mt-2"
-                            @click="router.visit(route('customer.profileView'))"
+                            @click="router.visit(route('auth.profileView'))"
                         >
                             Completar cadastro
                         </v-btn>
