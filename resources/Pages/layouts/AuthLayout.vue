@@ -14,18 +14,50 @@ const props = defineProps({
 });
 const drawer = ref(false);
 
+// Guarda os títulos dos grupos (dropdowns) que devem ficar abertos na sidebar
+const opened_groups = ref([]);
+
 onMounted(() => {
     drawer.value = mdAndUp.value;
+
+    // Na primeira renderização, já abre o grupo cujo filho está ativo
+    _syncOpenedGroups();
 });
 
+// Toda vez que a URL muda, reavalia quais dropdowns devem ficar abertos
+// e fecha o drawer no mobile
 watch(
     () => page.url,
     () => {
         if (!mdAndUp.value) {
             drawer.value = false;
         }
+
+        _syncOpenedGroups();
     },
 );
+
+// Varre toda a navegação e monta a lista de grupos que têm pelo menos
+// um filho ativo (a página atual). Esses grupos são abertos automaticamente
+function _syncOpenedGroups() {
+    const sections =
+        nav_sections.value[page.props.user?.user_type] ?? [];
+
+    const open = [];
+
+    for (const section of sections) {
+        for (const item of section.items) {
+            // Só grupos com children: se algum filho está na rota atual, abre o pai
+            if (
+                item.children?.some((child) => _isActive(child))
+            ) {
+                open.push(item.title);
+            }
+        }
+    }
+
+    opened_groups.value = open;
+}
 
 const fake_notifications = [
     {
@@ -94,6 +126,7 @@ const nav_sections = computed(() => {
                     {
                         title: "Empresas",
                         icon: "mdi-account-group-outline",
+                        active_names: ["developer.ownerListView"],
                         children: [
                             {
                                 title: "Empresas",
@@ -102,6 +135,9 @@ const nav_sections = computed(() => {
                             {
                                 title: "Listar clientes",
                                 icon: "mdi-account-multiple-outline",
+                                to: route('developer.ownerListView'),
+                                active_names: ["developer.ownerListView"],
+
                             },
                         ],
                     },
@@ -226,21 +262,21 @@ const nav_sections = computed(() => {
     };
 });
 
-function is_active(item) {
+function _isActive(item) {
     return item.active_names?.some((name) => route().current(name)) ?? false;
 }
 
-function navigate(item) {
+function _navigate(item) {
     if (item.to) {
         router.visit(item.to);
     }
 }
 
-function logout() {
+function _logout() {
     router.post(route("logout"));
 }
 
-function mark_as_read(notification) {
+function _markAsRead(notification) {
     if (!notification.is_read) {
         notification.is_read = true;
     }
@@ -257,7 +293,8 @@ function mark_as_read(notification) {
                 class="auth-sidebar"
             >
                 <div class="sidebar-scroll">
-                    <v-list nav density="compact">
+                    <!-- v-model:opened liga este v-list aos grupos que devem ficar abertos -->
+                    <v-list nav density="compact" v-model:opened="opened_groups">
                         <template
                             v-for="section in nav_sections[page.props.user.user_type]"
                             :key="section.title"
@@ -285,26 +322,26 @@ function mark_as_read(notification) {
                                         :key="child.title"
                                         :title="child.title"
                                         :prepend-icon="child.icon"
-                                        :active="is_active(child)"
+                                        :active="_isActive(child)"
                                         :variant="
-                                            is_active(child)
+                                            _isActive(child)
                                                 ? 'flat'
                                                 : undefined
                                         "
                                         color="primary"
-                                        @click="navigate(child)"
+                                        @click="_navigate(child)"
                                     ></v-list-item>
                                 </v-list-group>
                                 <v-list-item
                                     v-else
                                     :title="item.title"
                                     :prepend-icon="item.icon"
-                                    :active="is_active(item)"
+                                    :active="_isActive(item)"
                                     :variant="
-                                        is_active(item) ? 'flat' : undefined
+                                        _isActive(item) ? 'flat' : undefined
                                     "
                                     color="primary"
-                                    @click="navigate(item)"
+                                    @click="_navigate(item)"
                                 ></v-list-item>
                             </template>
                         </template>
@@ -318,7 +355,7 @@ function mark_as_read(notification) {
                             title="Sair"
                             prepend-icon="mdi-logout"
                             class="mx-2 my-2 logout-item"
-                            @click="logout"
+                            @click="_logout"
                         ></v-list-item>
                     </v-list>
                 </template>
@@ -379,7 +416,7 @@ function mark_as_read(notification) {
                                         'notification-unread':
                                             !notification.is_read,
                                     }"
-                                    @click="mark_as_read(notification)"
+                                    @click="_markAsRead(notification)"
                                 >
                                     <template v-slot:prepend>
                                         <v-avatar
@@ -493,7 +530,7 @@ function mark_as_read(notification) {
                             <v-list-item-title>Início</v-list-item-title>
                         </v-list-item>
                         <v-divider></v-divider>
-                        <v-list-item @click="logout" class="logout-item">
+                        <v-list-item @click="_logout" class="logout-item">
                             <template v-slot:prepend>
                                 <v-icon icon="mdi-logout"></v-icon>
                             </template>
