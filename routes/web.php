@@ -37,5 +37,7 @@ Route::prefix('developer')->name('developer')->group(function () {
 
     // operações owner
     Route::get('/owner/listView', [DeveloperController::class, 'ownerListView'])->name('.ownerListView');
+    Route::get('/owner/createOrUpdate/{user?}', [DeveloperController::class, 'ownerCreateUpdateView'])->name('.ownerCreateUpdateView');
+    Route::post('/owner/createOrUpdate', [DeveloperController::class, 'ownerCreateOrUpdate'])->name('.ownerCreateOrUpdate');
 
 });

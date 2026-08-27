@@ -2,11 +2,18 @@
 import "vuetify/styles";
 import "@mdi/font/css/materialdesignicons.css";
 import { createVuetify } from "vuetify";
+import { pt } from 'vuetify/locale'
 import { VMaskInput } from 'vuetify/labs/VMaskInput' //máscaras 
 import * as components from "vuetify/components";
 import * as directives from "vuetify/directives";
 
 const vuetify = createVuetify({
+    locale: {
+        locale: 'pt',
+        messages: {
+            pt,
+        },
+    },
     components: {
         ...components,
         VMaskInput,

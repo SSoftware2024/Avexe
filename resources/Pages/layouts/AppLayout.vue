@@ -508,23 +508,7 @@ defineExpose({
                             :error-messages="form_register.errors.whatsapp"
                             :hide-details="!form_register.errors.whatsapp"
                         ></v-mask-input>
-                        <v-text-field
-                            label="Senha"
-                            variant="outlined"
-                            type="password"
-                            name="password"
-                            v-model="form_register.password"
-                            :error-messages="form_register.errors.password"
-                            :hide-details="!form_register.errors.password"
-                        ></v-text-field>
-                        <v-text-field
-                            label="Confirmar senha"
-                            variant="outlined"
-                            type="password"
-                            name="password_confirmation"
-                            v-model="form_register.password_confirmation"
-                            hide-details
-                        ></v-text-field>
+                        
 
                         <div
                             class="w-full d-flex flex-row align-content-center"

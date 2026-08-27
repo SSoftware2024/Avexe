@@ -13,51 +13,8 @@ const props = defineProps({
     },
 });
 const drawer = ref(false);
-
 // Guarda os títulos dos grupos (dropdowns) que devem ficar abertos na sidebar
 const opened_groups = ref([]);
-
-onMounted(() => {
-    drawer.value = mdAndUp.value;
-
-    // Na primeira renderização, já abre o grupo cujo filho está ativo
-    _syncOpenedGroups();
-});
-
-// Toda vez que a URL muda, reavalia quais dropdowns devem ficar abertos
-// e fecha o drawer no mobile
-watch(
-    () => page.url,
-    () => {
-        if (!mdAndUp.value) {
-            drawer.value = false;
-        }
-
-        _syncOpenedGroups();
-    },
-);
-
-// Varre toda a navegação e monta a lista de grupos que têm pelo menos
-// um filho ativo (a página atual). Esses grupos são abertos automaticamente
-function _syncOpenedGroups() {
-    const sections =
-        nav_sections.value[page.props.user?.user_type] ?? [];
-
-    const open = [];
-
-    for (const section of sections) {
-        for (const item of section.items) {
-            // Só grupos com children: se algum filho está na rota atual, abre o pai
-            if (
-                item.children?.some((child) => _isActive(child))
-            ) {
-                open.push(item.title);
-            }
-        }
-    }
-
-    opened_groups.value = open;
-}
 
 const fake_notifications = [
     {
@@ -136,7 +93,7 @@ const nav_sections = computed(() => {
                                 title: "Listar clientes",
                                 icon: "mdi-account-multiple-outline",
                                 to: route('developer.ownerListView'),
-                                active_names: ["developer.ownerListView"],
+                                active_names: ["developer.ownerListView", 'developer.ownerCreateUpdateView'],
 
                             },
                         ],
@@ -262,6 +219,17 @@ const nav_sections = computed(() => {
     };
 });
 
+watch(
+    () => page.url,
+    () => {
+        if (!mdAndUp.value) {
+            drawer.value = false;
+        }
+
+        _syncOpenedGroups();
+    },
+);
+
 function _isActive(item) {
     return item.active_names?.some((name) => route().current(name)) ?? false;
 }
@@ -281,6 +249,32 @@ function _markAsRead(notification) {
         notification.is_read = true;
     }
 }
+
+function _syncOpenedGroups() {
+    const sections =
+        nav_sections.value[page.props.user?.user_type] ?? [];
+
+    const open = [];
+
+    for (const section of sections) {
+        for (const item of section.items) {
+            // Só grupos com children: se algum filho está na rota atual, abre o pai
+            if (
+                item.children?.some((child) => _isActive(child))
+            ) {
+                open.push(item.title);
+            }
+        }
+    }
+
+    opened_groups.value = open;
+}
+
+
+onMounted(() => {
+    drawer.value = mdAndUp.value;
+    _syncOpenedGroups();
+});
 </script>
 <template>
     <v-app>

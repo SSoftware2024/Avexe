@@ -23,7 +23,6 @@ return new class extends Migration
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password')->nullable();
             $table->enum('user_type', TypeUser::toArrayValues())->default(TypeUser::CUSTOMER->value);
-            $table->boolean('is_register_completed')->default(false);
             $table->date('date_of_birth')->nullable();
             $table->decimal('latitude', 10, 8)->nullable(); #valor max & min 90.00000000 (ou mínimo -90.00000000)
             $table->decimal('longitude', 11, 8)->nullable(); #valor max & min 180.00000000 (ou mínimo -180.00000000)
