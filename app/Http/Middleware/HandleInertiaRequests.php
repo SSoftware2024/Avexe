@@ -41,7 +41,8 @@ class HandleInertiaRequests extends Middleware
             'twofa' => [
                 'is_enabled' => $request->user()?->hasEnabledTwoFactorAuthentication() ?? false,
                 'status' => session('status') ?? null
-            ]
+            ],
+            RESPONSE_DATA_KEY_INERTIA => session(RESPONSE_DATA_KEY_INERTIA) ?? null
         ];
     }
 }

@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Enum\TypeUser;
+use App\Facades\DialogAlert;
+use App\Facades\Toast;
 use App\Models\User;
 use App\Services\DeveloperService;
 use Illuminate\Http\Request;
@@ -22,7 +24,8 @@ class DeveloperController extends Controller
     public function ownerCreateUpdateView(Request $request, ?User $user)
     {
         if (Auth::user()->cannot('ownerManager', User::class)) {
-            return redirect()->back();
+            DialogAlert::error('Usuário sem permição para ação desejada.');
+            return redirect()->route('auth.profileView');
         }
         return Inertia::render('Dev/OwnerCreateUpdate', [
             'user_data' => $user->exists ? $user : null
@@ -36,8 +39,8 @@ class DeveloperController extends Controller
     public function ownerCreateOrUpdate(Request $request, DeveloperService $service)
     {
         if (Auth::user()->cannot('ownerManager', User::class)) {
-            //usuario não pode fazer ação
-            return;
+            DialogAlert::error('Usuário sem permição para ação desejada.');
+            return redirect()->back();
         }
         $id = $request->id;
         $request->validate([
@@ -60,5 +63,6 @@ class DeveloperController extends Controller
         ]);
         $data = $request->all();
         $service->ownerCreateOrUpdate($data, $id);
+        Toast::success('Operação realizada com sucesso!');
     }
 }

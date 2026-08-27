@@ -1,11 +1,13 @@
 <script setup>
-import { ref, computed, onMounted, watch } from "vue";
+import { ref, computed, onMounted, watch, onUnmounted } from "vue";
 import { useDisplay } from "vuetify";
+import { useToast } from "vue-toast-notification";
 import { router, usePage } from "@inertiajs/vue3";
 import { route } from "ziggy-js";
 import { images } from "@/utils/files.js";
 import DialogAlert from "@/components/DialogAlert.vue";
 
+const toast = useToast();
 const page = usePage();
 const { mdAndUp } = useDisplay();
 const props = defineProps({
@@ -13,7 +15,7 @@ const props = defineProps({
         type: Object,
     },
 });
-const alertDialog = ref(null);//ref
+const alertDialog = ref(null); //ref
 
 const drawer = ref(false);
 // Guarda os títulos dos grupos (dropdowns) que devem ficar abertos na sidebar
@@ -95,9 +97,11 @@ const nav_sections = computed(() => {
                             {
                                 title: "Listar clientes",
                                 icon: "mdi-account-multiple-outline",
-                                to: route('developer.ownerListView'),
-                                active_names: ["developer.ownerListView", 'developer.ownerCreateUpdateView'],
-
+                                to: route("developer.ownerListView"),
+                                active_names: [
+                                    "developer.ownerListView",
+                                    "developer.ownerCreateUpdateView",
+                                ],
                             },
                         ],
                     },
@@ -113,16 +117,13 @@ const nav_sections = computed(() => {
                                 title: "Listar clientes",
                                 icon: "mdi-account-multiple-outline",
                             },
-                            
                         ],
                     },
                 ],
             },
             {
                 title: "Relatórios",
-                items: [
-                    { title: "Financeiro", icon: "mdi-cash-multiple" },
-                ],
+                items: [{ title: "Financeiro", icon: "mdi-cash-multiple" }],
             },
             {
                 title: "Configurações",
@@ -254,17 +255,14 @@ function _markAsRead(notification) {
 }
 
 function _syncOpenedGroups() {
-    const sections =
-        nav_sections.value[page.props.user?.user_type] ?? [];
+    const sections = nav_sections.value[page.props.user?.user_type] ?? [];
 
     const open = [];
 
     for (const section of sections) {
         for (const item of section.items) {
             // Só grupos com children: se algum filho está na rota atual, abre o pai
-            if (
-                item.children?.some((child) => _isActive(child))
-            ) {
+            if (item.children?.some((child) => _isActive(child))) {
                 open.push(item.title);
             }
         }
@@ -273,18 +271,18 @@ function _syncOpenedGroups() {
     opened_groups.value = open;
 }
 
-// function _showToast(event) {
-//     let messageToast = event.detail.page.props.response_data?.toast;
-//     if (messageToast) {
-//         messageToast.forEach((value) => {
-//             toast.open({
-//                 message: value.message,
-//                 type: value.type,
-//                 duration: value.duration,
-//             });
-//         });
-//     }
-// }
+function _showToast(event) {
+    let messageToast = event.detail.page.props.response_data?.toast;
+    if (messageToast) {
+        messageToast.forEach((value) => {
+            toast.open({
+                message: value.message,
+                type: value.type,
+                duration: value.duration,
+            });
+        });
+    }
+}
 function _showAlert(event) {
     let alert_dialog = event.detail.page.props.response_data?.alert_dialog;
     if (alert_dialog) {
@@ -292,11 +290,27 @@ function _showAlert(event) {
     }
 }
 
-onMounted(() => {
+//events
+let router_success;
+onMounted((e) => {
     drawer.value = mdAndUp.value;
-    alertDialog.value.open('Usário foi cadastrado com sucesso','info');
     _syncOpenedGroups();
+
+    //alertas iniciais
+    _showAlert({detail: {page}});
+    _showToast({detail: {page}});
+    //events
+    router_success = router.on("success", (event) => {
+        _showAlert(event);
+        _showToast(event);
+    });
+    
 });
+
+onUnmounted(() => {
+    if(router_success) router_success();
+});
+
 </script>
 <template>
     <dialog-alert ref="alertDialog"></dialog-alert>
@@ -311,9 +325,15 @@ onMounted(() => {
             >
                 <div class="sidebar-scroll">
                     <!-- v-model:opened liga este v-list aos grupos que devem ficar abertos -->
-                    <v-list nav density="compact" v-model:opened="opened_groups">
+                    <v-list
+                        nav
+                        density="compact"
+                        v-model:opened="opened_groups"
+                    >
                         <template
-                            v-for="section in nav_sections[page.props.user.user_type]"
+                            v-for="section in nav_sections[
+                                page.props.user.user_type
+                            ]"
                             :key="section.title"
                         >
                             <div class="sidebar-section-title px-4 pt-3 pb-1">
