@@ -1,7 +1,7 @@
 <!-- PARTIAL PAGE -->
 <script setup>
 import { computed, onMounted, reactive, ref } from "vue";
-import { getCurrentLocation, copyText } from "@js/utils/functions.js";
+import { getCurrentLocation, copyText } from "@/utils/functions.js";
 import { useForm, router, usePage } from "@inertiajs/vue3";
 import ConfirmPasswordModal from "@/components/ConfirmPasswordModal.vue";
 import AuthLayout from "@/layouts/AuthLayout.vue";

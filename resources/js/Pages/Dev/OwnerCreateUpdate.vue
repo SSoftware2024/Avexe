@@ -2,7 +2,7 @@
 import AuthLayout from "@/layouts/AuthLayout.vue";
 import { Head, useForm } from "@inertiajs/vue3";
 import SectionCard from "@/components/SectionCard.vue";
-import OwnerCreateUpdate from "../PartialPages/OwnerCreateUpdate.vue";
+import OwnerCreateUpdate from "@/PartialPages/OwnerCreateUpdate.vue";
 const props = defineProps({
     user_data: Object
 });

@@ -1,7 +1,7 @@
 <script setup>
 import { onMounted, reactive, ref, computed } from "vue";
 import { useDisplay } from "vuetify";
-import { images } from "../../js/utils/files.js";
+import { images } from "@/utils/files.js";
 import { router, useForm, usePage } from "@inertiajs/vue3";
 import { route } from "ziggy-js"; //route ziggy
 const page = usePage();

@@ -22,5 +22,5 @@
     </v-app>
 </template>
 <script setup>
-import { images } from "@js/utils/files.js";
+import { images } from "@/utils/files.js";
 </script>

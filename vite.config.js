@@ -28,13 +28,7 @@ export default defineConfig({
             {
                 find: "@",
                 replacement: fileURLToPath(
-                    new URL("./resources/Pages", import.meta.url),
-                ),
-            },
-            {
-                find: "@js",
-                replacement: fileURLToPath(
-                    new URL("./resources/js", import.meta.url),
+                    new URL("./resources/js/", import.meta.url),
                 ),
             },
         ],

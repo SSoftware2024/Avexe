@@ -3,7 +3,8 @@ import { ref, computed, onMounted, watch } from "vue";
 import { useDisplay } from "vuetify";
 import { router, usePage } from "@inertiajs/vue3";
 import { route } from "ziggy-js";
-import { images } from "@js/utils/files.js";
+import { images } from "@/utils/files.js";
+import DialogAlert from "@/components/DialogAlert.vue";
 
 const page = usePage();
 const { mdAndUp } = useDisplay();
@@ -12,6 +13,8 @@ const props = defineProps({
         type: Object,
     },
 });
+const alertDialog = ref(null);//ref
+
 const drawer = ref(false);
 // Guarda os títulos dos grupos (dropdowns) que devem ficar abertos na sidebar
 const opened_groups = ref([]);
@@ -270,13 +273,33 @@ function _syncOpenedGroups() {
     opened_groups.value = open;
 }
 
+// function _showToast(event) {
+//     let messageToast = event.detail.page.props.response_data?.toast;
+//     if (messageToast) {
+//         messageToast.forEach((value) => {
+//             toast.open({
+//                 message: value.message,
+//                 type: value.type,
+//                 duration: value.duration,
+//             });
+//         });
+//     }
+// }
+function _showAlert(event) {
+    let alert_dialog = event.detail.page.props.response_data?.alert_dialog;
+    if (alert_dialog) {
+        alertDialog.value.open(alert_dialog.message, alert_dialog.type);
+    }
+}
 
 onMounted(() => {
     drawer.value = mdAndUp.value;
+    alertDialog.value.open('Usário foi cadastrado com sucesso','info');
     _syncOpenedGroups();
 });
 </script>
 <template>
+    <dialog-alert ref="alertDialog"></dialog-alert>
     <v-app>
         <v-layout>
             <!-- SIDEBAR -->

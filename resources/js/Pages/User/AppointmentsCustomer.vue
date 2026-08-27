@@ -1,6 +1,6 @@
 <script setup>
 import AppLayout from "@/layouts/AppLayout.vue";
-import { images } from "@js/utils/files.js";
+import { images } from "@/utils/files.js";
 import { router } from "@inertiajs/vue3";
 import { route } from "ziggy-js";
 import { ref } from "vue";

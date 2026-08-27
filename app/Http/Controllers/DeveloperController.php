@@ -21,7 +21,7 @@ class DeveloperController extends Controller
 
     public function ownerCreateUpdateView(Request $request, ?User $user)
     {
-        if (Auth::user()->cannnot('ownerManager', User::class)) {
+        if (Auth::user()->cannot('ownerManager', User::class)) {
             return redirect()->back();
         }
         return Inertia::render('Dev/OwnerCreateUpdate', [
