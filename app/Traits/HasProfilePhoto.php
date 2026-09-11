@@ -17,7 +17,7 @@ trait HasProfilePhoto
     {
         if ($file instanceof UploadedFile && $file->isValid()) {
             $this->removeProfile();
-            $filename = 'profile_'.bin2hex(random_bytes(16)).'.'.$file->extension();
+            $filename = 'profile_' . bin2hex(random_bytes(16)) . '.' . $file->extension();
             $image = Image::decode($file)->resize(80, 80);
             Storage::disk('public')->put(
                 "{$this->profile_path}/$filename",
@@ -25,7 +25,7 @@ trait HasProfilePhoto
             );
             $this->{$this->profile_field} = $filename;
         } else {
-            throw new \Exception("Invalid upload file. Expected UploadedFile, but received: '".get_debug_type($file)."'");
+            throw new \Exception("Invalid upload file. Expected UploadedFile, but received: '" . get_debug_type($file) . "'");
         }
     }
 
@@ -38,7 +38,7 @@ trait HasProfilePhoto
     {
         return Attribute::make(
             get: function () {
-                if (! $this->profile) {
+                if (!$this->profile) {
                     return null;
                 }
                 // Se já é uma URL completa (ex: foto do Google), retorna direto
@@ -46,14 +46,14 @@ trait HasProfilePhoto
                     return $this->profile;
                 }
 
-                return asset("storage/{$this->profile_path}/".$this->profile);
+                return asset("storage/{$this->profile_path}/" . $this->profile);
             }
         );
     }
 
     public function removeProfile()
     {
-        $filename = $this->profile_path.'/'.$this->{$this->profile_field};
+        $filename = $this->profile_path . '/' . $this->{$this->profile_field};
         if (Storage::disk('public')->exists($filename)) {
             Storage::disk('public')->delete($filename);
         }

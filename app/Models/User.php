@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Traits\HasProfilePhoto;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -28,6 +29,7 @@ class User extends Authenticatable implements MustVerifyEmail
 
     protected $appends = [
         'profile_url', // trait HasProfilePhoto
+        'date_of_birth_formatted'
     ];
 
     /**
@@ -44,6 +46,13 @@ class User extends Authenticatable implements MustVerifyEmail
     }
 
     /** ======================================================MUTATORS======================================================== */
-
+    protected function dateOfBirthFormatted(): Attribute
+    {
+        return Attribute::make(
+            get: function () {
+                return date('d/m/Y', strtotime($this->date_of_birth));
+            }
+        );
+    }
     /** ======================================================FIM MUTATORS======================================================== */
 }

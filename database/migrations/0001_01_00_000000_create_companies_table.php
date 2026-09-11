@@ -18,6 +18,7 @@ return new class extends Migration
             $table->string('cpf', 14)->nullable();
             $table->string('corporate_name')->nullable();
             $table->string('name');
+            $table->boolean('active')->default(true);
             #endereço
             $table->decimal('latitude', 10, 8)->nullable(); #valor max & min 90.00000000 (ou mínimo -90.00000000)
             $table->decimal('longitude', 11, 8)->nullable(); #valor max & min 180.00000000 (ou mínimo -180.00000000)

@@ -25,7 +25,6 @@ class DatabaseSeeder extends Seeder
             'email' => 'test@example.com',
             'email_verified_at' => now(),
             'user_type' => TypeUser::DEVELOPER->value,
-            'is_register_completed' => true,
             'date_of_birth' => date('Y-m-d', strtotime('2001-02-02')),
             'password' => Hash::make('ssoftware'),
         ]);
