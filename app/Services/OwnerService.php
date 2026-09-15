@@ -47,8 +47,14 @@ class OwnerService
     public function delete(int $id): int
     {
         //futuramente deletar suas relações primeiro, caso use forceDelete
-        $deleted = User::where('id', $id)->where('user_type', TypeUser::OWNER->value)->forceDelete();
+        $deleted = User::where('id', $id)->forceDelete();
         return $deleted;
+    }
+    public function toggleActive(int $id): int
+    {
+        $user = User::find($id);
+        $user->active = !$user->active;
+        return $user->save();
     }
 
     public function getData(?int $paginate = 10, array $sort_by = [])

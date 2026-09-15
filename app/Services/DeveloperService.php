@@ -28,4 +28,9 @@ final class DeveloperService
     {
         return $this->ownerService->getData($paginate, $sort_by);
     }
+    public function ownerToggleActive(int $id):int
+    {
+        return $this->ownerService->toggleActive($id);
+    }
+    
 }

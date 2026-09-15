@@ -23,6 +23,12 @@ const datatable = reactive({
             align: "end",
         },
         {
+            title: "Ativo.",
+            sortable: false,
+            key: "active",
+            align: "end",
+        },
+        {
             title: "Ações",
             key: "actions",
             sortable: false,
@@ -52,17 +58,25 @@ function loadData({ page, itemsPerPage, sortBy }) {
         },
     );
 }
-function deleteOwner(id){
-    router.delete(route('developer.ownerDelete', [id]));
+function deleteOwner(id) {
+    datatable.loading = true;
+    router.delete(route("developer.ownerDelete", [id]));
 }
-function deleteQuestion(item){
-    dialog_alert.setButtons({
-        question_buttons: true,
-    }).confirmFunction(() => {
-        deleteOwner(item.id)
-    })
-    dialog_alert.open('Deletar usuario: '+item.name+'?', 'question');
-
+function toggleActiveOwner(item) {
+    router.patch(route("developer.ownerToggleActive", [item.id]));
+}
+function editOwner(item) {
+    router.get(route("developer.ownerCreateUpdateView", [item.id]));
+}
+function deleteQuestion(item) {
+    dialog_alert
+        .setButtons({
+            question_buttons: true,
+        })
+        .confirmFunction(() => {
+            deleteOwner(item.id);
+        });
+    dialog_alert.open("Deletar usuario: " + item.name + "?", "question");
 }
 </script>
 <template>
@@ -89,55 +103,83 @@ function deleteQuestion(item){
                 item-value="id"
                 @update:options="loadData"
             >
+                <template #item.active="{ item }">
+                    <v-icon
+                        :color="item.active ? 'success' : 'error'"
+                        size="large"
+                    >
+                        {{
+                            item.active
+                                ? "mdi-check-circle"
+                                : "mdi-close-circle"
+                        }}
+                    </v-icon>
+                </template>
                 <template #item.actions="{ item }">
-                    <div class="d-flex ga-2">
-                        <!-- Visualizar -->
-                        <v-tooltip text="Visualizar">
-                            <template #activator="{ props }">
-                                <v-btn
-                                    v-bind="props"
-                                    icon="mdi-eye"
-                                    size="small"
-                                    color="info"
-                                    @click="showOwner(item)"
-                                />
-                            </template>
-                        </v-tooltip>
+                    <v-menu
+                        offset-y
+                        location="bottom end"
+                        :close-on-content-click="false"
+                    >
+                        <template v-slot:activator="{ props }">
+                            <v-btn
+                                icon
+                                size="small"
+                                color="primary"
+                                v-bind="props"
+                            >
+                                <v-icon>mdi-dots-vertical</v-icon>
+                            </v-btn>
+                        </template>
 
-                        <!-- Editar -->
-                        <v-tooltip text="Editar">
-                            <template #activator="{ props }">
-                                <v-btn
-                                    v-bind="props"
-                                    icon="mdi-pencil"
-                                    size="small"
-                                    color="#FFEE58"
-                                    @click="
-                                        () =>
-                                            router.get(
-                                                route(
-                                                    'developer.ownerCreateUpdateView',
-                                                    [item.id],
-                                                ),
-                                            )
-                                    "
-                                />
-                            </template>
-                        </v-tooltip>
+                        <v-list density="compact" slim>
+                            <v-list-item @click="showOwner(item)">
+                                <template v-slot:prepend>
+                                    <v-icon size="small">mdi-eye</v-icon>
+                                </template>
 
-                        <!-- Excluir -->
-                        <v-tooltip text="Excluir">
-                            <template #activator="{ props }">
-                                <v-btn
-                                    v-bind="props"
-                                    icon="mdi-delete"
-                                    size="small"
-                                    color="error"
-                                    @click="deleteQuestion(item)"
-                                />
-                            </template>
-                        </v-tooltip>
-                    </div>
+                                <v-list-item-title
+                                    >Visualizar</v-list-item-title
+                                >
+                            </v-list-item>
+                            <v-list-item @click="">
+                                <template v-slot:prepend>
+                                    <v-icon size="small">
+                                        {{
+                                            item.active
+                                                ? "mdi-close-circle"
+                                                : "mdi-check-circle"
+                                        }}
+                                    </v-icon>
+                                </template>
+
+                                <v-list-item-title @click="toggleActiveOwner(item)">
+                                    {{ item.active ? "Desativar" : "Ativar" }}
+                                </v-list-item-title>
+                            </v-list-item>
+                            <v-list-item @click="editOwner(item)">
+                                <template v-slot:prepend>
+                                    <v-icon size="small">mdi-pencil</v-icon>
+                                </template>
+
+                                <v-list-item-title>Editar</v-list-item-title>
+                            </v-list-item>
+                            <v-list-item
+                                @click="deleteQuestion(item)"
+                                color="error"
+                            >
+                                <template v-slot:prepend>
+                                    <v-icon size="small" color="error"
+                                        >mdi-delete</v-icon
+                                    >
+                                </template>
+
+                                <v-list-item-title color="danger">
+                                    <span class="text-error">Deletar</span>
+                                </v-list-item-title>
+                            </v-list-item>
+                        </v-list>
+                    </v-menu>
                 </template>
             </v-data-table-server>
         </div>

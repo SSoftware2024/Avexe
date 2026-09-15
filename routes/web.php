@@ -40,5 +40,6 @@ Route::prefix('developer')->name('developer')->group(function () {
     Route::get('/owner/createOrUpdate/{user?}', [DeveloperController::class, 'ownerCreateUpdateView'])->name('.ownerCreateUpdateView');
     Route::post('/owner/createOrUpdate', [DeveloperController::class, 'ownerCreateOrUpdate'])->name('.ownerCreateOrUpdate');
     Route::delete('/owner/delete/{id}', [DeveloperController::class, 'ownerDelete'])->name('.ownerDelete');
+    Route::patch('/owner/toggleActive/{id}', [DeveloperController::class, 'ownerToggleActive'])->name('.ownerToggleActive');
 
 });

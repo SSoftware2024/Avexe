@@ -96,4 +96,21 @@ class DeveloperController extends Controller
             Toast::success('Operação realizada com sucesso!');
         }
     }
+    public function ownerToggleActive(DeveloperService $service, int $id)
+    {
+        if (Auth::user()->cannot('ownerManager', User::class)) {
+            DialogAlert::error('Usuário sem permição para ação desejada.');
+
+            return redirect()->back();
+        }
+        $validator = Validator::make(['id' => $id], [
+            'id' => ['required', 'integer', Rule::exists('users', 'id')],
+        ]);
+        if ($validator->fails()) {
+            DialogAlert::warning($validator->errors()->get('id')[0]); 
+        } else {
+            $service->ownerToggleActive($id);
+            Toast::success('Operação realizada com sucesso!');
+        }
+    }
 }
