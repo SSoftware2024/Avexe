@@ -8,6 +8,7 @@ use App\Models\User;
 use App\Services\DeveloperService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\Rules\Password;
 use Inertia\Inertia;
@@ -76,5 +77,23 @@ class DeveloperController extends Controller
         $data = $request->all();
         $service->ownerCreateOrUpdate($data, $id);
         Toast::success('Operação realizada com sucesso!');
+    }
+
+    public function ownerDelete(DeveloperService $service, int $id)
+    {
+        if (Auth::user()->cannot('ownerManager', User::class)) {
+            DialogAlert::error('Usuário sem permição para ação desejada.');
+
+            return redirect()->back();
+        }
+        $validator = Validator::make(['id' => $id], [
+            'id' => ['required', 'integer', Rule::exists('users', 'id')],
+        ]);
+        if ($validator->fails()) {
+            DialogAlert::warning($validator->errors()->get('id')[0]); 
+        } else {
+            $service->ownerDelete($id);
+            Toast::success('Operação realizada com sucesso!');
+        }
     }
 }

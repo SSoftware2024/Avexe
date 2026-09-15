@@ -39,5 +39,6 @@ Route::prefix('developer')->name('developer')->group(function () {
     Route::get('/owner/listView', [DeveloperController::class, 'ownerListView'])->name('.ownerListView');
     Route::get('/owner/createOrUpdate/{user?}', [DeveloperController::class, 'ownerCreateUpdateView'])->name('.ownerCreateUpdateView');
     Route::post('/owner/createOrUpdate', [DeveloperController::class, 'ownerCreateOrUpdate'])->name('.ownerCreateOrUpdate');
+    Route::delete('/owner/delete/{id}', [DeveloperController::class, 'ownerDelete'])->name('.ownerDelete');
 
 });

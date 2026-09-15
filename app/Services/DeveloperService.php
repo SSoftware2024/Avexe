@@ -20,6 +20,10 @@ final class DeveloperService
             $this->ownerService->update($data, $id);
     }
 
+    public function ownerDelete(int $id)
+    {
+        return $this->ownerService->delete($id);
+    }
     public function ownerGetDataPaginate(?int $paginate = 10, array $sort_by = [])
     {
         return $this->ownerService->getData($paginate, $sort_by);

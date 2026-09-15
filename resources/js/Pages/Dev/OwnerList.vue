@@ -3,7 +3,9 @@ import { onMounted, reactive, ref } from "vue";
 import AuthLayout from "@/layouts/AuthLayout.vue";
 import { Head, router, usePage } from "@inertiajs/vue3";
 import { route } from "ziggy-js";
+import { useDialogAlert } from "@/composables/useDialogAlert";
 const page = usePage();
+const dialog_alert = useDialogAlert();
 const datatable = reactive({
     items_per_page: 10,
     headers: [
@@ -49,6 +51,18 @@ function loadData({ page, itemsPerPage, sortBy }) {
             },
         },
     );
+}
+function deleteOwner(id){
+    router.delete(route('developer.ownerDelete', [id]));
+}
+function deleteQuestion(item){
+    dialog_alert.setButtons({
+        question_buttons: true,
+    }).confirmFunction(() => {
+        deleteOwner(item.id)
+    })
+    dialog_alert.open('Deletar usuario: '+item.name+'?', 'question');
+
 }
 </script>
 <template>
@@ -98,7 +112,15 @@ function loadData({ page, itemsPerPage, sortBy }) {
                                     icon="mdi-pencil"
                                     size="small"
                                     color="#FFEE58"
-                                    @click="() => router.get(route('developer.ownerCreateUpdateView', [item.id]))"
+                                    @click="
+                                        () =>
+                                            router.get(
+                                                route(
+                                                    'developer.ownerCreateUpdateView',
+                                                    [item.id],
+                                                ),
+                                            )
+                                    "
                                 />
                             </template>
                         </v-tooltip>
@@ -111,7 +133,7 @@ function loadData({ page, itemsPerPage, sortBy }) {
                                     icon="mdi-delete"
                                     size="small"
                                     color="error"
-                                    @click="deleteOwner(item)"
+                                    @click="deleteQuestion(item)"
                                 />
                             </template>
                         </v-tooltip>

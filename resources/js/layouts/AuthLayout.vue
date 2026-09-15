@@ -6,6 +6,7 @@ import { router, usePage } from "@inertiajs/vue3";
 import { route } from "ziggy-js";
 import { images } from "@/utils/files.js";
 import DialogAlert from "@/components/DialogAlert.vue";
+import { useDialogAlert } from "@/composables/useDialogAlert";
 
 const toast = useToast();
 const page = usePage();
@@ -15,7 +16,7 @@ const props = defineProps({
         type: Object,
     },
 });
-const alertDialog = ref(null); //ref
+const alertDialog = useDialogAlert(); //ref
 
 const drawer = ref(false);
 // Guarda os títulos dos grupos (dropdowns) que devem ficar abertos na sidebar
@@ -286,7 +287,7 @@ function _showToast(event) {
 function _showAlert(event) {
     let alert_dialog = event.detail.page.props.response_data?.alert_dialog;
     if (alert_dialog) {
-        alertDialog.value.open(alert_dialog.message, alert_dialog.type);
+        alertDialog.open(alert_dialog.message, alert_dialog.type);
     }
 }
 
@@ -297,23 +298,21 @@ onMounted((e) => {
     _syncOpenedGroups();
 
     //alertas iniciais
-    _showAlert({detail: {page}});
-    _showToast({detail: {page}});
+    _showAlert({ detail: { page } });
+    _showToast({ detail: { page } });
     //events
     router_success = router.on("success", (event) => {
         _showAlert(event);
         _showToast(event);
     });
-    
 });
 
 onUnmounted(() => {
-    if(router_success) router_success();
+    if (router_success) router_success();
 });
-
 </script>
 <template>
-    <dialog-alert ref="alertDialog"></dialog-alert>
+    <dialog-alert></dialog-alert>
     <v-app>
         <v-layout>
             <!-- SIDEBAR -->
