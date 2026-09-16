@@ -26,7 +26,7 @@ final class DeveloperService
     }
     public function ownerGetDataPaginate(?int $paginate = 10, array $sort_by = [])
     {
-        return $this->ownerService->getData($paginate, $sort_by);
+        return $this->ownerService->getDataPaginate($paginate, $sort_by);
     }
     public function ownerToggleActive(int $id):int
     {

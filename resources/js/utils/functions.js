@@ -58,4 +58,10 @@ function copyText(value) {
         return Promise.resolve();
     }
 }
-export { getCurrentLocation, copyText };
+
+function formatDate(date) {
+    if (!date) return "N/A";
+    return new Date(date).toLocaleDateString("pt-BR");
+}
+
+export { getCurrentLocation, copyText, formatDate };
