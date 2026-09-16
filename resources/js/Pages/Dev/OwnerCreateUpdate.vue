@@ -6,12 +6,6 @@ import OwnerCreateUpdate from "@/PartialPages/OwnerCreateUpdate.vue";
 const props = defineProps({
     user_data: Object
 });
-const form = useForm({
-    name: "",
-    email: "",
-    whatsapp: "",
-    password: "",
-});
 </script>
 <template>
     <Head title="Informações do Proprietário" />

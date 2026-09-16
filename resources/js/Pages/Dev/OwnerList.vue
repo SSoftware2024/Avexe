@@ -70,7 +70,6 @@ function _loadData({ page, itemsPerPage, sortBy }) {
     );
 }
 function _deleteOwner(id) {
-    datatable.loading = true;
     router.delete(route("developer.ownerDelete", [id]));
 }
 function _toggleActiveOwner(item) {

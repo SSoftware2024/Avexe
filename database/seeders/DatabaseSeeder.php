@@ -17,17 +17,20 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // User::factory(10)->create();
+        //user raiz
+        if (false) {
+            User::create([
+                'name' => 'Tiago Alves',
+                'whatsapp' => '88994135616',
+                'email' => 'test@example.com',
+                'email_verified_at' => now(),
+                'user_type' => TypeUser::DEVELOPER->value,
+                'date_of_birth' => date('Y-m-d', strtotime('2001-02-02')),
+                'password' => Hash::make('ssoftware'),
+            ]);
+        }
+        $this->call(UsersTableSeeder::class);
 
-        User::create([
-            'name' => 'Tiago Alves',
-            'whatsapp' => '88994135616',
-            'email' => 'test@example.com',
-            'email_verified_at' => now(),
-            'user_type' => TypeUser::DEVELOPER->value,
-            'date_of_birth' => date('Y-m-d', strtotime('2001-02-02')),
-            'password' => Hash::make('ssoftware'),
-        ]);
         // User::factory()->create([
         //     'name' => 'Test User',
         //     'email' => 'test@example.com',

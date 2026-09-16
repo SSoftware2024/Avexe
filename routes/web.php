@@ -42,4 +42,7 @@ Route::prefix('developer')->name('developer')->group(function () {
     Route::delete('/owner/delete/{id}', [DeveloperController::class, 'ownerDelete'])->name('.ownerDelete');
     Route::patch('/owner/toggleActive/{id}', [DeveloperController::class, 'ownerToggleActive'])->name('.ownerToggleActive');
 
+    //empresa
+    Route::get('/company/listView', [DeveloperController::class, 'companyListView'])->name('.companyListView');
+
 });

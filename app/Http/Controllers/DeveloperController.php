@@ -20,18 +20,19 @@ class DeveloperController extends Controller
         return Inertia::render('Dev/Index');
     }
 
-    public function ownerCreateUpdateView(Request $request, ?User $user)
+    # ================================================================================= #
+    #                                    Empresa Telas
+    # ================================================================================= #
+    public function companyListView(Request $request, DeveloperService $service)
     {
-        if (Auth::user()->cannot('ownerManager', User::class)) {
-            DialogAlert::error('Usuário sem permição para ação desejada.');
 
-            return redirect()->route('auth.profileView');
-        }
-
-        return Inertia::render('Dev/OwnerCreateUpdate', [
-            'user_data' => $user->exists ? $user : null,
-        ]);
+        return Inertia::render('Dev/CompanyList');
     }
+
+    # ================================================================================= #
+    #                                    Owner Telas
+    # ================================================================================= #
+
 
     public function ownerListView(Request $request, DeveloperService $service)
     {
@@ -47,6 +48,23 @@ class DeveloperController extends Controller
             'owners' => $owners
         ]);
     }
+
+    public function ownerCreateUpdateView(Request $request, ?User $user)
+    {
+        if (Auth::user()->cannot('ownerManager', User::class)) {
+            DialogAlert::error('Usuário sem permição para ação desejada.');
+
+            return redirect()->route('auth.profileView');
+        }
+
+        return Inertia::render('Dev/OwnerCreateUpdate', [
+            'user_data' => $user->exists ? $user : null,
+        ]);
+    }
+
+    # ================================================================================= #
+    #                                    Owner Métodos
+    # ================================================================================= #
 
     public function ownerCreateOrUpdate(Request $request, DeveloperService $service)
     {
@@ -90,7 +108,7 @@ class DeveloperController extends Controller
             'id' => ['required', 'integer', Rule::exists('users', 'id')],
         ]);
         if ($validator->fails()) {
-            DialogAlert::warning($validator->errors()->get('id')[0]); 
+            DialogAlert::warning($validator->errors()->get('id')[0]);
         } else {
             $service->ownerDelete($id);
             Toast::success('Operação realizada com sucesso!');
@@ -107,7 +125,7 @@ class DeveloperController extends Controller
             'id' => ['required', 'integer', Rule::exists('users', 'id')],
         ]);
         if ($validator->fails()) {
-            DialogAlert::warning($validator->errors()->get('id')[0]); 
+            DialogAlert::warning($validator->errors()->get('id')[0]);
         } else {
             $service->ownerToggleActive($id);
             Toast::success('Operação realizada com sucesso!');

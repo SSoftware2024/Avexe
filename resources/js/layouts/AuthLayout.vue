@@ -94,6 +94,10 @@ const nav_sections = computed(() => {
                             {
                                 title: "Empresas",
                                 icon: "mdi-account-plus-outline",
+                                to: route('developer.companyListView'),
+                                active_names: [
+                                    "developer.companyListView",
+                                ],
                             },
                             {
                                 title: "Listar clientes",
