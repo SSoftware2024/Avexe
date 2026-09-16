@@ -4,8 +4,15 @@ import AuthLayout from "@/layouts/AuthLayout.vue";
 import { Head, router, usePage } from "@inertiajs/vue3";
 import { route } from "ziggy-js";
 import { useDialogAlert } from "@/composables/useDialogAlert";
+import { useMask } from 'vuetify'
+
 const page = usePage();
+const whatsapp_mask = useMask({ mask: '(##) # ####-####' })
 const dialog_alert = useDialogAlert();
+const dialog = ref(false);
+const user = ref(null);
+const loadingModal = ref(false);
+const tab = ref("geral");
 const datatable = reactive({
     items_per_page: 10,
     headers: [
@@ -78,6 +85,31 @@ function deleteQuestion(item) {
         });
     dialog_alert.open("Deletar usuario: " + item.name + "?", "question");
 }
+function showOwner(item) {
+    loadingModal.value = true;
+    user.value = item;
+    dialog.value = true;
+    setTimeout(() => {
+        loadingModal.value = false;
+    }, 500);
+}
+function closeDialog() {
+    dialog.value = false;
+    user.value = null;
+    loadingModal.value = false;
+}
+function formatDate(date) {
+    if (!date) return "N/A";
+    return new Date(date).toLocaleDateString("pt-BR");
+}
+function formatUserType(type) {
+    if (!type) return "N/A";
+    const types = { customer: "Cliente", owner: "Proprietário", admin: "Administrador" };
+    return types[type] || type;
+}
+function formatBoolean(val) {
+    return val ? "Sim" : "Não";
+}
 </script>
 <template>
     <Head title="Informações do Proprietário" />
@@ -103,6 +135,11 @@ function deleteQuestion(item) {
                 item-value="id"
                 @update:options="loadData"
             >
+                <template #item.whatsapp="{ item }">
+                    <span>
+                        {{ whatsapp_mask.mask(item.whatsapp) }}
+                    </span>
+                </template>
                 <template #item.active="{ item }">
                     <v-icon
                         :color="item.active ? 'success' : 'error'"
@@ -183,5 +220,69 @@ function deleteQuestion(item) {
                 </template>
             </v-data-table-server>
         </div>
+
+        <v-dialog v-model="dialog" max-width="500" scrollable>
+            <v-card v-if="user">
+                <v-card-title class="d-flex justify-space-between align-center pa-4">
+                    <span class="text-subtitle-1 font-weight-bold">Dados do Proprietário</span>
+                    <v-btn icon variant="text" size="small" @click="closeDialog">
+                        <v-icon>mdi-close</v-icon>
+                    </v-btn>
+                </v-card-title>
+                <v-card-text class="pa-4 pt-0">
+                    <v-progress-circular v-if="loadingModal" indeterminate color="primary" class="my-6" />
+                    <div v-else>
+                        <v-tabs v-model="tab" align-tabs="auto" class="mb-2">
+                            <v-tab value="geral">Geral</v-tab>
+                            <v-tab value="conta">Conta</v-tab>
+                            <v-tab value="localizacao">Localização</v-tab>
+                            <v-tab value="datas">Datas</v-tab>
+                            <v-tab value="empresa">Empresa</v-tab>
+                        </v-tabs>
+                        <v-window v-model="tab">
+                            <v-window-item value="geral">
+                                <v-list density="compact" nav>
+                                    <v-list-item><p class="mb-0"><span class="font-weight-bold">ID:</span> {{ user.id }}</p></v-list-item>
+                                    <v-list-item><p class="mb-0"><span class="font-weight-bold">Nome:</span> {{ user.name }}</p></v-list-item>
+                                    <v-list-item><p class="mb-0"><span class="font-weight-bold">E-mail:</span> {{ user.email || "N/A" }}</p></v-list-item>
+                                    <v-list-item><p class="mb-0"><span class="font-weight-bold">WhatsApp:</span> {{ whatsapp_mask.mask(user.whatsapp) || "N/A" }}</p></v-list-item>
+                                    <v-list-item><p class="mb-0"><span class="font-weight-bold">Tipo:</span> {{ formatUserType(user.user_type) }}</p></v-list-item>
+                                    <v-list-item><p class="mb-0"><span class="font-weight-bold">Ativo:</span> {{ formatBoolean(user.active) }}</p></v-list-item>
+                                    <v-list-item><p class="mb-0"><span class="font-weight-bold">Perfil:</span> {{ user.profile || "N/A" }}</p></v-list-item>
+                                </v-list>
+                            </v-window-item>
+                            <v-window-item value="conta">
+                                <v-list density="compact" nav>
+                                    <v-list-item><p class="mb-0"><span class="font-weight-bold">Google ID:</span> {{ user.google_id || "N/A" }}</p></v-list-item>
+                                    <v-list-item><p class="mb-0"><span class="font-weight-bold">Senha:</span> {{ user.password ? "********" : "N/A" }}</p></v-list-item>
+                                    <v-list-item><p class="mb-0"><span class="font-weight-bold">E-mail Verif.:</span> {{ formatDate(user.email_verified_at) }}</p></v-list-item>
+                                    <v-list-item><p class="mb-0"><span class="font-weight-bold">Remember Token:</span> {{ user.remember_token ? "********" : "N/A" }}</p></v-list-item>
+                                </v-list>
+                            </v-window-item>
+                            <v-window-item value="localizacao">
+                                <v-list density="compact" nav>
+                                    <v-list-item><p class="mb-0"><span class="font-weight-bold">Latitude:</span> {{ user.latitude || "N/A" }}</p></v-list-item>
+                                    <v-list-item><p class="mb-0"><span class="font-weight-bold">Longitude:</span> {{ user.longitude || "N/A" }}</p></v-list-item>
+                                </v-list>
+                            </v-window-item>
+                            <v-window-item value="datas">
+                                <v-list density="compact" nav>
+                                    <v-list-item><p class="mb-0"><span class="font-weight-bold">Data Nasc.:</span> {{ formatDate(user.date_of_birth) }}</p></v-list-item>
+                                    <v-list-item><p class="mb-0"><span class="font-weight-bold">Criado em:</span> {{ formatDate(user.created_at) }}</p></v-list-item>
+                                    <v-list-item><p class="mb-0"><span class="font-weight-bold">Atualizado em:</span> {{ formatDate(user.updated_at) }}</p></v-list-item>
+                                    <v-list-item><p class="mb-0"><span class="font-weight-bold">Deletado em:</span> {{ formatDate(user.deleted_at) }}</p></v-list-item>
+                                    <v-list-item><p class="mb-0"><span class="font-weight-bold">2FA:</span> {{ formatDate(user.two_factor_confirmed_at) }}</p></v-list-item>
+                                </v-list>
+                            </v-window-item>
+                            <v-window-item value="empresa">
+                                <v-list density="compact" nav>
+                                    <v-list-item><p class="mb-0"><span class="font-weight-bold">ID Empresa:</span> {{ user.company_id || "N/A" }}</p></v-list-item>
+                                </v-list>
+                            </v-window-item>
+                        </v-window>
+                    </div>
+                </v-card-text>
+            </v-card>
+        </v-dialog>
     </AuthLayout>
 </template>

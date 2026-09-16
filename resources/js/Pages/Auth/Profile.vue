@@ -22,6 +22,7 @@ const form = useForm({
     profile: null,
     latitude: props.user?.latitude || null,
     longitude: props.user?.longitude || null,
+    date_of_birth: props.user?.date_of_birth || null,
 });
 
 const form_password = useForm({
@@ -386,6 +387,20 @@ onMounted(() => {
                                                 ?.whatsapp
                                         "
                                     ></v-mask-input>
+                                </v-col>
+                                <v-col cols="12">
+                                    <v-date-input
+                                        variant="outlined"
+                                        label="Data Nascimento"
+                                        autocomplete="false"
+                                        v-model="form.date_of_birth"
+                                        :error-messages="
+                                            form.errors.date_of_birth
+                                        "
+                                        :hide-details="
+                                            !form.errors.date_of_birth
+                                        "
+                                    ></v-date-input>
                                 </v-col>
                             </v-row>
 

@@ -74,13 +74,6 @@ function _googleAuth(operation) {
     }
 }
 
-function _sideLinkOrAction(link) {
-    if (link.to == "#") {
-        link.action();
-    } else {
-        router.visit(link.to);
-    }
-}
 
 function _checkActionJs() {
     const url = new URL(window.location.href);

@@ -36,6 +36,7 @@ class UpdateUserProfileInformation implements UpdatesUserProfileInformation
                 'digits:11',
                 Rule::unique(User::class)->ignore($user->id),
             ],
+            'date_of_birth' => ['nullable', 'date'],
             'latitude' => [
                 'nullable',
                 'numeric',
@@ -63,6 +64,7 @@ class UpdateUserProfileInformation implements UpdatesUserProfileInformation
                 'name' => $input['name'],
                 'email' => $input['email'],
                 'whatsapp' => $input['whatsapp'],
+                'date_of_birth' => !empty($input['date_of_birth']) ? date('Y-m-d', strtotime($input['date_of_birth'])):null,
                 'latitude' => $input['latitude'] ?? null,
                 'longitude' => $input['longitude'] ?? null,
             ])->save();
