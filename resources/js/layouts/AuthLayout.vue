@@ -590,12 +590,37 @@ onUnmounted(() => {
     </v-app>
 </template>
 <style scoped lang="scss">
+
+:deep(.v-main) {
+    background-color: #F2F2F2 !important;
+}
+
 .auth-sidebar {
-    background-color: var(--v-theme-surface-variant);
+    background-color: #ffffff !important;
+    background: #ffffff !important;
+
+    // Estrutura interna do v-navigation-drawer
+    :deep(.v-navigation-drawer__content) {
+        background-color: #ffffff !important;
+        background: #ffffff !important;
+    }
+
+    :deep(.v-navigation-drawer__prepend),
+    :deep(.v-navigation-drawer__append) {
+        background-color: #ffffff !important;
+        background: #ffffff !important;
+    }
+
+    // Todos os v-list internos devem ser transparentes
+    :deep(.v-list) {
+        background-color: transparent !important;
+        background: transparent !important;
+    }
 
     :deep(.sidebar-scroll) {
         flex: 1;
         overflow-y: auto;
+        background-color: #ffffff !important;
     }
 
     .sidebar-section-title {
@@ -617,9 +642,6 @@ onUnmounted(() => {
     }
 }
 
-:deep(.v-main) {
-    background-color: var(--v-theme-surface-variant);
-}
 
 .notification-content {
     display: -webkit-box;
