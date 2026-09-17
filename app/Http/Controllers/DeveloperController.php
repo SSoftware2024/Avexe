@@ -26,7 +26,7 @@ class DeveloperController extends Controller
     public function companyListView(Request $request, DeveloperService $service)
     {
 
-        return Inertia::render('Dev/CompanyList');
+        return Inertia::render('Dev/Company/List');
     }
 
     # ================================================================================= #
@@ -44,7 +44,7 @@ class DeveloperController extends Controller
         $per_page = $request->has('per_page') ? $request->per_page : 10;
         $sort_by = $request->has('sort_by') ? $request->sort_by : [];
         $owners = $service->ownerGetDataPaginate($per_page, $sort_by);
-        return Inertia::render('Dev/OwnerList', [
+        return Inertia::render('Dev/Owner/List', [
             'owners' => $owners
         ]);
     }
@@ -57,7 +57,7 @@ class DeveloperController extends Controller
             return redirect()->route('auth.profileView');
         }
 
-        return Inertia::render('Dev/OwnerCreateUpdate', [
+        return Inertia::render('Dev/Owner/CreateUpdate', [
             'user_data' => $user->exists ? $user : null,
         ]);
     }

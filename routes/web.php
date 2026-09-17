@@ -32,7 +32,7 @@ Route::prefix('owner')->name('owner')->group(function () {
 });
 
 // desenvolvedor
-Route::prefix('developer')->name('developer')->group(function () {
+Route::prefix('developer')->middleware(['auth'])->name('developer')->group(function () {
     Route::get('/dashboard', [DeveloperController::class, 'index']);
 
     // operações owner

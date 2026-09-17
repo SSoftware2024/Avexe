@@ -118,7 +118,7 @@ function _closeDialog() {
                 :items="$page.props.owners.data"
                 :items-length="$page.props.owners.total"
                 :loading="datatable.loading"
-                :items-per-page-options="[1, 10, 25, 50]"
+                :items-per-page-options="[10, 25, 50]"
                 gridlines="all"
                 item-value="id"
                 @update:options="_loadData"
