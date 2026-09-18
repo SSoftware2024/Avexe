@@ -11,7 +11,7 @@ const props = defineProps({
 });
 </script>
 <template>
-    <div class="container" v-bind="$attrs" :style="{ '--container-width': props.width }"">
+    <div class="container" v-bind="$attrs" :style="{ '--container-width': props.width }">
         <div class="title">
             <span>{{ props.title }}</span> 
         </div>

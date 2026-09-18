@@ -5,28 +5,23 @@ import { onMounted } from "vue";
 import { route } from "ziggy-js";
 
 const props = defineProps({
-    user_data: {
+    company: {
         type: Object,
         default: null,
     },
 });
 
-const emit = defineEmits([
-    'success'
-]);
-
 const form = useForm({
     id: "",
     name: "",
-    email: "",
-    whatsapp: "",
-    password: "",
-    date_of_birth: "",
+    corporate_name: "",
+    cnpj: "",
+    tag_url: "",
 });
 
 const is_update = computed(() => !(props.user_data == null));
 
-function _loadUser() {
+function _load() {
     form.id = props.user_data.id;
     form.name = props.user_data.name;
     form.email = props.user_data.email;
@@ -36,18 +31,17 @@ function _loadUser() {
 }
 
 function _save() {
-    form.post(route("developer.ownerCreateOrUpdate"), {
-        onSuccess: () => {
-            is_update.value ? null : form.reset();
-            emit('success');
-        },
-    });
+    // form.post(route("developer.ownerCreateOrUpdate"), {
+    //     onSuccess: () => {
+    //         is_update.value ? null : form.reset();
+    //     },
+    // });
 }
 
 onMounted(() => {
-    if (props.user_data) {
-        _loadUser();
-    }
+    // if (props.user_data) {
+    //     _load();
+    // }
 });
 </script>
 
@@ -66,49 +60,53 @@ onMounted(() => {
             </v-col>
             <v-col cols="6">
                 <v-text-field
-                    label="E-mail *"
+                    label="Razão Social"
                     variant="outlined"
-                    name="email"
-                    v-model="form.email"
-                    :error-messages="form.errors.email"
-                    :hide-details="!form.errors.email"
+                    name="corporate_name"
+                    v-model="form.corporate_name"
+                    :error-messages="form.errors.corporate_name"
+                    :hide-details="!form.errors.corporate_name"
                 ></v-text-field>
             </v-col>
         </v-row>
         <v-row>
             <v-col cols="6">
-                <v-mask-input
-                    mask="(##) # ####-####"
-                    label="Whatsapp *"
+                <v-text-field
+                    label="CNPJ"
                     variant="outlined"
-                    name="whatsapp"
-                    v-model="form.whatsapp"
-                    :error-messages="form.errors.whatsapp"
-                    :hide-details="!form.errors.whatsapp"
-                ></v-mask-input>
+                    type="text"
+                    name="cnpj"
+                    v-model="form.cnpj"
+                    :error-messages="form.errors.cnpj"
+                    :hide-details="!form.errors.cnpj"
+                ></v-text-field>
             </v-col>
             <v-col cols="6">
                 <v-text-field
-                    label="Senha"
+                    label="TAG URL"
                     variant="outlined"
-                    type="password"
-                    name="password"
-                    v-model="form.password"
-                    :error-messages="form.errors.password"
-                    :hide-details="!form.errors.password"
+                    type="text"
+                    name="tag_url"
+                    v-model="form.tag_url"
+                    :error-messages="form.errors.tag_url"
+                    :hide-details="!form.errors.tag_url"
                 ></v-text-field>
             </v-col>
         </v-row>
         <v-row>
             <v-col cols="12">
-                <v-date-input
+                <v-select
+                    label="Donos"
                     variant="outlined"
-                    label="Data Nascimento"
-                    autocomplete="false"
-                    v-model="form.date_of_birth"
-                    :error-messages="form.errors.date_of_birth"
-                    :hide-details="!form.errors.date_of_birth"
-                ></v-date-input>
+                    :items="[
+                        'California',
+                        'Colorado',
+                        'Florida',
+                        'Georgia',
+                        'Texas',
+                        'Wyoming',
+                    ]"
+                ></v-select>
             </v-col>
         </v-row>
         <v-row>

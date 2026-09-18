@@ -97,6 +97,7 @@ const nav_sections = computed(() => {
                                 to: route('developer.companyListView'),
                                 active_names: [
                                     "developer.companyListView",
+                                    "developer.companyCreateOrUpdateView",
                                 ],
                             },
                             {

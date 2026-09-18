@@ -28,6 +28,11 @@ class DeveloperController extends Controller
 
         return Inertia::render('Dev/Company/List');
     }
+    public function companyCreateOrUpdateView(Request $request, DeveloperService $service)
+    {
+
+        return Inertia::render('Dev/Company/CreateUpdate');
+    }
 
     # ================================================================================= #
     #                                    Owner Telas
