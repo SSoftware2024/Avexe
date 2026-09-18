@@ -30,8 +30,12 @@ class DeveloperController extends Controller
     }
     public function companyCreateOrUpdateView(Request $request, DeveloperService $service)
     {
-
-        return Inertia::render('Dev/Company/CreateUpdate');
+        $owners = User::where('user_type', 'owner')
+        ->whereNull('company_id')->get(['id','name','user_type']);
+        
+        return Inertia::render('Dev/Company/CreateUpdate', [
+            'owners' => $owners
+        ]);
     }
 
     # ================================================================================= #

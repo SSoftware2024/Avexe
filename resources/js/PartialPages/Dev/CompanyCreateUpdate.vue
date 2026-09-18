@@ -9,6 +9,10 @@ const props = defineProps({
         type: Object,
         default: null,
     },
+    owners: {
+        type: Array,
+        default: () => [],
+    },
 });
 
 const form = useForm({
@@ -17,9 +21,21 @@ const form = useForm({
     corporate_name: "",
     cnpj: "",
     tag_url: "",
+    owners_ids: [],
 });
 
 const is_update = computed(() => !(props.user_data == null));
+const sortedOwnersSelected = computed(() => {
+    const items = props.owners ?? [];
+    const selected = form.owners_ids ?? [];
+
+    return [...items].sort((a, b) => {
+        const aSelected = selected.includes(a.id);
+        const bSelected = selected.includes(b.id);
+
+        return Number(bSelected) - Number(aSelected);
+    });
+});
 
 function _load() {
     form.id = props.user_data.id;
@@ -95,18 +111,16 @@ onMounted(() => {
         </v-row>
         <v-row>
             <v-col cols="12">
-                <v-select
+                <v-autocomplete
+                    v-model="form.owners_ids"
                     label="Donos"
                     variant="outlined"
-                    :items="[
-                        'California',
-                        'Colorado',
-                        'Florida',
-                        'Georgia',
-                        'Texas',
-                        'Wyoming',
-                    ]"
-                ></v-select>
+                    :items="sortedOwnersSelected"
+                    item-title="name"
+                    item-value="id"
+                    multiple
+                    chips
+                ></v-autocomplete>
             </v-col>
         </v-row>
         <v-row>
