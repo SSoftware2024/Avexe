@@ -61,7 +61,7 @@ class OwnerService
     {
         $owners = User::where('user_type', TypeUser::OWNER->value);
 
-        if (!empty($sort_by)) {
+        if (!empty($sort_by)) { //vuetify datatable
             $owners->orderBy($sort_by[0]['key'], $sort_by[1]['order']);
         }
         $owners = $owners->paginate($paginate);

@@ -22,13 +22,13 @@ return new class extends Migration
             #endereço
             $table->decimal('latitude', 10, 8)->nullable(); #valor max & min 90.00000000 (ou mínimo -90.00000000)
             $table->decimal('longitude', 11, 8)->nullable(); #valor max & min 180.00000000 (ou mínimo -180.00000000)
-            $table->string('street'); #rua
-            $table->string('neighborhood'); #bairro
+            $table->string('street')->nullable(); #rua
+            $table->string('neighborhood')->nullable(); #bairro
             $table->string('complement')->nullable(); #complemento
-            $table->string('number', 20); #numero estabelecimento
-            $table->string('city', 20); #cidade
-            $table->string('state', 20); #estado
-            $table->string('cep', 20); #cep
+            $table->string('number', 20)->nullable(); #numero estabelecimento
+            $table->string('city', 20)->nullable(); #cidade
+            $table->string('state', 20)->nullable(); #estado
+            $table->string('cep', 20)->nullable(); #cep
             #dados sociais
             $table->string('instagram')->nullable(); #link url
             $table->string('whatsapp')->nullable(); #link url
@@ -36,8 +36,8 @@ return new class extends Migration
             $table->string('tag_url')->unique();
             $table->string('logo')->nullable();
             #pix e taxa
-            $table->string('pix_key', 100);
-            $table->string('pix_name');
+            $table->string('pix_key', 100)->nullable();
+            $table->string('pix_name')->nullable();
             $table->boolean('is_have_appointment_tax')->default(false);
             $table->double('appointment_tax_value', 5,2)->nullable();
             $table->boolean('is_percentage_appointment_tax_value')->nullable(); #porcentagem do serviço agendado

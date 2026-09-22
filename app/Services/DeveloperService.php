@@ -7,10 +7,12 @@ use App\Models\User;
 final class DeveloperService
 {
     private OwnerService $ownerService;
+    private CompanyService $companyService;
 
     public function __construct()
     {
-        $this->ownerService = new OwnerService;
+        $this->ownerService = new OwnerService();
+        $this->companyService = new CompanyService();
     }
 
     public function ownerCreateOrUpdate(array $data, ?int $id): User|int
@@ -28,9 +30,15 @@ final class DeveloperService
     {
         return $this->ownerService->getDataPaginate($paginate, $sort_by);
     }
-    public function ownerToggleActive(int $id):int
+    public function ownerToggleActive(int $id): int
     {
         return $this->ownerService->toggleActive($id);
     }
-    
+
+    public function companyCreateOrUpdate(array $data, ?array $owners_id = [])
+    {
+        empty($data['id']) ?
+            $this->companyService->createByDeveloper($data, $owners_id) :
+            $this->companyService->updateByDeveloper($data['id'], $data);
+    }
 }

@@ -20,11 +20,12 @@ const form = useForm({
     name: "",
     corporate_name: "",
     cnpj: "",
+    cpf: "",
     tag_url: "",
     owners_ids: [],
 });
 
-const is_update = computed(() => !(props.user_data == null));
+const is_update = computed(() => !(props.company == null));
 const sortedOwnersSelected = computed(() => {
     const items = props.owners ?? [];
     const selected = form.owners_ids ?? [];
@@ -47,11 +48,11 @@ function _load() {
 }
 
 function _save() {
-    // form.post(route("developer.ownerCreateOrUpdate"), {
-    //     onSuccess: () => {
-    //         is_update.value ? null : form.reset();
-    //     },
-    // });
+    form.post(route("developer.companyCreateOrUpdate"), {
+        onSuccess: () => {
+            is_update.value ? null : form.reset();
+        },
+    });
 }
 
 onMounted(() => {
@@ -87,16 +88,29 @@ onMounted(() => {
         </v-row>
         <v-row>
             <v-col cols="6">
-                <v-text-field
-                    label="CNPJ"
+                <v-mask-input
+                    mask="##.###.###/####-##"
+                    label="CNPJ *"
                     variant="outlined"
-                    type="text"
                     name="cnpj"
                     v-model="form.cnpj"
                     :error-messages="form.errors.cnpj"
                     :hide-details="!form.errors.cnpj"
-                ></v-text-field>
+                ></v-mask-input>
             </v-col>
+            <v-col cols="6">
+                <v-mask-input
+                    mask="###.###.###-##"
+                    label="CPF *"
+                    variant="outlined"
+                    name="cpf"
+                    v-model="form.cpf"
+                    :error-messages="form.errors.cpf"
+                    :hide-details="!form.errors.cpf"
+                ></v-mask-input>
+            </v-col>
+        </v-row>
+        <v-row>
             <v-col cols="6">
                 <v-text-field
                     label="TAG URL"
@@ -108,9 +122,7 @@ onMounted(() => {
                     :hide-details="!form.errors.tag_url"
                 ></v-text-field>
             </v-col>
-        </v-row>
-        <v-row>
-            <v-col cols="12">
+            <v-col cols="6">
                 <v-autocomplete
                     v-model="form.owners_ids"
                     label="Donos"
@@ -120,6 +132,8 @@ onMounted(() => {
                     item-value="id"
                     multiple
                     chips
+                    :error-messages="form.errors.owners_ids"
+                    :hide-details="!form.errors.owners_ids"
                 ></v-autocomplete>
             </v-col>
         </v-row>

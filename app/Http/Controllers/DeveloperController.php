@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Facades\DialogAlert;
 use App\Facades\Toast;
+use App\Models\Company;
 use App\Models\User;
 use App\Services\DeveloperService;
 use Illuminate\Http\Request;
@@ -31,8 +32,8 @@ class DeveloperController extends Controller
     public function companyCreateOrUpdateView(Request $request, DeveloperService $service)
     {
         $owners = User::where('user_type', 'owner')
-        ->whereNull('company_id')->get(['id','name','user_type']);
-        
+            ->whereNull('company_id')->get(['id', 'name', 'user_type']);
+
         return Inertia::render('Dev/Company/CreateUpdate', [
             'owners' => $owners
         ]);
@@ -62,7 +63,6 @@ class DeveloperController extends Controller
     {
         if (Auth::user()->cannot('ownerManager', User::class)) {
             DialogAlert::error('Usuário sem permição para ação desejada.');
-
             return redirect()->route('auth.profileView');
         }
 
@@ -79,7 +79,6 @@ class DeveloperController extends Controller
     {
         if (Auth::user()->cannot('ownerManager', User::class)) {
             DialogAlert::error('Usuário sem permição para ação desejada.');
-
             return redirect()->back();
         }
         $id = $request->id;
@@ -92,13 +91,13 @@ class DeveloperController extends Controller
                 'string',
                 'email',
                 'max:255',
-                ! is_null($id) ? Rule::unique('users')->ignore($id) : Rule::unique(User::class),
+                !is_null($id) ? Rule::unique('users')->ignore($id) : Rule::unique(User::class),
             ],
             'password' => [is_null($id) ? 'required' : 'nullable', 'string', Password::min(8)],
             'whatsapp' => [
                 'required',
                 'digits:11',
-                ! is_null($id) ? Rule::unique('users')->ignore($id) : Rule::unique(User::class),
+                !is_null($id) ? Rule::unique('users')->ignore($id) : Rule::unique(User::class),
             ],
         ]);
         $data = $request->all();
@@ -110,7 +109,6 @@ class DeveloperController extends Controller
     {
         if (Auth::user()->cannot('ownerManager', User::class)) {
             DialogAlert::error('Usuário sem permição para ação desejada.');
-
             return redirect()->back();
         }
         $validator = Validator::make(['id' => $id], [
@@ -127,7 +125,6 @@ class DeveloperController extends Controller
     {
         if (Auth::user()->cannot('ownerManager', User::class)) {
             DialogAlert::error('Usuário sem permição para ação desejada.');
-
             return redirect()->back();
         }
         $validator = Validator::make(['id' => $id], [
@@ -139,5 +136,37 @@ class DeveloperController extends Controller
             $service->ownerToggleActive($id);
             Toast::success('Operação realizada com sucesso!');
         }
+    }
+
+    # ================================================================================= #
+    #                                    Company Métodos
+    # ================================================================================= #
+
+    public function companyCreateOrUpdate(Request $request, DeveloperService $service)
+    {
+        $cpf_or_cnpj_is_required = (empty($request->cpf) && empty($request->cnpj)) ? 'required' : 'nullable';
+        $id = $request->id;
+        $request->validate([
+            'id' => ['nullable', 'integer', Rule::exists('company', 'id')],
+            'owners_ids' => ['required', 'array'],
+            'name' => ['required'],
+            'corporate_name' => ['required', 'max:255'],
+            'cnpj' => [$cpf_or_cnpj_is_required], //cnpj
+            'cpf' => [$cpf_or_cnpj_is_required], //cpf
+            'tag_url' => [
+                'required',
+                'lowercase',
+                'max:50',
+                'regex:/^[a-z0-9_]+$/',
+                is_null($id) ? Rule::unique(Company::class) : Rule::unique(Company::class)->ignore($id)
+            ]
+        ], [
+            'cnpj.required' => 'Informe CNPJ ou CPF',
+            'cpf.required' => 'Informe CNPJ ou CPF',
+            'tag_url.regex' => 'Sem espaço, apenas letras, números e _'
+        ]);
+        $data = $request->all();
+        $service->companyCreateOrUpdate($data, $data['owners_ids']);
+        Toast::success('Operação realizada com sucesso!');
     }
 }
