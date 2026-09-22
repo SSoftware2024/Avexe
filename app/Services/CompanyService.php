@@ -2,8 +2,9 @@
 
 namespace App\Services;
 
-use App\Classes\OwnerManager;
+use App\Enum\TypeUser;
 use App\Models\Company;
+use App\Models\User;
 
 final class CompanyService
 {
@@ -16,13 +17,24 @@ final class CompanyService
             'corporate_name' => $data['corporate_name'],
             'tag_url' => $data['tag_url'],
         ]);
-        (new OwnerManager())->associateCompany($owners_id, $company->id);
+        $this->associateOwners($owners_id, $company->id);
         return $company;
     }
 
     public function updateByDeveloper(int $id, array $datas) {}
 
-    public function getDataPaginateByDeveloper(?int $paginate = 10, array $sort_by = [])
+
+    public function getOwnersNotSelected() //dados
+    {
+        return User::where('user_type', TypeUser::OWNER->value)
+            ->whereNull('company_id')->get(['id', 'name', 'user_type']);
+    }
+    public function getOwnersSelectedByCompany() {}
+
+    # ================================================================================= #
+    #                                    View
+    # ================================================================================= #
+    public function paginateByDeveloper(?int $paginate = 10, array $sort_by = [])
     {
         $company = Company::query();
         if (!empty($sort_by)) { //vuetify datatable
@@ -30,6 +42,23 @@ final class CompanyService
         }
         $company = $company->paginate($paginate);
         return $company;
+    }
+    public function createOrUpdateViewData():array
+    {
+        $ownersNotSelected = $this->getOwnersNotSelected();
+        // $ownersByCompany = $this->getOwnersSelectedByCompany();
+        return compact('ownersNotSelected');
+    }
+    
+    # ================================================================================= #
+    #                                    PRIVADOS
+    # ================================================================================= #
+
+    private function associateOwners(array $owners_id, int $id): int
+    {
+        return User::whereIn('id', $owners_id)->update([
+            'company_id' => $id
+        ]);
     }
 
     //  $company = Company::update([

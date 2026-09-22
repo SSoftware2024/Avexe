@@ -6,6 +6,7 @@ use App\Traits\HasProfilePhoto;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Fortify\TwoFactorAuthenticatable;
@@ -45,7 +46,9 @@ class User extends Authenticatable implements MustVerifyEmail
         ];
     }
 
-    /** ======================================================MUTATORS======================================================== */
+    # ================================================================================= #
+    #                                    MUTATORS
+    # ================================================================================= #
     protected function dateOfBirthFormatted(): Attribute
     {
         return Attribute::make(
@@ -54,5 +57,12 @@ class User extends Authenticatable implements MustVerifyEmail
             }
         );
     }
-    /** ======================================================FIM MUTATORS======================================================== */
+    # ================================================================================= #
+    #                                    Relacionamentos
+    # ================================================================================= #
+
+    public function company(): BelongsTo
+    {
+        return $this->belongsTo(Company::class);
+    }
 }

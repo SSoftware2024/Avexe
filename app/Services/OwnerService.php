@@ -57,7 +57,18 @@ class OwnerService
         return $user->save();
     }
 
-    public function getDataPaginate(?int $paginate = 10, array $sort_by = [])
+
+    public function getOwnerData(int $id): ?User //apenas dado
+    {
+        $user = User::find($id);
+        return $user;
+    }
+
+
+    # ================================================================================= #
+    #                                    View
+    # ================================================================================= #
+    public function paginate(?int $paginate = 10, array $sort_by = [])
     {
         $owners = User::where('user_type', TypeUser::OWNER->value);
 
@@ -66,11 +77,5 @@ class OwnerService
         }
         $owners = $owners->paginate($paginate);
         return $owners;
-    }
-
-    public function getOwnerData(int $id): ?User
-    {
-        $user = User::find($id);
-        return $user;
     }
 }

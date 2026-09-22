@@ -26,7 +26,7 @@ const new_owner_dialog = ref(false);
             </SectionCard>
             <SectionCard title="Nova empresa">
                 <div>
-                    <CompanyCreateUpdate :owners="$page.props.owners"></CompanyCreateUpdate>
+                    <CompanyCreateUpdate :owners="$page.props.ownersNotSelected"></CompanyCreateUpdate>
                 </div>
             </SectionCard>
         </div>
