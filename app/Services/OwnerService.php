@@ -58,7 +58,7 @@ class OwnerService
     }
 
 
-    public function getOwnerData(int $id): ?User //apenas dado
+    public function getOwnerData(int $id): ?User //dado
     {
         $user = User::find($id);
         return $user;
@@ -68,7 +68,7 @@ class OwnerService
     # ================================================================================= #
     #                                    View
     # ================================================================================= #
-    public function paginate(?int $paginate = 10, array $sort_by = [])
+    public function ownerListViewData(?int $paginate = 10, array $sort_by = [])
     {
         $owners = User::where('user_type', TypeUser::OWNER->value);
 

@@ -8,33 +8,18 @@ use App\Models\User;
 
 final class CompanyService
 {
-    public function createByDeveloper(array $data, array $owners_id): Company
-    {
-        $company = Company::create([
-            'cpf' => $data['cpf'],
-            'cnpj' => $data['cnpj'],
-            'name' => $data['name'],
-            'corporate_name' => $data['corporate_name'],
-            'tag_url' => $data['tag_url'],
-        ]);
-        $this->associateOwners($owners_id, $company->id);
-        return $company;
-    }
-
-    public function updateByDeveloper(int $id, array $datas) {}
-
 
     public function getOwnersNotSelected() //dados
     {
         return User::where('user_type', TypeUser::OWNER->value)
             ->whereNull('company_id')->get(['id', 'name', 'user_type']);
     }
-    public function getOwnersSelectedByCompany() {}
+    public function getOwnersSelectedByCompany(int $id) {}
 
     # ================================================================================= #
     #                                    View
     # ================================================================================= #
-    public function paginateByDeveloper(?int $paginate = 10, array $sort_by = [])
+    public function companyListViewData(?int $paginate = 10, array $sort_by = [])
     {
         $company = Company::query();
         if (!empty($sort_by)) { //vuetify datatable
@@ -46,20 +31,18 @@ final class CompanyService
     public function createOrUpdateViewData():array
     {
         $ownersNotSelected = $this->getOwnersNotSelected();
-        // $ownersByCompany = $this->getOwnersSelectedByCompany();
+        $ownersByCompany = $this->getOwnersSelectedByCompany(); //fazer este metodo
+
+        //pegar os selecionados e salvar no fron-end
+        //salvar no front end: old ids
+        //verficar se o ids enviados possuem os old ids
+            // sim: corta os olds e fica com os novos, atuliza valores novos
+            //não atuliza para null ids antes vinculados e atualiza valores novos
+        //old ids não podem vir null caso nenhum id novo tenha sido marcado
         return compact('ownersNotSelected');
     }
     
-    # ================================================================================= #
-    #                                    PRIVADOS
-    # ================================================================================= #
 
-    private function associateOwners(array $owners_id, int $id): int
-    {
-        return User::whereIn('id', $owners_id)->update([
-            'company_id' => $id
-        ]);
-    }
 
     //  $company = Company::update([
     //         //developer

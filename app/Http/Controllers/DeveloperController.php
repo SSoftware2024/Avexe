@@ -7,6 +7,7 @@ use App\Facades\Toast;
 use App\Models\Company;
 use App\Models\User;
 use App\Services\CompanyService;
+use App\Services\DeveloperService;
 use App\Services\OwnerService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -37,7 +38,7 @@ class DeveloperController extends Controller
         ]);
         $per_page = $request->has('per_page') ? $request->per_page : 10;
         $sort_by = $request->has('sort_by') ? $request->sort_by : [];
-        $owners = $ownerService->paginate($per_page, $sort_by);
+        $owners = $ownerService->ownerListViewData($per_page, $sort_by);
         return Inertia::render('Dev/Owner/List', [
             'owners' => $owners
         ]);
@@ -132,7 +133,7 @@ class DeveloperController extends Controller
         ]);
         $per_page = $request->has('per_page') ? $request->per_page : 10;
         $sort_by = $request->has('sort_by') ? $request->sort_by : [];
-        $companies = $companyService->paginateByDeveloper($per_page, $sort_by);
+        $companies = $companyService->companyListViewData($per_page, $sort_by);
         return Inertia::render('Dev/Company/List', [
             'companies' => $companies
         ]);
@@ -143,7 +144,7 @@ class DeveloperController extends Controller
         return Inertia::render('Dev/Company/CreateUpdate', $data);
     }
 
-    public function companyCreateOrUpdate(Request $request, CompanyService $companyService)
+    public function companyCreateOrUpdate(Request $request, DeveloperService $service)
     {
         $cpf_or_cnpj_is_required = (empty($request->cpf) && empty($request->cnpj)) ? 'required' : 'nullable';
         $id = $request->id;
@@ -168,8 +169,8 @@ class DeveloperController extends Controller
         ]);
         $data = $request->all();
         empty($data['id']) ?
-            $companyService->createByDeveloper($data, $data['owners_ids']) :
-            $companyService->updateByDeveloper($data['id'], $data);
+            $service->createCompany($data, $data['owners_ids']) :
+            $service->updateCompany($data['id'], $data);
         Toast::success('Operação realizada com sucesso!');
     }
 }
