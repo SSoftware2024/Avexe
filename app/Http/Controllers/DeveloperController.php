@@ -26,8 +26,17 @@ class DeveloperController extends Controller
     # ================================================================================= #
     public function companyListView(Request $request, DeveloperService $service)
     {
-
-        return Inertia::render('Dev/Company/List');
+        $request->validate([
+            'page' => ['nullable', 'integer'],
+            'per_page' => ['nullable', 'integer'],
+            'sort_by' => ['nullable', 'array']
+        ]);
+        $per_page = $request->has('per_page') ? $request->per_page : 10;
+        $sort_by = $request->has('sort_by') ? $request->sort_by : [];
+        $companies = $service->companyGetDataPaginate($per_page, $sort_by);
+        return Inertia::render('Dev/Company/List', [
+            'companies' => $companies
+        ]);
     }
     public function companyCreateOrUpdateView(Request $request, DeveloperService $service)
     {

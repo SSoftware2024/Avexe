@@ -41,4 +41,9 @@ final class DeveloperService
             $this->companyService->createByDeveloper($data, $owners_id) :
             $this->companyService->updateByDeveloper($data['id'], $data);
     }
+
+    public function companyGetDataPaginate(?int $paginate = 10, array $sort_by = [])
+    {
+        return $this->companyService->getDataPaginateByDeveloper($paginate, $sort_by);
+    }
 }

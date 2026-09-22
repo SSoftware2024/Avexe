@@ -16,13 +16,20 @@ final class CompanyService
             'corporate_name' => $data['corporate_name'],
             'tag_url' => $data['tag_url'],
         ]);
-        (new OwnerManager())->associateCompany($owners_id,$company->id);
+        (new OwnerManager())->associateCompany($owners_id, $company->id);
         return $company;
     }
 
-    public function updateByDeveloper(int $id, array $datas)
+    public function updateByDeveloper(int $id, array $datas) {}
+
+    public function getDataPaginateByDeveloper(?int $paginate = 10, array $sort_by = [])
     {
-       
+        $company = Company::query();
+        if (!empty($sort_by)) { //vuetify datatable
+            $company->orderBy($sort_by[0]['key'], $sort_by[1]['order']);
+        }
+        $company = $company->paginate($paginate);
+        return $company;
     }
 
     //  $company = Company::update([
