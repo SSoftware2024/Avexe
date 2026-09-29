@@ -44,7 +44,7 @@ Route::prefix('developer')->middleware(['auth'])->name('developer')->group(funct
 
     //empresa
     Route::get('/company/listView', [DeveloperController::class, 'companyListView'])->name('.companyListView');
-    Route::get('/company/createOrUpdate/{company?}', [DeveloperController::class, 'companyCreateOrUpdateView'])->name('.companyCreateOrUpdateView');
+    Route::get('/company/createOrUpdate/{id?}', [DeveloperController::class, 'companyCreateOrUpdateView'])->name('.companyCreateOrUpdateView');
     Route::post('/company/createOrUpdate', [DeveloperController::class, 'companyCreateOrUpdate'])->name('.companyCreateOrUpdate');
 
 });

@@ -57,7 +57,6 @@ class OwnerService
         return $user->save();
     }
 
-
     public function getOwnerData(int $id): ?User //dado
     {
         $user = User::find($id);

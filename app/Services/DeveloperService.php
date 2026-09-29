@@ -17,21 +17,16 @@ final class DeveloperService
     }
 
 
-    public function createCompany(array $data, array $owners_id): Company
-    {
-        $company = Company::create([
-            'cpf' => $data['cpf'],
-            'cnpj' => $data['cnpj'],
-            'name' => $data['name'],
-            'corporate_name' => $data['corporate_name'],
-            'tag_url' => $data['tag_url'],
-        ]);
-        $this->associateOwners($owners_id, $company->id);
-        return $company;
-    }
+
 
     public function updateCompany(int $company_id, array $datas)
     {
+
+        //verficar se o ids enviados possuem os old ids
+        // sim: corta os olds e fica com os novos, atuliza valores novos
+        //não atuliza para null ids antes vinculados e atualiza valores novos
+        //old ids não podem vir null caso nenhum id novo tenha sido marcado
+        
         //desassociar antigos
         //associar novos
         //atualizar
@@ -42,10 +37,5 @@ final class DeveloperService
     #                                    PRIVADOS
     # ================================================================================= #
 
-    private function associateOwners(array $owners_id, int $company_id): int
-    {
-        return User::whereIn('id', $owners_id)->update([
-            'company_id' => $company_id
-        ]);
-    }
+
 }

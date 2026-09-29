@@ -138,14 +138,20 @@ class DeveloperController extends Controller
             'companies' => $companies
         ]);
     }
-    public function companyCreateOrUpdateView(Request $request, CompanyService $companyService, ?Company $company)
-    {
-        $data = $companyService->createOrUpdateViewData();
+    public function companyCreateOrUpdateView(
+        Request $request,
+        CompanyService $companyService,
+        ?int $id = null
+    ) {
+        $data = $companyService->createOrUpdateViewData($id);
         return Inertia::render('Dev/Company/CreateUpdate', $data);
     }
 
-    public function companyCreateOrUpdate(Request $request, DeveloperService $service)
-    {
+    public function companyCreateOrUpdate(
+        Request $request,
+        DeveloperService $service,
+        CompanyService $companyService,
+    ) {
         $cpf_or_cnpj_is_required = (empty($request->cpf) && empty($request->cnpj)) ? 'required' : 'nullable';
         $id = $request->id;
         $request->validate([
@@ -169,7 +175,7 @@ class DeveloperController extends Controller
         ]);
         $data = $request->all();
         empty($data['id']) ?
-            $service->createCompany($data, $data['owners_ids']) :
+            $companyService->create($data, $data['owners_ids']) :
             $service->updateCompany($data['id'], $data);
         Toast::success('Operação realizada com sucesso!');
     }

@@ -1,12 +1,21 @@
 <script setup>
 import AuthLayout from "@/layouts/AuthLayout.vue";
-import { Head, useForm } from "@inertiajs/vue3";
+import { Head, useForm, usePage } from "@inertiajs/vue3";
 import SectionCard from "@/components/SectionCard.vue";
 import CompanyCreateUpdate from "@/PartialPages/Dev/CompanyCreateUpdate.vue";
 import OwnerCreateUpdate from "@/PartialPages/Dev/OwnerCreateUpdate.vue";
-import { ref } from "vue";
+import { onMounted, ref } from "vue";
 
+const page = usePage();
 const new_owner_dialog = ref(false);
+
+function _ownersByCompanyIds() {
+    const owners = page.props?.ownersByCompany ?? [];
+    return owners.map(owner => owner.id);
+}
+
+onMounted(() => {
+});
 </script>
 <template>
     <Head title="Informações do Proprietário" />
@@ -26,7 +35,11 @@ const new_owner_dialog = ref(false);
             </SectionCard>
             <SectionCard title="Nova empresa">
                 <div>
-                    <CompanyCreateUpdate :owners="$page.props.ownersNotSelected"></CompanyCreateUpdate>
+                    <CompanyCreateUpdate
+                        :owners="$page.props.ownersAvalable"
+                        :owners_selected_ids="_ownersByCompanyIds()"
+                        :company="$page.props?.company"
+                    ></CompanyCreateUpdate>
                 </div>
             </SectionCard>
         </div>
@@ -37,10 +50,16 @@ const new_owner_dialog = ref(false);
                 title="Novo dono"
                 class="dialog-auth-responsive-800 pa-3"
             >
-                <OwnerCreateUpdate @success="new_owner_dialog = false"></OwnerCreateUpdate>
+                <OwnerCreateUpdate
+                    @success="new_owner_dialog = false"
+                ></OwnerCreateUpdate>
 
                 <template #append>
-                    <v-btn icon variant="text" @click="new_owner_dialog = false">
+                    <v-btn
+                        icon
+                        variant="text"
+                        @click="new_owner_dialog = false"
+                    >
                         <v-icon>mdi-close</v-icon>
                     </v-btn>
                 </template>

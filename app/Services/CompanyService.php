@@ -5,16 +5,42 @@ namespace App\Services;
 use App\Enum\TypeUser;
 use App\Models\Company;
 use App\Models\User;
+use Illuminate\Database\Eloquent\Collection;
 
 final class CompanyService
 {
+    public function create(array $data, array $owners_id): Company
+    {
+        $company = Company::create([
+            'cpf' => $data['cpf'],
+            'cnpj' => $data['cnpj'],
+            'name' => $data['name'],
+            'corporate_name' => $data['corporate_name'],
+            'tag_url' => $data['tag_url'],
+        ]);
+        $this->associateOwners($owners_id, $company->id);
+        return $company;
+    }
 
-    public function getOwnersNotSelected() //dados
+    public function getOwnersNotSelected(): Collection
     {
         return User::where('user_type', TypeUser::OWNER->value)
             ->whereNull('company_id')->get(['id', 'name', 'user_type']);
     }
-    public function getOwnersSelectedByCompany(int $id) {}
+    public function getAllOwnersAvailable(?array $ids = []): Collection
+    {
+        $user = User::where('user_type', TypeUser::OWNER->value)
+            ->whereNull('company_id');
+        if (!empty($ids)) {
+            $user->orWhereIn('id',$ids);
+        }
+        return $user->get(['id', 'name', 'user_type']);
+    }
+    public function getOwnersSelectedByCompany(int $id): Collection
+    {
+        return User::where('user_type', TypeUser::OWNER->value)
+            ->where('company_id', $id)->get(['id', 'name', 'user_type']);
+    }
 
     # ================================================================================= #
     #                                    View
@@ -28,20 +54,29 @@ final class CompanyService
         $company = $company->paginate($paginate);
         return $company;
     }
-    public function createOrUpdateViewData():array
+    public function createOrUpdateViewData(?int $id = null): array
     {
-        $ownersNotSelected = $this->getOwnersNotSelected();
-        $ownersByCompany = $this->getOwnersSelectedByCompany(); //fazer este metodo
 
-        //pegar os selecionados e salvar no fron-end
-        //salvar no front end: old ids
-        //verficar se o ids enviados possuem os old ids
-            // sim: corta os olds e fica com os novos, atuliza valores novos
-            //não atuliza para null ids antes vinculados e atualiza valores novos
-        //old ids não podem vir null caso nenhum id novo tenha sido marcado
-        return compact('ownersNotSelected');
+        $ownersByCompany = [];
+        $company = null;
+        if (!empty($id)) {
+            $ownersByCompany = $this->getOwnersSelectedByCompany($id);
+            $company = Company::select('id', 'name', 'corporate_name', 'cpf', 'cnpj', 'tag_url', 'active')->find($id);
+        }
+        $ownersAvalable= $this->getAllOwnersAvailable($ownersByCompany->pluck('id')->toArray());
+        return compact('ownersAvalable', 'ownersByCompany', 'company');
     }
-    
+
+    # ================================================================================= #
+    #                                    PRIVADOS
+    # ================================================================================= #
+
+    private function associateOwners(array $owners_id, int $id): int
+    {
+        return User::whereIn('id', $owners_id)->update([
+            'company_id' => $id
+        ]);
+    }
 
 
     //  $company = Company::update([

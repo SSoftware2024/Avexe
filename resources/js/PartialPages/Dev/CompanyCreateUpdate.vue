@@ -13,6 +13,10 @@ const props = defineProps({
         type: Array,
         default: () => [],
     },
+    owners_selected_ids: {
+        type: Array,
+        default: () => [],
+    },
 });
 
 const form = useForm({
@@ -39,12 +43,13 @@ const sortedOwnersSelected = computed(() => {
 });
 
 function _load() {
-    form.id = props.user_data.id;
-    form.name = props.user_data.name;
-    form.email = props.user_data.email;
-    form.whatsapp = props.user_data.whatsapp;
-    form.password = props.user_data.password;
-    form.date_of_birth = props.user_data.date_of_birth;
+    form.id = props.company.id;
+    form.name = props.company.name;
+    form.corporate_name = props.company.corporate_name;
+    form.cnpj = props.company.cnpj;
+    form.cpf = props.company.cpf;
+    form.tag_url = props.company.name;
+    form.owners_ids = props.owners_selected_ids ?? [];
 }
 
 function _save() {
@@ -56,9 +61,9 @@ function _save() {
 }
 
 onMounted(() => {
-    // if (props.user_data) {
-    //     _load();
-    // }
+    if (props.company) {
+        _load();
+    }
 });
 </script>
 
