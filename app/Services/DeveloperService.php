@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Enum\TypeUser;
 use App\Models\Company;
 use App\Models\User;
 
@@ -19,17 +20,28 @@ final class DeveloperService
 
 
 
-    public function updateCompany(int $company_id, array $datas)
+    public function updateCompany(int $company_id, array $data, array $old_owners_id): int
     {
 
-        //verficar se o ids enviados possuem os old ids
-        // sim: corta os olds e fica com os novos, atuliza valores novos
-        //não atuliza para null ids antes vinculados e atualiza valores novos
-        //old ids não podem vir null caso nenhum id novo tenha sido marcado
-        
-        //desassociar antigos
-        //associar novos
-        //atualizar
+        $total_rows = Company::where('id', $company_id)->update([
+            'cpf' => $data['cpf'],
+            'cnpj' => $data['cnpj'],
+            'name' => $data['name'],
+            'corporate_name' => $data['corporate_name'],
+            'tag_url' => $data['tag_url'],
+        ]);
+        $owners_id = $data['owners_ids'];
+        $new_owners_id = array_values(array_diff($owners_id, $old_owners_id));
+        $remove_owners_id = array_values(array_diff($old_owners_id, $owners_id));
+        if (!empty($remove_owners_id)) {
+            $total_rows += User::whereIn('id', $remove_owners_id)->update([
+                'company_id' => null
+            ]);
+        }
+        if (!empty($new_owners_id)) {
+            $total_rows += $this->companyService->associateOwners($new_owners_id, $company_id);
+        }
+        return $total_rows;
     }
 
 

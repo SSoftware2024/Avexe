@@ -42,6 +42,22 @@ final class CompanyService
             ->where('company_id', $id)->get(['id', 'name', 'user_type']);
     }
 
+    
+    public function associateOwners(array $owners_id, int $id): int
+    {
+        return User::whereIn('id', $owners_id)->update([
+            'company_id' => $id
+        ]);
+    }
+
+    public function toggleActive(int $id)
+    {
+        $company = Company::select('id','active')->find($id);
+        $company->active = !$company->active;
+        $company->save();
+
+    }
+
     # ================================================================================= #
     #                                    View
     # ================================================================================= #
@@ -71,12 +87,6 @@ final class CompanyService
     #                                    PRIVADOS
     # ================================================================================= #
 
-    private function associateOwners(array $owners_id, int $id): int
-    {
-        return User::whereIn('id', $owners_id)->update([
-            'company_id' => $id
-        ]);
-    }
 
 
     //  $company = Company::update([

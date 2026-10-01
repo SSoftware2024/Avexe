@@ -48,16 +48,28 @@ function _load() {
     form.corporate_name = props.company.corporate_name;
     form.cnpj = props.company.cnpj;
     form.cpf = props.company.cpf;
-    form.tag_url = props.company.name;
+    form.tag_url = props.company.tag_url;
     form.owners_ids = props.owners_selected_ids ?? [];
 }
 
 function _save() {
-    form.post(route("developer.companyCreateOrUpdate"), {
-        onSuccess: () => {
-            is_update.value ? null : form.reset();
-        },
-    });
+    let url = route("developer.companyCreateOrUpdate");
+    if (!is_update.value) {
+        form.post(url, {
+            onSuccess: () => {
+                is_update.value ? null : form.reset();
+            },
+        });
+    } else {
+        form.transform((data) => ({
+            ...data,
+            old_owners_id: props.owners_selected_ids 
+        })).patch(url, {
+            onSuccess: () => {
+                is_update.value ? null : form.reset();
+            },
+        });
+    }
 }
 
 onMounted(() => {

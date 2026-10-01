@@ -6,11 +6,10 @@ import { route } from "ziggy-js";
 import AuthLayout from "@/layouts/AuthLayout.vue";
 import SectionCard from "@/components/SectionCard.vue";
 
-
-const maskes = reactive({ 
+const maskes = reactive({
     cnpj: useMask({ mask: "##.###.###/####-##" }),
-    cpf: useMask({ mask: "###.###.###-##" })
-})
+    cpf: useMask({ mask: "###.###.###-##" }),
+});
 const datatable = reactive({
     items_per_page: 10,
     headers: [
@@ -56,6 +55,17 @@ function _edit(item) {
     router.get(route("developer.companyCreateOrUpdateView", [item.id]));
 }
 
+function _toggleActive(item) {
+    router.patch(
+        route("developer.companyToggleActive"),
+        {
+            id: item.id,
+        },
+        {
+            only: ["companies"],
+        },
+    );
+}
 
 function _loadData({ page, itemsPerPage, sortBy }) {
     datatable.loading = true;
@@ -149,7 +159,7 @@ function _loadData({ page, itemsPerPage, sortBy }) {
                                         >Visualizar</v-list-item-title
                                     >
                                 </v-list-item>
-                                <v-list-item @click="">
+                                <v-list-item @click="_toggleActive(item)">
                                     <template v-slot:prepend>
                                         <v-icon size="small">
                                             {{
@@ -160,7 +170,7 @@ function _loadData({ page, itemsPerPage, sortBy }) {
                                         </v-icon>
                                     </template>
 
-                                    <v-list-item-title @click="">
+                                    <v-list-item-title>
                                         {{
                                             item.active ? "Desativar" : "Ativar"
                                         }}

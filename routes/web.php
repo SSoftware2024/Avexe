@@ -45,6 +45,7 @@ Route::prefix('developer')->middleware(['auth'])->name('developer')->group(funct
     //empresa
     Route::get('/company/listView', [DeveloperController::class, 'companyListView'])->name('.companyListView');
     Route::get('/company/createOrUpdate/{id?}', [DeveloperController::class, 'companyCreateOrUpdateView'])->name('.companyCreateOrUpdateView');
-    Route::post('/company/createOrUpdate', [DeveloperController::class, 'companyCreateOrUpdate'])->name('.companyCreateOrUpdate');
+    Route::match(['post','patch'],'/company/createOrUpdate', [DeveloperController::class, 'companyCreateOrUpdate'])->name('.companyCreateOrUpdate');
+    Route::patch('/company/toggleActive', [DeveloperController::class, 'companyToggleActive'])->name('.companyToggleActive');
 
 });

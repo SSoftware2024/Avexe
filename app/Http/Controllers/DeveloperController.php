@@ -155,7 +155,7 @@ class DeveloperController extends Controller
         $cpf_or_cnpj_is_required = (empty($request->cpf) && empty($request->cnpj)) ? 'required' : 'nullable';
         $id = $request->id;
         $request->validate([
-            'id' => ['nullable', 'integer', Rule::exists('company', 'id')],
+            'id' => ['nullable', 'integer', Rule::exists('companies', 'id')],
             'owners_ids' => ['required', 'array'],
             'name' => ['required'],
             'corporate_name' => ['required', 'max:255'],
@@ -167,16 +167,31 @@ class DeveloperController extends Controller
                 'max:50',
                 'regex:/^[a-z0-9_]+$/',
                 is_null($id) ? Rule::unique(Company::class) : Rule::unique(Company::class)->ignore($id)
-            ]
+            ],
+            'old_owners_id' => [is_null($id) ? 'nullable' : 'required', 'array'],
+            'old_owners_id.*' => ['integer']
         ], [
             'cnpj.required' => 'Informe CNPJ ou CPF',
             'cpf.required' => 'Informe CNPJ ou CPF',
             'tag_url.regex' => 'Sem espaço, apenas letras, números e _'
         ]);
         $data = $request->all();
-        empty($data['id']) ?
-            $companyService->create($data, $data['owners_ids']) :
-            $service->updateCompany($data['id'], $data);
-        Toast::success('Operação realizada com sucesso!');
+        if (empty($data['id'])) {
+            $companyService->create($data, $data['owners_ids']);
+            $message = 'Operação realizada com sucesso!';
+        } else {
+            $total_rows = $service->updateCompany($data['id'], $data, $data['old_owners_id']);
+            $message = "$total_rows registros atualizados com sucesso";
+        }
+
+        Toast::success($message);
+    }
+
+    public function companyToggleActive(Request $request, CompanyService $companyService)
+    {
+        $request->validate([
+            'id' => ['required', 'integer', Rule::exists('companies', 'id')]
+        ]);
+        $companyService->toggleActive($request->id);
     }
 }

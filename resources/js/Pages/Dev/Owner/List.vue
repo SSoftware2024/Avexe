@@ -167,7 +167,7 @@ function _closeDialog() {
                                     >Visualizar</v-list-item-title
                                 >
                             </v-list-item>
-                            <v-list-item @click="">
+                            <v-list-item>
                                 <template v-slot:prepend>
                                     <v-icon size="small">
                                         {{
