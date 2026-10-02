@@ -89,7 +89,7 @@ const nav_sections = computed(() => {
                     {
                         title: "Empresas",
                         icon: "mdi-account-group-outline",
-                        active_names: ["developer.ownerListView"],
+                        active_names: ["owner.listView"],
                         children: [
                             {
                                 title: "Empresas",
@@ -103,10 +103,10 @@ const nav_sections = computed(() => {
                             {
                                 title: "Listar clientes",
                                 icon: "mdi-account-multiple-outline",
-                                to: route("developer.ownerListView"),
+                                to: route("owner.listView"),
                                 active_names: [
-                                    "developer.ownerListView",
-                                    "developer.ownerCreateUpdateView",
+                                    "owner.listView",
+                                    "owner.createUpdateView",
                                 ],
                             },
                         ],

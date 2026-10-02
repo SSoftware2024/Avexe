@@ -101,7 +101,7 @@ const form = useForm({
 
 const isUpdate = computed(() => props.company != null);
 
-function load() {
+function _load() {
 }
 
 function _save() {

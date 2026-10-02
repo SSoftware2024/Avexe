@@ -27,8 +27,16 @@ Route::prefix('customer')->name('customer')->group(function () {
 });
 
 // dono
-Route::prefix('owner')->name('owner')->group(function () {
+Route::prefix('owner')->middleware(['auth'])->name('owner')->group(function () {
     Route::get('/dashboard', [OwnerController::class, 'index']);
+
+
+    // operações owner
+    Route::get('/listView', [OwnerController::class, 'listView'])->name('.listView');
+    Route::get('/createOrUpdate/{user?}', [OwnerController::class, 'createUpdateView'])->name('.createUpdateView');
+    Route::post('/createOrUpdate', [OwnerController::class, 'createOrUpdate'])->name('.createOrUpdate');
+    Route::delete('/delete/{id}', [OwnerController::class, 'delete'])->name('.delete');
+    Route::patch('/toggleActive/{id}', [OwnerController::class, 'toggleActive'])->name('.toggleActive');
 });
 
 // desenvolvedor
@@ -36,11 +44,11 @@ Route::prefix('developer')->middleware(['auth'])->name('developer')->group(funct
     Route::get('/dashboard', [DeveloperController::class, 'index']);
 
     // operações owner
-    Route::get('/owner/listView', [DeveloperController::class, 'ownerListView'])->name('.ownerListView');
-    Route::get('/owner/createOrUpdate/{user?}', [DeveloperController::class, 'ownerCreateUpdateView'])->name('.ownerCreateUpdateView');
-    Route::post('/owner/createOrUpdate', [DeveloperController::class, 'ownerCreateOrUpdate'])->name('.ownerCreateOrUpdate');
-    Route::delete('/owner/delete/{id}', [DeveloperController::class, 'ownerDelete'])->name('.ownerDelete');
-    Route::patch('/owner/toggleActive/{id}', [DeveloperController::class, 'ownerToggleActive'])->name('.ownerToggleActive');
+    // Route::get('/owner/listView', [DeveloperController::class, 'ownerListView'])->name('.ownerListView');
+    // Route::get('/owner/createOrUpdate/{user?}', [DeveloperController::class, 'ownerCreateUpdateView'])->name('.ownerCreateUpdateView');
+    // Route::post('/owner/createOrUpdate', [DeveloperController::class, 'ownerCreateOrUpdate'])->name('.ownerCreateOrUpdate');
+    // Route::delete('/owner/delete/{id}', [DeveloperController::class, 'ownerDelete'])->name('.ownerDelete');
+    // Route::patch('/owner/toggleActive/{id}', [DeveloperController::class, 'ownerToggleActive'])->name('.ownerToggleActive');
 
     //empresa
     Route::get('/company/listView', [DeveloperController::class, 'companyListView'])->name('.companyListView');
@@ -50,3 +58,17 @@ Route::prefix('developer')->middleware(['auth'])->name('developer')->group(funct
     Route::delete('/company/delete/{id}', [DeveloperController::class, 'companyDelete'])->name('.companyDelete');
 
 });
+// // desenvolvedor
+// Route::prefix('owner')->middleware(['auth'])->name('owner')->group(function () {
+
+
+
+
+//     //empresa
+//     Route::get('/company/listView', [DeveloperController::class, 'companyListView'])->name('.companyListView');
+//     Route::get('/company/createOrUpdate/{id?}', [DeveloperController::class, 'companyCreateOrUpdateView'])->name('.companyCreateOrUpdateView');
+//     Route::match(['post','patch'],'/company/createOrUpdate', [DeveloperController::class, 'companyCreateOrUpdate'])->name('.companyCreateOrUpdate');
+//     Route::patch('/company/toggleActive', [DeveloperController::class, 'companyToggleActive'])->name('.companyToggleActive');
+//     Route::delete('/company/delete/{id}', [DeveloperController::class, 'companyDelete'])->name('.companyDelete');
+
+// });

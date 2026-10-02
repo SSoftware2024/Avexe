@@ -36,7 +36,7 @@ function _loadUser() {
 }
 
 function _save() {
-    form.post(route("developer.ownerCreateOrUpdate"), {
+    form.post(route("owner.createOrUpdate"), {
         onSuccess: () => {
             is_update.value ? null : form.reset();
             emit('success');

@@ -52,7 +52,7 @@ function _loadData({ page, itemsPerPage, sortBy }) {
     datatable.loading = true;
 
     router.get(
-        route("developer.ownerListView"),
+        route("owner.listView"),
         {
             page: page,
             per_page: itemsPerPage,
@@ -70,13 +70,13 @@ function _loadData({ page, itemsPerPage, sortBy }) {
     );
 }
 function _deleteOwner(id) {
-    router.delete(route("developer.ownerDelete", [id]));
+    router.delete(route("owner.delete", [id]));
 }
 function _toggleActiveOwner(item) {
-    router.patch(route("developer.ownerToggleActive", [item.id]));
+    router.patch(route("owner.toggleActive", [item.id]));
 }
 function _editOwner(item) {
-    router.get(route("developer.ownerCreateUpdateView", [item.id]));
+    router.get(route("owner.createUpdateView", [item.id]));
 }
 function _deleteQuestion(item) {
     dialog_alert
@@ -105,7 +105,7 @@ function _closeDialog() {
         <v-btn
             color="green"
             variant="flat"
-            @click="router.visit(route('developer.ownerCreateUpdateView'))"
+            @click="router.visit(route('owner.createUpdateView'))"
         >
             <v-icon start> mdi-plus </v-icon>
             Novo
