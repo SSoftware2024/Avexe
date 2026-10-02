@@ -2,18 +2,15 @@
 
 namespace App\Services;
 
-use App\Enum\TypeUser;
 use App\Models\Company;
-use App\Models\User;
+use App\Services\CompanyService;
 
 final class DeveloperService
 {
-    private OwnerService $ownerService;
     private CompanyService $companyService;
 
     public function __construct()
     {
-        $this->ownerService = new OwnerService();
         $this->companyService = new CompanyService();
     }
 
