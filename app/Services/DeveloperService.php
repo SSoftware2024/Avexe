@@ -17,9 +17,6 @@ final class DeveloperService
         $this->companyService = new CompanyService();
     }
 
-
-
-
     public function updateCompany(int $company_id, array $data, array $old_owners_id): int
     {
 
@@ -34,9 +31,7 @@ final class DeveloperService
         $new_owners_id = array_values(array_diff($owners_id, $old_owners_id));
         $remove_owners_id = array_values(array_diff($old_owners_id, $owners_id));
         if (!empty($remove_owners_id)) {
-            $total_rows += User::whereIn('id', $remove_owners_id)->update([
-                'company_id' => null
-            ]);
+            $total_rows += $this->companyService->removeOwners($company_id, $remove_owners_id);
         }
         if (!empty($new_owners_id)) {
             $total_rows += $this->companyService->associateOwners($new_owners_id, $company_id);

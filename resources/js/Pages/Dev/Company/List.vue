@@ -4,12 +4,13 @@ import { useMask } from "vuetify";
 import { Head, useForm, router } from "@inertiajs/vue3";
 import { route } from "ziggy-js";
 import AuthLayout from "@/layouts/AuthLayout.vue";
-import SectionCard from "@/components/SectionCard.vue";
+import { useDialogAlert } from "@/composables/useDialogAlert";
 
 const maskes = reactive({
     cnpj: useMask({ mask: "##.###.###/####-##" }),
     cpf: useMask({ mask: "###.###.###-##" }),
 });
+const dialog_alert = useDialogAlert();
 const datatable = reactive({
     items_per_page: 10,
     headers: [
@@ -65,6 +66,21 @@ function _toggleActive(item) {
             only: ["companies"],
         },
     );
+}
+
+function _delete(id){
+    router.delete(route('developer.companyDelete', [id]));
+}
+
+function _deleteQuestion(item) {
+    dialog_alert
+        .setButtons({
+            question_buttons: true,
+        })
+        .confirmFunction(() => {
+            _delete(item.id);
+        });
+    dialog_alert.open("Deletar empresa: " + item.name + "?", "question");
 }
 
 function _loadData({ page, itemsPerPage, sortBy }) {
@@ -185,7 +201,7 @@ function _loadData({ page, itemsPerPage, sortBy }) {
                                         >Editar</v-list-item-title
                                     >
                                 </v-list-item>
-                                <v-list-item @click="" color="error">
+                                <v-list-item @click="_deleteQuestion(item)" color="error">
                                     <template v-slot:prepend>
                                         <v-icon size="small" color="error"
                                             >mdi-delete</v-icon

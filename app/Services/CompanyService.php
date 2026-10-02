@@ -31,8 +31,8 @@ final class CompanyService
     {
         $user = User::where('user_type', TypeUser::OWNER->value)
             ->whereNull('company_id');
-        if (!empty($ids)) {
-            $user->orWhereIn('id',$ids);
+        if (!empty($ids)) { //caso de edição, mostra os relacionados
+            $user->orWhereIn('id', $ids);
         }
         return $user->get(['id', 'name', 'user_type']);
     }
@@ -42,20 +42,34 @@ final class CompanyService
             ->where('company_id', $id)->get(['id', 'name', 'user_type']);
     }
 
-    
+
     public function associateOwners(array $owners_id, int $id): int
     {
         return User::whereIn('id', $owners_id)->update([
             'company_id' => $id
         ]);
     }
+    public function removeOwners(int $id, ?array $owners_id = null): int
+    {
+        $user = User::where('company_id', $id);
+        !empty($owners_id) ? $user->whereIn('id', $owners_id) : null;
+        return $user->update([
+            'company_id' => null
+        ]);
+    }
 
     public function toggleActive(int $id)
     {
-        $company = Company::select('id','active')->find($id);
+        $company = Company::select('id', 'active')->find($id);
         $company->active = !$company->active;
         $company->save();
+    }
 
+    public function delete(int $id) 
+    {
+        $owners_disassociated_total = $this->removeOwners($id);
+        Company::where('id', $id)->forceDelete();
+        return $owners_disassociated_total;
     }
 
     # ================================================================================= #
@@ -75,11 +89,14 @@ final class CompanyService
 
         $ownersByCompany = [];
         $company = null;
+        $owners_avalable = null;
         if (!empty($id)) {
             $ownersByCompany = $this->getOwnersSelectedByCompany($id);
             $company = Company::select('id', 'name', 'corporate_name', 'cpf', 'cnpj', 'tag_url', 'active')->find($id);
+            $owners_avalable = $ownersByCompany->pluck('id')->toArray();
         }
-        $ownersAvalable= $this->getAllOwnersAvailable($ownersByCompany->pluck('id')->toArray());
+        $ownersAvalable = $this->getAllOwnersAvailable($owners_avalable);
+        
         return compact('ownersAvalable', 'ownersByCompany', 'company');
     }
 

@@ -194,4 +194,17 @@ class DeveloperController extends Controller
         ]);
         $companyService->toggleActive($request->id);
     }
+
+    public function companyDelete(CompanyService $companyService, int $id)
+    {
+        $validator = Validator::make(['id' => $id], [
+            'id' => ['required', 'integer', Rule::exists('users', 'id')],
+        ]);
+        if ($validator->fails()) {
+            DialogAlert::warning($validator->errors()->get('id')[0]);
+        } else {
+            $owners_disassociated_total = $companyService->delete($id);
+            Toast::success("$owners_disassociated_total donos desassociados");
+        }
+    }
 }

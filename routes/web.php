@@ -47,5 +47,6 @@ Route::prefix('developer')->middleware(['auth'])->name('developer')->group(funct
     Route::get('/company/createOrUpdate/{id?}', [DeveloperController::class, 'companyCreateOrUpdateView'])->name('.companyCreateOrUpdateView');
     Route::match(['post','patch'],'/company/createOrUpdate', [DeveloperController::class, 'companyCreateOrUpdate'])->name('.companyCreateOrUpdate');
     Route::patch('/company/toggleActive', [DeveloperController::class, 'companyToggleActive'])->name('.companyToggleActive');
+    Route::delete('/company/delete/{id}', [DeveloperController::class, 'companyDelete'])->name('.companyDelete');
 
 });
