@@ -53,7 +53,7 @@ function _load() {
 }
 
 function _save() {
-    let url = route("developer.companyCreateOrUpdate");
+    let url = route("company.createOrUpdate");
     if (!is_update.value) {
         form.post(url, {
             onSuccess: () => {

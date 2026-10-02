@@ -105,7 +105,8 @@ function _load() {
 }
 
 function _save() {
-    const url = route("developer.companyOperatingHoursUpdate");
+    // const url = route("companyOperatingHoursUpdate.create");
+    const url = '';
 
     if (!isUpdate.value) {
         form.post(url, {

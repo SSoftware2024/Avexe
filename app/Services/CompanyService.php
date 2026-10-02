@@ -75,7 +75,7 @@ final class CompanyService
     # ================================================================================= #
     #                                    View
     # ================================================================================= #
-    public function companyListViewData(?int $paginate = 10, array $sort_by = [])
+    public function listViewData(?int $paginate = 10, array $sort_by = [])
     {
         $company = Company::query();
         if (!empty($sort_by)) { //vuetify datatable

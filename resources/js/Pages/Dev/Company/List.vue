@@ -53,12 +53,12 @@ const datatable = reactive({
 });
 
 function _edit(item) {
-    router.get(route("developer.companyCreateOrUpdateView", [item.id]));
+    router.get(route("company.createOrUpdateView", [item.id]));
 }
 
 function _toggleActive(item) {
     router.patch(
-        route("developer.companyToggleActive"),
+        route("company.toggleActive"),
         {
             id: item.id,
         },
@@ -69,7 +69,7 @@ function _toggleActive(item) {
 }
 
 function _delete(id){
-    router.delete(route('developer.companyDelete', [id]));
+    router.delete(route('company.delete', [id]));
 }
 
 function _deleteQuestion(item) {
@@ -87,7 +87,7 @@ function _loadData({ page, itemsPerPage, sortBy }) {
     datatable.loading = true;
 
     router.get(
-        route("developer.companyListView"),
+        route("company.listView"),
         {
             page: page,
             per_page: itemsPerPage,
@@ -111,7 +111,7 @@ function _loadData({ page, itemsPerPage, sortBy }) {
         <v-btn
             color="green"
             variant="flat"
-            @click="router.visit(route('developer.companyCreateOrUpdateView'))"
+            @click="router.visit(route('company.createOrUpdateView'))"
         >
             <v-icon start> mdi-plus </v-icon>
             Novo

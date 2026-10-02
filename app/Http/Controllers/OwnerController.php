@@ -29,7 +29,6 @@ class OwnerController extends Controller
     }
 
 
-
     public function listView(Request $request, OwnerService $service)
     {
         $request->validate([
