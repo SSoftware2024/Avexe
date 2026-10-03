@@ -22,6 +22,28 @@ final class CompanyService
         return $company;
     }
 
+    public function updateByDeveloper(int $id, array $data, array $old_owners_id): int
+    {
+
+        $total_rows = Company::where('id', $id)->update([
+            'cpf' => $data['cpf'],
+            'cnpj' => $data['cnpj'],
+            'name' => $data['name'],
+            'corporate_name' => $data['corporate_name'],
+            'tag_url' => $data['tag_url'],
+        ]);
+        $owners_id = $data['owners_ids'];
+        $new_owners_id = array_values(array_diff($owners_id, $old_owners_id));
+        $remove_owners_id = array_values(array_diff($old_owners_id, $owners_id));
+        if (!empty($remove_owners_id)) {
+            $total_rows += $this->removeOwners($id, $remove_owners_id);
+        }
+        if (!empty($new_owners_id)) {
+            $total_rows += $this->associateOwners($new_owners_id, $id);
+        }
+        return $total_rows;
+    }
+
     public function getOwnersNotSelected(): Collection
     {
         return User::where('user_type', TypeUser::OWNER->value)
@@ -42,22 +64,6 @@ final class CompanyService
             ->where('company_id', $id)->get(['id', 'name', 'user_type']);
     }
 
-
-    public function associateOwners(array $owners_id, int $id): int
-    {
-        return User::whereIn('id', $owners_id)->update([
-            'company_id' => $id
-        ]);
-    }
-    public function removeOwners(int $id, ?array $owners_id = null): int
-    {
-        $user = User::where('company_id', $id);
-        !empty($owners_id) ? $user->whereIn('id', $owners_id) : null;
-        return $user->update([
-            'company_id' => null
-        ]);
-    }
-
     public function toggleActive(int $id)
     {
         $company = Company::select('id', 'active')->find($id);
@@ -65,7 +71,7 @@ final class CompanyService
         $company->save();
     }
 
-    public function delete(int $id) 
+    public function delete(int $id)
     {
         $owners_disassociated_total = $this->removeOwners($id);
         Company::where('id', $id)->forceDelete();
@@ -96,14 +102,27 @@ final class CompanyService
             $owners_avalable = $ownersByCompany->pluck('id')->toArray();
         }
         $ownersAvalable = $this->getAllOwnersAvailable($owners_avalable);
-        
+
         return compact('ownersAvalable', 'ownersByCompany', 'company');
     }
 
     # ================================================================================= #
     #                                    PRIVADOS
     # ================================================================================= #
-
+    private function associateOwners(array $owners_id, int $id): int
+    {
+        return User::whereIn('id', $owners_id)->update([
+            'company_id' => $id
+        ]);
+    }
+    private function removeOwners(int $id, ?array $owners_id = null): int
+    {
+        $user = User::where('company_id', $id);
+        !empty($owners_id) ? $user->whereIn('id', $owners_id) : null;
+        return $user->update([
+            'company_id' => null
+        ]);
+    }
 
 
     //  $company = Company::update([

@@ -6,7 +6,6 @@ use App\Facades\DialogAlert;
 use App\Facades\Toast;
 use App\Models\Company;
 use App\Services\CompanyService;
-use App\Services\DeveloperService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
@@ -42,7 +41,6 @@ class CompanyController extends Controller
 
     public function createOrUpdate(
         Request $request,
-        DeveloperService $developerService,
         CompanyService $service,
     ) {
         $cpf_or_cnpj_is_required = (empty($request->cpf) && empty($request->cnpj)) ? 'required' : 'nullable';
@@ -73,7 +71,7 @@ class CompanyController extends Controller
             $service->create($data, $data['owners_ids']);
             $message = 'Operação realizada com sucesso!';
         } else {
-            $total_rows = $developerService->updateCompany($data['id'], $data, $data['old_owners_id']);
+            $total_rows = $service->updateByDeveloper($data['id'], $data, $data['old_owners_id']);
             $message = "$total_rows registros atualizados com sucesso";
         }
 

@@ -47,6 +47,8 @@ Route::prefix('company')->middleware(['auth'])->name('company')->group(function 
     Route::match(['post','patch'],'/createOrUpdate', [CompanyController::class, 'createOrUpdate'])->name('.createOrUpdate');
     Route::patch('/toggleActive', [CompanyController::class, 'toggleActive'])->name('.toggleActive');
     Route::delete('/delete/{id}', [CompanyController::class, 'delete'])->name('.delete');
+
+    //horário funcionamento
 });
 
 // desenvolvedor
