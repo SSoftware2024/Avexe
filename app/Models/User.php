@@ -52,8 +52,11 @@ class User extends Authenticatable implements MustVerifyEmail
     protected function dateOfBirthFormatted(): Attribute
     {
         return Attribute::make(
-            get: function () {
-                return date('d/m/Y', strtotime($this->date_of_birth));
+            get: function (): ?string {
+                if (!empty($this->date_of_birth)) {
+                    return date('d/m/Y', strtotime($this->date_of_birth));
+                }
+                return null;
             }
         );
     }

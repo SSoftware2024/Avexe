@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CompanyController;
+use App\Http\Controllers\CompanyOperatingHoursController;
 use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\DeveloperController;
 use App\Http\Controllers\OwnerController;
@@ -44,12 +45,18 @@ Route::prefix('company')->middleware(['auth'])->name('company')->group(function 
     // operações empresa
     Route::get('/listView', [CompanyController::class, 'listView'])->name('.listView');
     Route::get('/createOrUpdate/{id?}', [CompanyController::class, 'createOrUpdateView'])->name('.createOrUpdateView');
-    Route::match(['post','patch'],'/createOrUpdate', [CompanyController::class, 'createOrUpdate'])->name('.createOrUpdate');
+    Route::match(['post', 'patch'], '/createOrUpdate', [CompanyController::class, 'createOrUpdate'])->name('.createOrUpdate');
     Route::patch('/toggleActive', [CompanyController::class, 'toggleActive'])->name('.toggleActive');
     Route::delete('/delete/{id}', [CompanyController::class, 'delete'])->name('.delete');
 
     //horário funcionamento
+    Route::prefix('operatingHours')->name('.operating_hours')->group(function () {
+        Route::match(['post', 'patch'], '/save', [CompanyOperatingHoursController::class, 'save'])->name('.save');
+    });
 });
+
+
+
 
 // desenvolvedor
 Route::prefix('developer')->middleware(['auth'])->name('developer')->group(function () {

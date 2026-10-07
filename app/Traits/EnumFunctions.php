@@ -27,17 +27,21 @@ trait EnumFunctions
      */
     public static function toArrayPortuguese()
     {
-        // $english_portuguese = [
-        //     'pay' => 'pagar',
-        //     'paid' => 'paga',
-        //     'late' => 'atrasada',
-        //     'overdue' => 'vencida',
-        // ];
-        // $array = self::toArrayValues();
-        // $array_translated = [];
-        // foreach ($array as $value) {
-        //     in_array($value, $array, true) ? $array_translated[$value] = $english_portuguese[$value] : null;
-        // }
-        // return $array_translated;
+        
+        $english_portuguese = [
+            'sunday' => 'domingo',
+            'monday' => 'segunda',
+            'tuesday' => 'terça',
+            'wednesday' => 'quarta',
+            'thursday' => 'quinta',
+            'friday' => 'sexta',
+            'saturday' => 'sabado',
+        ];
+        $array = self::toArrayValues();
+        $array_translated = [];
+        foreach ($array as $value) {
+            in_array($value, $array, true) ? $array_translated[$value] = $english_portuguese[$value] : null;
+        }
+        return $array_translated;
     }
 }

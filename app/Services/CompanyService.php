@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Enum\TypeUser;
 use App\Models\Company;
 use App\Models\User;
+use App\Services\CompanyOperatingHoursService;
 use Illuminate\Database\Eloquent\Collection;
 
 final class CompanyService
@@ -74,6 +75,7 @@ final class CompanyService
     public function delete(int $id)
     {
         $owners_disassociated_total = $this->removeOwners($id);
+        // (new CompanyOperatingHoursService($id))->delete();
         Company::where('id', $id)->forceDelete();
         return $owners_disassociated_total;
     }

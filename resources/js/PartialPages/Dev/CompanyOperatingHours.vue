@@ -4,9 +4,9 @@ import { useForm } from "@inertiajs/vue3";
 import { route } from "ziggy-js";
 
 const props = defineProps({
-    company: {
-        type: Object,
-        default: null,
+    company_id: {
+        type: Number,
+        required: true,
     },
 });
 
@@ -97,16 +97,15 @@ const form = useForm({
     sunday_afternoon_end_time: null,
     sunday_evening_start_time: null,
     sunday_evening_end_time: null,
+    company_id: props.company_id,
 });
 
 const isUpdate = computed(() => props.company != null);
 
-function _load() {
-}
+function _load() {}
 
 function _save() {
-    // const url = route("companyOperatingHoursUpdate.create");
-    const url = '';
+    const url = route("company.operating_hours.save");
 
     if (!isUpdate.value) {
         form.post(url, {
@@ -138,45 +137,26 @@ onMounted(() => {
             <table class="operating-hours-table">
                 <thead>
                     <tr>
-                        <th class="day-column">
-                            Dia
-                        </th>
+                        <th class="day-column">Dia</th>
 
-                        <th class="time-column">
-                            Manhã Início
-                        </th>
+                        <th class="time-column">Manhã Início</th>
 
-                        <th class="time-column">
-                            Manhã Fim
-                        </th>
+                        <th class="time-column">Manhã Fim</th>
 
-                        <th class="time-column">
-                            Tarde Início
-                        </th>
+                        <th class="time-column">Tarde Início</th>
 
-                        <th class="time-column">
-                            Tarde Fim
-                        </th>
+                        <th class="time-column">Tarde Fim</th>
 
-                        <th class="time-column">
-                            Noite Início
-                        </th>
+                        <th class="time-column">Noite Início</th>
 
-                        <th class="time-column">
-                            Noite Fim
-                        </th>
+                        <th class="time-column">Noite Fim</th>
 
-                        <th class="active-column">
-                            Ativo
-                        </th>
+                        <th class="active-column">Ativo</th>
                     </tr>
                 </thead>
 
                 <tbody>
-                    <tr
-                        v-for="day in days"
-                        :key="day.key"
-                    >
+                    <tr v-for="day in days" :key="day.key">
                         <td class="day-name">
                             {{ day.label }}
                         </td>
@@ -184,11 +164,7 @@ onMounted(() => {
                         <!-- Manhã - Início -->
                         <td>
                             <v-text-field
-                                v-model="
-                                    form[
-                                        `${day.key}_morning_start_time`
-                                    ]
-                                "
+                                v-model="form[`${day.key}_morning_start_time`]"
                                 type="time"
                                 density="compact"
                                 variant="outlined"
@@ -199,11 +175,7 @@ onMounted(() => {
                         <!-- Manhã - Fim -->
                         <td>
                             <v-text-field
-                                v-model="
-                                    form[
-                                        `${day.key}_morning_end_time`
-                                    ]
-                                "
+                                v-model="form[`${day.key}_morning_end_time`]"
                                 type="time"
                                 density="compact"
                                 variant="outlined"
@@ -215,9 +187,7 @@ onMounted(() => {
                         <td>
                             <v-text-field
                                 v-model="
-                                    form[
-                                        `${day.key}_afternoon_start_time`
-                                    ]
+                                    form[`${day.key}_afternoon_start_time`]
                                 "
                                 type="time"
                                 density="compact"
@@ -229,11 +199,7 @@ onMounted(() => {
                         <!-- Tarde - Fim -->
                         <td>
                             <v-text-field
-                                v-model="
-                                    form[
-                                        `${day.key}_afternoon_end_time`
-                                    ]
-                                "
+                                v-model="form[`${day.key}_afternoon_end_time`]"
                                 type="time"
                                 density="compact"
                                 variant="outlined"
@@ -244,11 +210,7 @@ onMounted(() => {
                         <!-- Noite - Início -->
                         <td>
                             <v-text-field
-                                v-model="
-                                    form[
-                                        `${day.key}_evening_start_time`
-                                    ]
-                                "
+                                v-model="form[`${day.key}_evening_start_time`]"
                                 type="time"
                                 density="compact"
                                 variant="outlined"
@@ -259,11 +221,7 @@ onMounted(() => {
                         <!-- Noite - Fim -->
                         <td>
                             <v-text-field
-                                v-model="
-                                    form[
-                                        `${day.key}_evening_end_time`
-                                    ]
-                                "
+                                v-model="form[`${day.key}_evening_end_time`]"
                                 type="time"
                                 density="compact"
                                 variant="outlined"
@@ -274,11 +232,7 @@ onMounted(() => {
                         <!-- Ativo -->
                         <td class="active-cell">
                             <v-switch
-                                v-model="
-                                    form[
-                                        `${day.key}_is_active`
-                                    ]
-                                "
+                                v-model="form[`${day.key}_is_active`]"
                                 color="primary"
                                 density="compact"
                                 hide-details
@@ -290,10 +244,7 @@ onMounted(() => {
         </div>
 
         <v-row class="mt-4">
-            <v-col
-                cols="12"
-                class="d-flex justify-end"
-            >
+            <v-col cols="12" class="d-flex justify-end">
                 <v-btn
                     variant="flat"
                     color="primary"
@@ -306,6 +257,17 @@ onMounted(() => {
                 </v-btn>
             </v-col>
         </v-row>
+
+        <v-alert
+            v-if="Object.keys(form.errors).length > 0"
+            type="error"
+            variant="tonal"
+            class="mt-3"
+        >
+            <ol>
+                <li v-for="error in form.errors">{{ error }}</li>
+            </ol>
+        </v-alert>
     </v-form>
 </template>
 

@@ -62,7 +62,7 @@ onMounted(() => {});
                     <div
                         class="mt-3 mb-2 pa-2"
                     >
-                         <CompanyOperatingHours></CompanyOperatingHours>
+                         <CompanyOperatingHours :company_id="6"></CompanyOperatingHours>
                     </div>
                 </v-tabs-window-item>
             </v-tabs-window>
