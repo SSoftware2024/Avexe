@@ -23,7 +23,7 @@ onMounted(() => {});
         <v-sheet elevation="2">
             <v-tabs v-model="tab" color="primary">
                 <v-tab value="company">Empresa</v-tab>
-                <v-tab value="company_operating_hours">
+                <v-tab value="company_operating_hours" v-if="page.props?.company">
                     Horário Funcionamento
                 </v-tab>
             </v-tabs>
@@ -58,11 +58,11 @@ onMounted(() => {});
                         </SectionCard>
                     </div>
                 </v-tabs-window-item>
-                <v-tabs-window-item value="company_operating_hours">
+                <v-tabs-window-item value="company_operating_hours" v-if="page.props?.company">
                     <div
                         class="mt-3 mb-2 pa-2"
                     >
-                         <CompanyOperatingHours :company_id="6"></CompanyOperatingHours>
+                         <CompanyOperatingHours :company_id="$page.props?.company.id"></CompanyOperatingHours>
                     </div>
                 </v-tabs-window-item>
             </v-tabs-window>

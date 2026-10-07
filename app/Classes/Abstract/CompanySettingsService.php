@@ -22,23 +22,28 @@ abstract class CompanySettingsService
     }
     public function exists()
     {
-        return $this->getModel()->where($this->column_id, $this->company_id)->exists();
+        return $this->getModel()::where($this->column_id, $this->company_id)->count() == 7;
     }
     public function get()
     {
-        return $this->getModel()->where($this->column_id, $this->company_id)->firstOrFail();
+        return $this->getModel()::where($this->column_id, $this->company_id)->firstOrFail();
     }
     public function delete()
     {
-        $this->getModel()->where($this->column_id, $this->company_id)->forceDelete();
+        $this->getModel()::where($this->column_id, $this->company_id)->forceDelete();
     }
     private function create(array $data)
     {
         $data[$this->column_id] = $this->company_id;
-        $this->getModel()->create($data);
+        $this->getModel()::create($data);
     }
     private function update(array $data)
     {
-        $this->getModel()->where($this->column_id, $this->company_id)->update($data);
+        $model = $this->getModel()::query();
+        $model->where($this->column_id, $this->company_id);
+        if(array_key_exists('day_of_week', $data)){
+            $model->where('day_of_week', $data['day_of_week']);
+        }
+        $model->update($data);
     }
 }

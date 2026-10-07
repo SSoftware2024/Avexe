@@ -100,24 +100,10 @@ const form = useForm({
     company_id: props.company_id,
 });
 
-const isUpdate = computed(() => props.company != null);
-
 function _load() {}
 
 function _save() {
-    const url = route("company.operating_hours.save");
-
-    if (!isUpdate.value) {
-        form.post(url, {
-            onSuccess: () => {
-                form.reset();
-            },
-        });
-
-        return;
-    }
-
-    form.patch(url, {
+    form.post(route("company.operating_hours.save"), {
         onSuccess: () => {
             form.reset();
         },

@@ -16,7 +16,6 @@ final class CompanyOperatingHoursService extends CompanySettingsService
     #[Override]
     public function save(array $data)
     {
-        ds($this->getCompanyId());
         $days_of_week = DayOfWeek::toArrayValues();
         foreach ($days_of_week as $value) {
             parent::save([

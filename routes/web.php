@@ -51,7 +51,7 @@ Route::prefix('company')->middleware(['auth'])->name('company')->group(function 
 
     //horário funcionamento
     Route::prefix('operatingHours')->name('.operating_hours')->group(function () {
-        Route::match(['post', 'patch'], '/save', [CompanyOperatingHoursController::class, 'save'])->name('.save');
+        Route::post('/save', [CompanyOperatingHoursController::class, 'save'])->name('.save');
     });
 });
 

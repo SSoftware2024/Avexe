@@ -22,33 +22,28 @@ class CompanyOperatingHoursController extends Controller
                     'nullable',
                     'date_format:H:i',
                     'after_or_equal:06:00',
-                    'before_or_equal:12:00'
                 ],
                 $value . '_morning_end_time' => [
                     'nullable',
                     'required_with:' . $value . '_morning_start_time',
                     'date_format:H:i',
                     'after:' . $value . '_morning_start_time',
-                    'before_or_equal:12:00'
                 ],
                 $value . '_afternoon_start_time' => [
                     'nullable',
                     'date_format:H:i',
                     'after_or_equal:12:00',
-                    'before_or_equal:18:00'
                 ],
                 $value . '_afternoon_end_time' => [
                     'nullable',
                     'required_with:' . $value . '_afternoon_start_time',
                     'date_format:H:i',
                     'after:' . $value . '_afternoon_start_time',
-                    'before_or_equal:18:00'
                 ],
                 $value . '_evening_start_time' => [
                     'nullable',
                     'date_format:H:i',
                     'after_or_equal:18:00',
-                    'before_or_equal:23:59',
                 ],
                 $value . '_evening_end_time' => [
                     'nullable',
@@ -72,6 +67,6 @@ class CompanyOperatingHoursController extends Controller
         ];
         $rules = array_merge($rules, ...$rules_days_of_week);
         $request->validate($rules, [],array_merge(...$days_of_week_fields_ptbr));
-        // (new CompanyOperatingHoursService($request->company_id))->save($request->all());
+        (new CompanyOperatingHoursService($request->company_id))->save($request->all());
     }
 }
