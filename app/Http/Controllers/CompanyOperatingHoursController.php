@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Enum\DayOfWeek;
+use App\Facades\Toast;
 use App\Services\CompanyOperatingHoursService;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
@@ -11,7 +12,6 @@ class CompanyOperatingHoursController extends Controller
 {
     public function save(Request $request)
     {
-        //fazer array para colocar campos de regra dinamicamente
         $days_of_week = DayOfWeek::toArrayValues();
         $days_of_week_ptbr = DayOfWeek::toArrayPortuguese();
         $rules_days_of_week = [];
@@ -71,5 +71,6 @@ class CompanyOperatingHoursController extends Controller
         $rules = array_merge($rules, ...$rules_days_of_week);
         $request->validate($rules, [],array_merge(...$days_of_week_fields_ptbr));
         (new CompanyOperatingHoursService($request->company_id))->save($request->all());
+        Toast::success('Operação realizada com sucesso!');
     }
 }

@@ -1,5 +1,5 @@
 <script setup>
-import { computed, onMounted } from "vue";
+import { computed, onMounted, watch } from "vue";
 import { useForm, usePage } from "@inertiajs/vue3";
 import { route } from "ziggy-js";
 
@@ -133,12 +133,17 @@ function _load() {
 
 function _save() {
     form.post(route("company.operating_hours.save"), {
-        onSuccess: () => {
-            form.reset();
-        },
+        only: ["operatingHours", "response_data"],
     });
 }
-
+watch(
+    () => page.props.operatingHours,
+    (operatingHours) => {
+        if (operatingHours) {
+            _load();
+        }
+    },
+);
 onMounted(() => {
     if (props.company_id) {
         _load();
@@ -183,6 +188,9 @@ onMounted(() => {
                                 type="time"
                                 density="compact"
                                 variant="outlined"
+                                :error-messages="
+                                    form.errors[`${day.key}_morning_start_time`]
+                                "
                                 hide-details
                             />
                         </td>
@@ -194,6 +202,9 @@ onMounted(() => {
                                 type="time"
                                 density="compact"
                                 variant="outlined"
+                                :error-messages="
+                                    form.errors[`${day.key}_morning_end_time`]
+                                "
                                 hide-details
                             />
                         </td>
@@ -207,6 +218,11 @@ onMounted(() => {
                                 type="time"
                                 density="compact"
                                 variant="outlined"
+                                :error-messages="
+                                    form.errors[
+                                        `${day.key}_afternoon_start_time`
+                                    ]
+                                "
                                 hide-details
                             />
                         </td>
@@ -218,6 +234,9 @@ onMounted(() => {
                                 type="time"
                                 density="compact"
                                 variant="outlined"
+                                :error-messages="
+                                    form.errors[`${day.key}_afternoon_end_time`]
+                                "
                                 hide-details
                             />
                         </td>
@@ -229,6 +248,9 @@ onMounted(() => {
                                 type="time"
                                 density="compact"
                                 variant="outlined"
+                                :error-messages="
+                                    form.errors[`${day.key}_evening_start_time`]
+                                "
                                 hide-details
                             />
                         </td>
@@ -240,6 +262,9 @@ onMounted(() => {
                                 type="time"
                                 density="compact"
                                 variant="outlined"
+                                :error-messages="
+                                    form.errors[`${day.key}_evening_end_time`]
+                                "
                                 hide-details
                             />
                         </td>
