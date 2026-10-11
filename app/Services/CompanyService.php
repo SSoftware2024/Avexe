@@ -7,6 +7,7 @@ use App\Models\Company;
 use App\Models\User;
 use App\Services\CompanyOperatingHoursService;
 use Illuminate\Database\Eloquent\Collection;
+use Inertia\Inertia;
 
 final class CompanyService
 {
@@ -98,14 +99,16 @@ final class CompanyService
         $ownersByCompany = [];
         $company = null;
         $owners_avalable = null;
+        $operatingHours = null;
         if (!empty($id)) {
             $ownersByCompany = $this->getOwnersSelectedByCompany($id);
             $company = Company::select('id', 'name', 'corporate_name', 'cpf', 'cnpj', 'tag_url', 'active')->find($id);
             $owners_avalable = $ownersByCompany->pluck('id')->toArray();
+            $operatingHours = Inertia::defer(fn() => (new CompanyOperatingHoursService($id))->get());
         }
         $ownersAvalable = $this->getAllOwnersAvailable($owners_avalable);
 
-        return compact('ownersAvalable', 'ownersByCompany', 'company');
+        return compact('ownersAvalable', 'ownersByCompany', 'operatingHours', 'company');
     }
 
     # ================================================================================= #

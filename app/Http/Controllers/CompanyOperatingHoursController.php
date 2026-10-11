@@ -20,6 +20,7 @@ class CompanyOperatingHoursController extends Controller
             $rules_days_of_week[] = [
                 $value . '_morning_start_time' => [
                     'nullable',
+                    'required_with:' . $value . '_morning_end_time',
                     'date_format:H:i',
                     'after_or_equal:06:00',
                 ],
@@ -31,6 +32,7 @@ class CompanyOperatingHoursController extends Controller
                 ],
                 $value . '_afternoon_start_time' => [
                     'nullable',
+                    'required_with:' . $value . '_afternoon_end_time',
                     'date_format:H:i',
                     'after_or_equal:12:00',
                 ],
@@ -42,6 +44,7 @@ class CompanyOperatingHoursController extends Controller
                 ],
                 $value . '_evening_start_time' => [
                     'nullable',
+                    'required_with:' . $value . '_evening_end_time',
                     'date_format:H:i',
                     'after_or_equal:18:00',
                 ],

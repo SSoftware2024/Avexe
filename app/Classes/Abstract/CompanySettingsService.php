@@ -2,6 +2,8 @@
 
 namespace App\Classes\Abstract;
 
+use App\Models\CompanyOperatingHours;
+
 abstract class CompanySettingsService
 {
     private int $company_id = 0;
@@ -26,7 +28,8 @@ abstract class CompanySettingsService
     }
     public function get()
     {
-        return $this->getModel()::where($this->column_id, $this->company_id)->firstOrFail();
+        $model = $this->getModel()::query()->where($this->column_id, $this->company_id);
+        return $this->getModel() === CompanyOperatingHours::class ? $model->get() : $model->firstOrFail();
     }
     public function delete()
     {
@@ -41,7 +44,7 @@ abstract class CompanySettingsService
     {
         $model = $this->getModel()::query();
         $model->where($this->column_id, $this->company_id);
-        if(array_key_exists('day_of_week', $data)){
+        if (array_key_exists('day_of_week', $data)) {
             $model->where('day_of_week', $data['day_of_week']);
         }
         $model->update($data);

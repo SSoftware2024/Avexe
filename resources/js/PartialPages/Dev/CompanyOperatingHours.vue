@@ -1,6 +1,6 @@
 <script setup>
 import { computed, onMounted } from "vue";
-import { useForm } from "@inertiajs/vue3";
+import { useForm, usePage } from "@inertiajs/vue3";
 import { route } from "ziggy-js";
 
 const props = defineProps({
@@ -9,6 +9,7 @@ const props = defineProps({
         required: true,
     },
 });
+const page = usePage();
 
 const days = [
     {
@@ -100,7 +101,35 @@ const form = useForm({
     company_id: props.company_id,
 });
 
-function _load() {}
+function _load() {
+    const operatingHours = page.props.operatingHours;
+
+    if (!operatingHours) return;
+
+    operatingHours.forEach((data) => {
+        const day = data.day_of_week;
+
+        form[`${day}_is_active`] = Boolean(data.is_active);
+
+        form[`${day}_morning_start_time`] =
+            data.morning_start_time?.substring(0, 5) ?? null;
+
+        form[`${day}_morning_end_time`] =
+            data.morning_end_time?.substring(0, 5) ?? null;
+
+        form[`${day}_afternoon_start_time`] =
+            data.afternoon_start_time?.substring(0, 5) ?? null;
+
+        form[`${day}_afternoon_end_time`] =
+            data.afternoon_end_time?.substring(0, 5) ?? null;
+
+        form[`${day}_evening_start_time`] =
+            data.evening_start_time?.substring(0, 5) ?? null;
+
+        form[`${day}_evening_end_time`] =
+            data.evening_end_time?.substring(0, 5) ?? null;
+    });
+}
 
 function _save() {
     form.post(route("company.operating_hours.save"), {
@@ -111,8 +140,8 @@ function _save() {
 }
 
 onMounted(() => {
-    if (props.company) {
-        load();
+    if (props.company_id) {
+        _load();
     }
 });
 </script>
