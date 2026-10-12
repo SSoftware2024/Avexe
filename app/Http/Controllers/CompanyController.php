@@ -68,14 +68,18 @@ class CompanyController extends Controller
         ]);
         $data = $request->all();
         if (empty($data['id'])) {
-            $service->create($data, $data['owners_ids']);
-            $message = 'Operação realizada com sucesso!';
+            $company = $service->create($data, $data['owners_ids']);
+            Toast::success('Empresa cadastrada com sucesso!');
+            Toast::info('Tela de edição empresa');
+            return redirect()->route('company.createOrUpdateView', [
+                'id' => $company->id
+            ]);
         } else {
             $total_rows = $service->updateByDeveloper($data['id'], $data, $data['old_owners_id']);
-            $message = "$total_rows registros atualizados com sucesso";
+            Toast::success("$total_rows registros atualizados com sucesso");
         }
 
-        Toast::success($message);
+        
     }
 
     public function toggleActive(Request $request, CompanyService $service)
