@@ -2,18 +2,27 @@
 
 namespace App\Services;
 
-use App\Models\Company;
+use App\Classes\Abstract\CompanySettingsService;
+use App\Models\CompanySystemSetting;
+use Override;
 
-final class CompanySystemSettingsService
+final class CompanySystemSettingsService extends CompanySettingsService
 {
-    private int|Company $company;
-    public function __construct(int|Company $company)
+    protected function getModel()
     {
-        $this->company = $company;
+        return CompanySystemSetting::class;
     }
-    public function save() {}
-    public function exists() {}
-    public function get() {}
-    private function create() {}
-    private function update() {}
+
+    #[Override]
+    public function save(array $data)
+    {
+        parent::save([
+            'simultaneous_access' => $data['simultaneous_access'],
+            'max_owners' => $data['max_owners'],
+            'max_employees' => $data['max_employees'],
+            'date_payment' => date('Y-m-d', strtotime($data['date_payment'])),
+            'interval_return_message' => $data['interval_return_message'],
+            'value_monthly_fee' => $data['value_monthly_fee'],
+        ]);
+    }
 }

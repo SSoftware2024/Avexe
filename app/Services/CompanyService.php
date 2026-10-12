@@ -97,18 +97,18 @@ final class CompanyService
     {
 
         $ownersByCompany = [];
-        $company = null;
-        $owners_avalable = null;
-        $operatingHours = null;
+        $company = $owners_avalable = $operatingHours = $systemSettings = null;
         if (!empty($id)) {
             $ownersByCompany = $this->getOwnersSelectedByCompany($id);
             $company = Company::select('id', 'name', 'corporate_name', 'cpf', 'cnpj', 'tag_url', 'active')->find($id);
             $owners_avalable = $ownersByCompany->pluck('id')->toArray();
-            $operatingHours = Inertia::defer(fn() => (new CompanyOperatingHoursService($id))->get());
+            $operatingHours = (new CompanyOperatingHoursService($id))->get();
+            $systemSettings = (new CompanySystemSettingsService($id))->get();
+            empty($systemSettings) ? null:$systemSettings->value_monthly_fee_formated = getMoneyToStringBr($systemSettings->value_monthly_fee);
         }
         $ownersAvalable = $this->getAllOwnersAvailable($owners_avalable);
 
-        return compact('ownersAvalable', 'ownersByCompany', 'operatingHours', 'company');
+        return compact('ownersAvalable', 'ownersByCompany', 'operatingHours', 'systemSettings', 'company');
     }
 
     # ================================================================================= #

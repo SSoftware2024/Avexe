@@ -6,6 +6,10 @@ import vuetify from './vuetify';
 //toast plugin
 import ToastPlugin from 'vue-toast-notification';
 import 'vue-toast-notification/dist/theme-bootstrap.css'; //theme-default - theme-bootstrap - theme-sugar
+//input money mask
+import money from 'v-money3'
+import { Money3Component } from 'v-money3'
+import { Money3Directive } from 'v-money3'
 
 createInertiaApp({
     resolve: name => {
@@ -17,7 +21,9 @@ createInertiaApp({
             .use(plugin)
             .use(vuetify)
             .use(ToastPlugin)
+            .use(money)
             .component('Link', Link)
+            .component('v-input-money', Money3Component)
             .mount(el)
     },
 })

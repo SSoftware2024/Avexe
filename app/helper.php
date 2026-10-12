@@ -23,6 +23,6 @@ if (!function_exists('getMoneyToStringBr')) {
      */
     function getMoneyToStringBr(float $money): string
     {
-        return number_format($money, 2, ',', '.');
+        return empty($money) ? 0:number_format($money, 2, ',', '.');
     }
 }

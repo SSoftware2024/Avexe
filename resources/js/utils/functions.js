@@ -1,3 +1,9 @@
+const money3Config = {
+    prefix: "R$ ",
+    thousands: ".",
+    decimal: ",",
+    precision: 2,
+};
 function getCurrentLocation() {
     return new Promise((resolve) => {
         if (!navigator.geolocation) {
@@ -45,7 +51,7 @@ function getCurrentLocation() {
 
 function copyText(value) {
     if (navigator.clipboard?.writeText) {
-       return navigator.clipboard.writeText(value);
+        return navigator.clipboard.writeText(value);
     } else {
         const textarea = document.createElement("textarea");
         textarea.value = value;
@@ -64,4 +70,4 @@ function formatDate(date) {
     return new Date(date).toLocaleDateString("pt-BR");
 }
 
-export { getCurrentLocation, copyText, formatDate };
+export { money3Config, getCurrentLocation, copyText, formatDate };

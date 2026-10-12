@@ -24,12 +24,13 @@ abstract class CompanySettingsService
     }
     public function exists()
     {
-        return $this->getModel()::where($this->column_id, $this->company_id)->count() == 7;
+        $model = $this->getModel()::query()->where($this->column_id, $this->company_id);
+        return $this->getModel() === CompanyOperatingHours::class ? $model->count() == 7 : $model->exists();
     }
     public function get()
     {
         $model = $this->getModel()::query()->where($this->column_id, $this->company_id);
-        return $this->getModel() === CompanyOperatingHours::class ? $model->get() : $model->firstOrFail();
+        return $this->getModel() === CompanyOperatingHours::class ? $model->get() : $model->first();
     }
     public function delete()
     {

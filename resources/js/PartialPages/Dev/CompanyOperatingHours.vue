@@ -8,6 +8,10 @@ const props = defineProps({
         type: Number,
         required: true,
     },
+    operatingHours: {
+        type: Object,
+        default: {}
+    }
 });
 const page = usePage();
 
@@ -102,7 +106,7 @@ const form = useForm({
 });
 
 function _load() {
-    const operatingHours = page.props.operatingHours;
+    const operatingHours = props.operatingHours;
 
     if (!operatingHours) return;
 
@@ -136,18 +140,8 @@ function _save() {
         only: ["operatingHours", "response_data"],
     });
 }
-watch(
-    () => page.props.operatingHours,
-    (operatingHours) => {
-        if (operatingHours) {
-            _load();
-        }
-    },
-);
 onMounted(() => {
-    if (props.company_id) {
-        _load();
-    }
+    _load();
 });
 </script>
 

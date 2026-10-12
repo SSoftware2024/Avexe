@@ -3,6 +3,7 @@
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CompanyController;
 use App\Http\Controllers\CompanyOperatingHoursController;
+use App\Http\Controllers\CompanySettingsController;
 use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\DeveloperController;
 use App\Http\Controllers\OwnerController;
@@ -52,6 +53,10 @@ Route::prefix('company')->middleware(['auth'])->name('company')->group(function 
     //horário funcionamento
     Route::prefix('operatingHours')->name('.operating_hours')->group(function () {
         Route::post('/save', [CompanyOperatingHoursController::class, 'save'])->name('.save');
+    });
+    //configurações
+    Route::prefix('settings')->name('.settings')->group(function () {
+        Route::post('/save', [CompanySettingsController::class, 'save'])->name('.save');
     });
 });
 

@@ -1,11 +1,12 @@
 <script setup>
-import AuthLayout from "@/layouts/AuthLayout.vue";
+import { onMounted, ref } from "vue";
 import { Head, useForm, usePage } from "@inertiajs/vue3";
+import AuthLayout from "@/layouts/AuthLayout.vue";
 import SectionCard from "@/components/SectionCard.vue";
 import CompanyCreateUpdate from "@/PartialPages/Dev/CompanyCreateUpdate.vue";
 import CompanyOperatingHours from "@/PartialPages/Dev/CompanyOperatingHours.vue";
 import OwnerCreateUpdate from "@/PartialPages/Dev/OwnerCreateUpdate.vue";
-import { onMounted, ref } from "vue";
+import CompanySettings from "@/PartialPages/Dev/CompanySettings.vue";
 
 const page = usePage();
 const new_owner_dialog = ref(false);
@@ -23,9 +24,13 @@ onMounted(() => {});
         <v-sheet elevation="2">
             <v-tabs v-model="tab" color="primary">
                 <v-tab value="company">Empresa</v-tab>
-                <v-tab value="company_operating_hours" v-if="page.props?.company">
+                <v-tab
+                    value="company_operating_hours"
+                    v-if="page.props?.company"
+                >
                     Horário Funcionamento
                 </v-tab>
+                <v-tab value="company_settings" v-if="page.props?.company">Configurações</v-tab>
             </v-tabs>
 
             <v-divider></v-divider>
@@ -47,7 +52,7 @@ onMounted(() => {});
                                 </v-btn>
                             </div>
                         </SectionCard>
-                        <SectionCard title="Nova empresa">
+                        <SectionCard :title="$page.props?.company ? `Edição: ${$page.props?.company.name}` : 'Nova empresa'">
                             <div>
                                 <CompanyCreateUpdate
                                     :owners="$page.props.ownersAvalable"
@@ -58,11 +63,26 @@ onMounted(() => {});
                         </SectionCard>
                     </div>
                 </v-tabs-window-item>
-                <v-tabs-window-item value="company_operating_hours" v-if="page.props?.company">
+                <v-tabs-window-item
+                    value="company_operating_hours"
+                    v-if="page.props?.company"
+                >
+                    <div class="mt-3 mb-2 pa-2">
+                        <h4>{{ `Edição: ${$page.props?.company.name}` }}</h4>
+                        <CompanyOperatingHours
+                            :company_id="$page.props?.company.id"
+                            :operatingHours="$page.props?.operatingHours"
+                        ></CompanyOperatingHours>
+                    </div>
+                </v-tabs-window-item>
+                <v-tabs-window-item value="company_settings">
                     <div
-                        class="mt-3 mb-2 pa-2"
+                        class="d-flex flex-column justify-center align-center mt-3 mb-2 pa-2"
+                        v-if="page.props?.company"
                     >
-                         <CompanyOperatingHours :company_id="$page.props?.company.id"></CompanyOperatingHours>
+                        <SectionCard :title="`Edição: ${$page.props?.company.name}`">
+                            <CompanySettings :company_id="$page.props?.company.id" :systemSettings="$page.props?.systemSettings"></CompanySettings>
+                        </SectionCard>
                     </div>
                 </v-tabs-window-item>
             </v-tabs-window>
@@ -91,5 +111,3 @@ onMounted(() => {});
         </v-dialog>
     </AuthLayout>
 </template>
-
-
