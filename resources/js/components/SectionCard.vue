@@ -39,7 +39,7 @@ const props = defineProps({
         }
     }
 }
-@media (max-width: 600px) {
+@media (max-width: 868px) {
     .container {
         width: 100%;
     }

@@ -39,7 +39,7 @@ class OwnerController extends Controller
         $per_page = $request->has('per_page') ? $request->per_page : 10;
         $sort_by = $request->has('sort_by') ? $request->sort_by : [];
         $owners = $service->ownerListViewData($per_page, $sort_by);
-        return Inertia::render('Dev/Owner/List', [
+        return Inertia::render('Dev/OwnerList', [
             'owners' => $owners
         ]);
     }
@@ -51,7 +51,7 @@ class OwnerController extends Controller
             return redirect()->route('auth.profileView');
         }
 
-        return Inertia::render('Dev/Owner/CreateUpdate', [
+        return Inertia::render('Dev/OwnerCreateUpdate', [
             'user_data' => $user->exists ? $user : null,
         ]);
     }

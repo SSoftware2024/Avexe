@@ -18,7 +18,7 @@ class DatabaseSeeder extends Seeder
     public function run(): void
     {
         //user raiz
-        if (true) {
+        if (false) {
             User::create([
                 'name' => 'Tiago Alves',
                 'whatsapp' => '88994135616',
@@ -29,8 +29,7 @@ class DatabaseSeeder extends Seeder
                 'password' => Hash::make('ssoftware'),
             ]);
         }
-        $fakes = false;
-        if ($fakes) {
+        if (true) { //fakes
             $this->call(UsersTableSeeder::class);
         }
 

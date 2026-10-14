@@ -26,7 +26,7 @@ class CompanyController extends Controller
         $per_page = $request->has('per_page') ? $request->per_page : 10;
         $sort_by = $request->has('sort_by') ? $request->sort_by : [];
         $companies = $service->listViewData($per_page, $sort_by);
-        return Inertia::render('Dev/Company/List', [
+        return Inertia::render('Dev/CompanyList', [
             'companies' => $companies
         ]);
     }
@@ -36,7 +36,7 @@ class CompanyController extends Controller
         ?int $id = null
     ) {
         $data = $service->createOrUpdateViewData($id);
-        return Inertia::render('Dev/Company/CreateUpdate', $data);
+        return Inertia::render('Dev/CompanyCreateUpdate', $data);
     }
 
     public function createOrUpdate(

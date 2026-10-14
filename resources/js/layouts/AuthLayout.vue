@@ -109,6 +109,14 @@ const nav_sections = computed(() => {
                                     "owner.createUpdateView",
                                 ],
                             },
+                            {
+                                title: "Forma Pagamento",
+                                icon: "mdi-cash-100",
+                                to: route('payment_method'),
+                                active_names: [
+                                    'payment_method'
+                                ],
+                            },
                         ],
                     },
                     {

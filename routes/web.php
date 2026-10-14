@@ -7,6 +7,7 @@ use App\Http\Controllers\CompanySettingsController;
 use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\DeveloperController;
 use App\Http\Controllers\OwnerController;
+use App\Http\Controllers\PaymentMethodController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', [CustomerController::class, 'index'])->name('index');
@@ -60,6 +61,9 @@ Route::prefix('company')->middleware(['auth'])->name('company')->group(function 
     });
 });
 
+Route::prefix('payment_method')->middleware(['auth'])->name('payment_method')->group(function () {
+    Route::get('/index', [PaymentMethodController::class, 'index']);
+});
 
 
 

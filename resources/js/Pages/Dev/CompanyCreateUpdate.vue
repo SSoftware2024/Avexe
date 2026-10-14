@@ -4,7 +4,7 @@ import { Head, useForm, usePage } from "@inertiajs/vue3";
 import AuthLayout from "@/layouts/AuthLayout.vue";
 import SectionCard from "@/components/SectionCard.vue";
 import CompanyCreateUpdate from "@/PartialPages/Dev/CompanyCreateUpdate.vue";
-import CompanyOperatingHours from "@/PartialPages/Dev/CompanyOperatingHours.vue";
+import CompanyOperatingHours from "@/PartialPages/Company/CompanyOperatingHours.vue";
 import OwnerCreateUpdate from "@/PartialPages/Dev/OwnerCreateUpdate.vue";
 import CompanySettings from "@/PartialPages/Dev/CompanySettings.vue";
 

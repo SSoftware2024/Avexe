@@ -13,7 +13,7 @@ class UsersTableSeeder extends Seeder
      */
     public function run(): void
     {
-        User::factory(20)->create([
+        User::factory(200)->create([
             'user_type' => 'owner'
         ]);
     }
