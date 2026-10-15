@@ -1,0 +1,14 @@
+[
+    {
+        "name": "DINHEIRO",
+        "type": "receivable"
+    },
+    {
+        "name": "PIX",
+        "type": "receivable"
+    },
+    {
+        "name": "PROMISSÓRIA",
+        "type": "receivable"
+    }
+]

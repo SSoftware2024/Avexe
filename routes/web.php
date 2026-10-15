@@ -63,6 +63,7 @@ Route::prefix('company')->middleware(['auth'])->name('company')->group(function 
 
 Route::prefix('payment_method')->middleware(['auth'])->name('payment_method')->group(function () {
     Route::get('/index', [PaymentMethodController::class, 'index']);
+    Route::post('/createJson', [PaymentMethodController::class, 'createJson'])->name('.createJson');
 });
 
 

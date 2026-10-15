@@ -3,10 +3,10 @@ import { onMounted, ref } from "vue";
 import { Head, useForm, usePage } from "@inertiajs/vue3";
 import AuthLayout from "@/layouts/AuthLayout.vue";
 import SectionCard from "@/components/SectionCard.vue";
-import CompanyCreateUpdate from "@/PartialPages/Dev/CompanyCreateUpdate.vue";
+import CompanyCreateUpdate from "@/PartialPages/Company/CompanyCreateUpdate.vue";
 import CompanyOperatingHours from "@/PartialPages/Company/CompanyOperatingHours.vue";
-import OwnerCreateUpdate from "@/PartialPages/Dev/OwnerCreateUpdate.vue";
-import CompanySettings from "@/PartialPages/Dev/CompanySettings.vue";
+import OwnerCreateUpdate from "@/PartialPages/Owner/OwnerCreateUpdate.vue";
+import CompanySettings from "@/PartialPages/Company/CompanySettings.vue";
 
 const page = usePage();
 const new_owner_dialog = ref(false);

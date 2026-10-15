@@ -136,10 +136,6 @@ const nav_sections = computed(() => {
                 ],
             },
             {
-                title: "Relatórios",
-                items: [{ title: "Financeiro", icon: "mdi-cash-multiple" }],
-            },
-            {
                 title: "Configurações",
                 items: [
                     {

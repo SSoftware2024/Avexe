@@ -1,6 +1,6 @@
 <?php
 
-use App\Enum\PaymentMethodType;
+use App\Enum\AccountType;
 use App\Models\Company;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
@@ -16,10 +16,11 @@ return new class extends Migration
         Schema::create('payment_methods', function (Blueprint $table) {
             $table->id();
             $table->string('name');
-            $table->enum('tag', PaymentMethodType::toArrayValues())->unique();
+            $table->enum('account_type', AccountType::toArrayValues())->unique();
+            $table->boolean('is_active')->default(true);
+            $table->foreignIdFor(Company::class)->constrained();
             $table->timestamps();
             $table->softDeletes();
-            $table->foreignIdFor(Company::class)->constrained();
         });
     }
 
