@@ -1,14 +1,10 @@
 [
     {
         "name": "DINHEIRO",
-        "type": "receivable"
+        "account_type": "receivable"
     },
     {
         "name": "PIX",
-        "type": "receivable"
-    },
-    {
-        "name": "PROMISSÓRIA",
-        "type": "receivable"
+        "account_type": "receivable"
     }
 ]

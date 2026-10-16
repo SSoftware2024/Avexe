@@ -4,8 +4,10 @@ namespace App\Services;
 
 use App\Enum\TypeUser;
 use App\Models\Company;
+use App\Models\PaymentMethod;
 use App\Models\User;
 use App\Services\CompanyOperatingHoursService;
+use App\Services\PaymentMethodService;
 use Illuminate\Database\Eloquent\Collection;
 use Inertia\Inertia;
 
@@ -21,6 +23,8 @@ final class CompanyService
             'tag_url' => $data['tag_url'],
         ]);
         $this->associateOwners($owners_id, $company->id);
+        $this->associatePaymentMethods($company->id);
+
         return $company;
     }
 
@@ -76,6 +80,7 @@ final class CompanyService
     public function delete(int $id)
     {
         $owners_disassociated_total = $this->removeOwners($id);
+        $this->removePaymentMethods($id);
         // (new CompanyOperatingHoursService($id))->delete();
         Company::where('id', $id)->forceDelete();
         return $owners_disassociated_total;
@@ -104,7 +109,7 @@ final class CompanyService
             $owners_avalable = $ownersByCompany->pluck('id')->toArray();
             $operatingHours = (new CompanyOperatingHoursService($id))->get();
             $systemSettings = (new CompanySystemSettingsService($id))->get();
-            empty($systemSettings) ? null:$systemSettings->value_monthly_fee_formated = getMoneyToStringBr($systemSettings->value_monthly_fee);
+            empty($systemSettings) ? null : $systemSettings->value_monthly_fee_formated = getMoneyToStringBr($systemSettings->value_monthly_fee);
         }
         $ownersAvalable = $this->getAllOwnersAvailable($owners_avalable);
 
@@ -127,6 +132,20 @@ final class CompanyService
         return $user->update([
             'company_id' => null
         ]);
+    }
+    private function associatePaymentMethods(int $id)
+    {
+        $paymentMethodsService = new PaymentMethodService()->setCompanyId($id);
+        $paymentMethodsJson = $paymentMethodsService->getJsonFilePath(decoded: true);
+        if (!empty($paymentMethodsJson) && $paymentMethodsService->isValidJson()) {
+            foreach ($paymentMethodsJson as $value) {
+                $paymentMethodsService->create((array) $value);
+            }
+        }
+    }
+    private function removePaymentMethods(int $id): int
+    {
+        return PaymentMethod::where('company_id', $id)->forceDelete();
     }
 
 

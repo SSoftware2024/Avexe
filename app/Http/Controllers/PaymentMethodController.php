@@ -27,8 +27,8 @@ class PaymentMethodController extends Controller
     {
         $validator = Validator::make($request->all(), [
             'json_content' => ['required', 'array'],
-            'json_content.*' => ['required', 'array:name,type'],
-            'json_content.*.type' => [
+            'json_content.*' => ['required', 'array:name,account_type'],
+            'json_content.*.account_type' => [
                 'required',
                 'string',
                 Rule::in(AccountType::toArrayValues()),
@@ -71,13 +71,7 @@ class PaymentMethodController extends Controller
             }
         }
     }
+    public function create() {}
     public function update() {}
     public function delete() {}
-    public function execute()
-    {
-        // 'products.*' => 'required|array:name,price',
-        //verficar se ja existe na storage/app
-        //caso sim pedir confirmação force para reescrita
-        //no front fazer botão copiar json
-    }
 }

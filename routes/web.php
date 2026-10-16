@@ -71,4 +71,5 @@ Route::prefix('payment_method')->middleware(['auth'])->name('payment_method')->g
 // desenvolvedor
 Route::prefix('developer')->middleware(['auth'])->name('developer')->group(function () {
     Route::get('/dashboard', [DeveloperController::class, 'index']);
+    Route::get('/listView', [DeveloperController::class, 'listView'])->name('.listView');
 });

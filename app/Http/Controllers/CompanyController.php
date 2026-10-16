@@ -93,7 +93,7 @@ class CompanyController extends Controller
     public function delete(CompanyService $service, int $id)
     {
         $validator = Validator::make(['id' => $id], [
-            'id' => ['required', 'integer', Rule::exists('users', 'id')],
+            'id' => ['required', 'integer', Rule::exists('companies', 'id')],
         ]);
         if ($validator->fails()) {
             DialogAlert::warning($validator->errors()->get('id')[0]);

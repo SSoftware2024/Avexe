@@ -22,5 +22,9 @@ class DeveloperController extends Controller
     {
         return Inertia::render('Dev/Index');
     }
+    public function listView()
+    {
+        return Inertia::render('Dev/DevList');
+    }
 
 }

@@ -88,20 +88,20 @@ const nav_sections = computed(() => {
                     },
                     {
                         title: "Empresas",
-                        icon: "mdi-account-group-outline",
+                        icon: "mdi-domain",
                         active_names: ["owner.listView"],
                         children: [
                             {
                                 title: "Empresas",
-                                icon: "mdi-account-plus-outline",
-                                to: route('company.listView'),
+                                icon: "mdi-office-building-plus",
+                                to: route("company.listView"),
                                 active_names: [
                                     "company.listView",
                                     "company.createOrUpdateView",
                                 ],
                             },
                             {
-                                title: "Listar clientes",
+                                title: "Clientes",
                                 icon: "mdi-account-multiple-outline",
                                 to: route("owner.listView"),
                                 active_names: [
@@ -111,27 +111,17 @@ const nav_sections = computed(() => {
                             },
                             {
                                 title: "Forma Pagamento",
-                                icon: "mdi-cash-100",
-                                to: route('payment_method'),
-                                active_names: [
-                                    'payment_method'
-                                ],
+                                icon: "mdi-code-json",
+                                to: route("payment_method"),
+                                active_names: ["payment_method"],
                             },
                         ],
                     },
                     {
-                        title: "Developers",
-                        icon: "mdi-account-group-outline",
-                        children: [
-                            {
-                                title: "Novo cliente",
-                                icon: "mdi-account-plus-outline",
-                            },
-                            {
-                                title: "Listar clientes",
-                                icon: "mdi-account-multiple-outline",
-                            },
-                        ],
+                        title: "Desenvolvedores",
+                        icon: "mdi-code-block-tags",
+                        to: route('developer.listView'),
+                        active_names: ["developer.listView"],
                     },
                 ],
             },
@@ -324,7 +314,7 @@ onUnmounted(() => {
     <dialog-alert></dialog-alert>
     <v-app>
         <v-layout>
-            <!-- SIDEBAR -->
+            <!-- #region SIDEBAR -->
             <v-navigation-drawer
                 v-model="drawer"
                 :temporary="!mdAndUp"
@@ -405,7 +395,8 @@ onUnmounted(() => {
                     </v-list>
                 </template>
             </v-navigation-drawer>
-            <!-- FIM SIDEBAR -->
+            <!-- #endregion FIM SIDEBAR -->
+            <!-- #region APP BAR -->
             <v-app-bar elevation="1">
                 <v-btn
                     icon="mdi-menu"
@@ -584,6 +575,7 @@ onUnmounted(() => {
                     </v-list>
                 </v-menu>
             </v-app-bar>
+            <!-- #endregion APP BAR -->
             <v-main>
                 <v-container fluid class="pa-4">
                     <v-card class="pa-4" elevation="1">
@@ -595,9 +587,8 @@ onUnmounted(() => {
     </v-app>
 </template>
 <style scoped lang="scss">
-
 :deep(.v-main) {
-    background-color: #F2F2F2 !important;
+    background-color: #f2f2f2 !important;
 }
 
 .auth-sidebar {
@@ -646,7 +637,6 @@ onUnmounted(() => {
         }
     }
 }
-
 
 .notification-content {
     display: -webkit-box;
