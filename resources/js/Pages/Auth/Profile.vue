@@ -78,13 +78,17 @@ const layout_component_name = computed(() =>
 //FUNCTIONS
 function _enable2fa() {
     loading.twofa = true;
-    axios.post(route("two-factor.enable")).then(async function (response) {
-        if (response.status == 200) {
-            twofa_active.value = true;
-            await _loadDataTwoFa();
-            loading.twofa = false;
-        }
-    });
+    router.post(
+        route("two-factor.enable"),
+        {},
+        {
+            onSuccess: async () => {
+                twofa_active.value = true;
+                await _loadDataTwoFa();
+                loading.twofa = false;
+            },
+        },
+    );
 }
 function _disable2fa() {
     router.delete(route("two-factor.disable"), {
@@ -604,10 +608,12 @@ onMounted(() => {
                             :label="
                                 twofa_active ? '2FA ativado' : '2FA desativado'
                             "
-                            :color="twofa_active ? 'success' : 'grey'"
-                            v-model="twofa_active"
                             inset
-                            hide-details
+                            v-model="twofa_active"
+                            true-icon="mdi-check"
+                            false-icon="mdi-close"
+                            base-color="#B71C1C"
+                            color="success"
                             @click="
                                 () => {
                                     confirm_password_dialog = true;

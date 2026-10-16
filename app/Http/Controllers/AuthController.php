@@ -6,6 +6,8 @@ use App\Enum\TypeUser;
 use App\Services\AuthService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\MessageBag;
 use Inertia\Inertia;
 
 class AuthController extends Controller
@@ -29,11 +31,24 @@ class AuthController extends Controller
                 break;
         }
     }
-    public function profileView() {
+    public function profileView()
+    {
         return Inertia::render('Auth/Profile');
     }
     public function removeProfile(AuthService $auth_service)
     {
         $auth_service->removeProfile(Auth::user());
+    }
+    public function confirmPasswordInertiaXHR(Request $request)
+    {
+        $request->validate([
+            'password' => ['required', 'string']
+        ]);
+        if (!Hash::check($request->password, $request->user()->password)) {
+            $errors = new MessageBag();
+            $errors->add('password', 'A senha fornecida está incorreta.');
+            return redirect()->back()->withErrors($errors);
+        }
+        $request->session()->passwordConfirmed();
     }
 }

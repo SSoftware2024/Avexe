@@ -1,21 +1,22 @@
 <script setup>
 import { ref } from "vue";
-import { useForm } from '@inertiajs/vue3';
+import { useForm } from "@inertiajs/vue3";
 import { route } from "ziggy-js";
+import { router } from "@inertiajs/vue3";
 
 const props = defineProps({
     successFunction: {
         type: Function,
-        required: true
+        required: true,
     },
     cancelFunction: {
         type: Function,
-        default: () => {}
-    }
+        default: () => {},
+    },
 });
 const emit = defineEmits(["update:modelValue", "confirm"]);
 const form = useForm({
-    password: ''
+    password: "",
 });
 
 function _close() {
@@ -28,16 +29,15 @@ function _cancel() {
 }
 
 function _submit() {
-
-    form.post(route('password.confirm.store'),
-        {
-            onSuccess: (page) => {
-                form.reset();
-                props.successFunction();
-                _close();
-            },
+    form.post(route("auth.confirmPasswordInertiaXHR"), {
+        preserveScroll: true,
+        preserveState: true,
+        onSuccess: () => {
+            form.reset();
+            props.successFunction();
+            _close();
         },
-    );
+    });
 }
 </script>
 
@@ -63,7 +63,12 @@ function _submit() {
             </v-card-title>
             <v-card-text>
                 <v-form @submit.prevent="_submit">
-                    <v-alert v-if="form.errors.password" type="error" variant="tonal" class="mb-3">
+                    <v-alert
+                        v-if="form.errors.password"
+                        type="error"
+                        variant="tonal"
+                        class="mb-3"
+                    >
                         {{ form.errors.password }}
                     </v-alert>
                     <v-text-field
@@ -79,7 +84,11 @@ function _submit() {
                         <v-btn variant="text" color="grey" @click="_cancel"
                             >Cancelar</v-btn
                         >
-                        <v-btn type="submit" variant="flat" color="primary" :loading="form.processing"
+                        <v-btn
+                            type="submit"
+                            variant="flat"
+                            color="primary"
+                            :loading="form.processing"
                             >Confirmar</v-btn
                         >
                     </div>
