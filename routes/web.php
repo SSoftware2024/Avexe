@@ -19,7 +19,7 @@ Route::get('/home', [AuthController::class, 'index'])->name('home');
 Route::prefix('auth')->name('auth')->middleware(['auth', 'verified'])->group(function () {
     Route::get('/profileView', [AuthController::class, 'profileView'])->name('.profileView');
     Route::delete('/removeProfile', [AuthController::class, 'removeProfile'])->name('.removeProfile');
-    Route::post('/confirm-password', [AuthController::class, 'confirmPasswordInertiaXHR'])->name('.confirmPasswordInertiaXHR')->middleware('throttle:6,1');
+    Route::post('/confirm-password-xhr-inertia', [AuthController::class, 'confirmPasswordInertiaXHR'])->name('.confirmPasswordInertiaXHR')->middleware('throttle:6,1');
 });
 
 // cliente

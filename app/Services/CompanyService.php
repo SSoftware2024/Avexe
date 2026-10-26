@@ -81,7 +81,8 @@ final class CompanyService
     {
         $owners_disassociated_total = $this->removeOwners($id);
         $this->removePaymentMethods($id);
-        // (new CompanyOperatingHoursService($id))->delete();
+        (new CompanyOperatingHoursService($id))->delete();
+        (new CompanySystemSettingsService($id))->delete();
         Company::where('id', $id)->forceDelete();
         return $owners_disassociated_total;
     }
