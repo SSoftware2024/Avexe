@@ -9,7 +9,6 @@ use App\Models\User;
 use App\Services\CompanyOperatingHoursService;
 use App\Services\PaymentMethodService;
 use Illuminate\Database\Eloquent\Collection;
-use Inertia\Inertia;
 
 final class CompanyService
 {
