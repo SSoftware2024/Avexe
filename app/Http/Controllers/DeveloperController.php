@@ -4,11 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Facades\DialogAlert;
 use App\Facades\Toast;
-use App\Models\Company;
 use App\Models\User;
-use App\Services\CompanyService;
 use App\Services\DeveloperService;
-use App\Services\OwnerService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
@@ -20,11 +17,99 @@ class DeveloperController extends Controller
 {
     public function index()
     {
-        return Inertia::render('Dev/Index');
+        return Inertia::render('Owner/Index');
     }
-    public function listView()
+
+    public function listView(Request $request, DeveloperService $service)
     {
-        return Inertia::render('Dev/DevList');
+        $request->validate([
+            'page' => ['nullable', 'integer'],
+            'per_page' => ['nullable', 'integer'],
+            'sort_by' => ['nullable', 'array']
+        ]);
+        $per_page = $request->has('per_page') ? $request->per_page : 10;
+        $sort_by = $request->has('sort_by') ? $request->sort_by : [];
+        $developers = $service->getListViewData($per_page, $sort_by);
+        return Inertia::render('Dev/DevList', [
+            'developers' => $developers
+        ]);
+    }
+
+    public function createUpdateView(Request $request, ?User $user)
+    {
+        if (Auth::user()->cannot('accessDeveloper', User::class)) {
+            DialogAlert::error('Usuário sem permição para ação desejada.');
+            return redirect()->route('auth.profileView');
+        }
+
+        return Inertia::render('Dev/DevCreateUpdate', [
+            'user_data' => $user->exists ? $user : null,
+        ]);
+    }
+
+    public function createOrUpdate(Request $request, DeveloperService $service)
+    {
+        if (Auth::user()->cannot('accessDeveloper', User::class)) {
+            DialogAlert::error('Usuário sem permição para ação desejada.');
+            return redirect()->back();
+        }
+        $id = $request->id;
+        $request->validate([
+            'id' => ['nullable', 'integer', Rule::exists('users', 'id')],
+            'name' => ['required', 'string', 'max:255'],
+            'date_of_birth' => ['required', 'date'],
+            'email' => [
+                'required',
+                'string',
+                'email',
+                'max:255',
+                !is_null($id) ? Rule::unique('users')->ignore($id) : Rule::unique(User::class),
+            ],
+            'password' => [is_null($id) ? 'required' : 'nullable', 'string', Password::min(8)],
+            'whatsapp' => [
+                'required',
+                'digits:11',
+                !is_null($id) ? Rule::unique('users')->ignore($id) : Rule::unique(User::class),
+            ],
+        ]);
+        $data = $request->all();
+        is_null($id) ?
+            $service->create($data) :
+            $service->update($data, $id);
+        Toast::success('Operação realizada com sucesso!');
+    }
+
+    public function delete(DeveloperService $service, int $id)
+    {
+        if (Auth::user()->cannot('accessDeveloper', User::class)) {
+            DialogAlert::error('Usuário sem permição para ação desejada.');
+            return redirect()->back();
+        }
+        $validator = Validator::make(['id' => $id], [
+            'id' => ['required', 'integer', Rule::exists('users', 'id')],
+        ]);
+        if ($validator->fails()) {
+            DialogAlert::warning($validator->errors()->get('id')[0]);
+        } else {
+            $service->delete($id);
+            Toast::success('Operação realizada com sucesso!');
+        }
+    }
+    public function toggleActive(DeveloperService $service, int $id)
+    {
+        if (Auth::user()->cannot('accessDeveloper', User::class)) {
+            DialogAlert::error('Usuário sem permição para ação desejada.');
+            return redirect()->back();
+        }
+        $validator = Validator::make(['id' => $id], [
+            'id' => ['required', 'integer', Rule::exists('users', 'id')],
+        ]);
+        if ($validator->fails()) {
+            DialogAlert::warning($validator->errors()->get('id')[0]);
+        } else {
+            $service->toggleActive($id);
+            Toast::success('Operação realizada com sucesso!');
+        }
     }
 
 }

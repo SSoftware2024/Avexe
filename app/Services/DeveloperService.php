@@ -2,24 +2,16 @@
 
 namespace App\Services;
 
+use App\Classes\Abstract\BaseUserService;
+use App\Enum\TypeUser;
 use App\Models\Company;
+use App\Models\User;
 use App\Services\CompanyService;
 
-final class DeveloperService
+final class DeveloperService extends BaseUserService
 {
-    private CompanyService $companyService;
-
     public function __construct()
     {
-        $this->companyService = new CompanyService();
-    }
-
-
-
-
-    # ================================================================================= #
-    #                                    PRIVADOS
-    # ================================================================================= #
-
-
+        $this->userType = TypeUser::DEVELOPER;
+    }  
 }

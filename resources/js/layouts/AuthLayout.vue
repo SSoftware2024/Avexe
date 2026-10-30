@@ -121,7 +121,10 @@ const nav_sections = computed(() => {
                         title: "Desenvolvedores",
                         icon: "mdi-code-block-tags",
                         to: route('developer.listView'),
-                        active_names: ["developer.listView"],
+                        active_names: [
+                            "developer.listView",
+                            "developer.createUpdateView"
+                        ],
                     },
                 ],
             },

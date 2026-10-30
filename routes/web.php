@@ -73,4 +73,8 @@ Route::prefix('payment_method')->middleware(['auth'])->name('payment_method')->g
 Route::prefix('developer')->middleware(['auth'])->name('developer')->group(function () {
     Route::get('/dashboard', [DeveloperController::class, 'index']);
     Route::get('/listView', [DeveloperController::class, 'listView'])->name('.listView');
+    Route::get('/createOrUpdate/{user?}', [DeveloperController::class, 'createUpdateView'])->name('.createUpdateView');
+    Route::post('/createOrUpdate', [DeveloperController::class, 'createOrUpdate'])->name('.createOrUpdate');
+    Route::delete('/delete/{id}', [DeveloperController::class, 'delete'])->name('.delete');
+    Route::patch('/toggleActive/{id}', [DeveloperController::class, 'toggleActive'])->name('.toggleActive');
 });

@@ -19,15 +19,6 @@ class OwnerController extends Controller
     {
         return Inertia::render('Owner/Index');
     }
-    public function profileView()
-    {
-        return Inertia::render('Auth/Profile');
-    }
-    public function removeProfile()
-    {
-        // $customer_service->removeProfile(Auth::user());
-    }
-
 
     public function listView(Request $request, OwnerService $service)
     {
@@ -38,7 +29,7 @@ class OwnerController extends Controller
         ]);
         $per_page = $request->has('per_page') ? $request->per_page : 10;
         $sort_by = $request->has('sort_by') ? $request->sort_by : [];
-        $owners = $service->ownerListViewData($per_page, $sort_by);
+        $owners = $service->getListViewData($per_page, $sort_by);
         return Inertia::render('Dev/OwnerList', [
             'owners' => $owners
         ]);
@@ -46,7 +37,7 @@ class OwnerController extends Controller
 
     public function createUpdateView(Request $request, ?User $user)
     {
-        if (Auth::user()->cannot('ownerManager', User::class)) {
+        if (Auth::user()->cannot('accessDeveloper', User::class)) {
             DialogAlert::error('Usuário sem permição para ação desejada.');
             return redirect()->route('auth.profileView');
         }
@@ -58,7 +49,7 @@ class OwnerController extends Controller
 
     public function createOrUpdate(Request $request, OwnerService $service)
     {
-        if (Auth::user()->cannot('ownerManager', User::class)) {
+        if (Auth::user()->cannot('accessDeveloper', User::class)) {
             DialogAlert::error('Usuário sem permição para ação desejada.');
             return redirect()->back();
         }
@@ -90,7 +81,7 @@ class OwnerController extends Controller
 
     public function delete(OwnerService $service, int $id)
     {
-        if (Auth::user()->cannot('ownerManager', User::class)) {
+        if (Auth::user()->cannot('accessDeveloper', User::class)) {
             DialogAlert::error('Usuário sem permição para ação desejada.');
             return redirect()->back();
         }
@@ -106,7 +97,7 @@ class OwnerController extends Controller
     }
     public function toggleActive(OwnerService $service, int $id)
     {
-        if (Auth::user()->cannot('ownerManager', User::class)) {
+        if (Auth::user()->cannot('accessDeveloper', User::class)) {
             DialogAlert::error('Usuário sem permição para ação desejada.');
             return redirect()->back();
         }

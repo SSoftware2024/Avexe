@@ -16,7 +16,7 @@ class UserPolicy
         //
     }
 
-    public function ownerManager(User $user)
+    public function accessDeveloper(User $user)
     {
         return $user->user_type == TypeUser::DEVELOPER->value;
     }
