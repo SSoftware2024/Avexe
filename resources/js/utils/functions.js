@@ -64,10 +64,18 @@ function copyText(value) {
         return Promise.resolve();
     }
 }
-
+function formatBooleanToText(value) {
+    return value ? "SIM" : "NÃO";
+}
 function formatDate(date) {
     if (!date) return "N/A";
     return new Date(date).toLocaleDateString("pt-BR");
 }
 
-export { money3Config, getCurrentLocation, copyText, formatDate };
+export {
+    money3Config,
+    getCurrentLocation,
+    copyText,
+    formatDate,
+    formatBooleanToText,
+};

@@ -5,7 +5,7 @@ import { Head, router, usePage } from "@inertiajs/vue3";
 import { route } from "ziggy-js";
 import { useDialogAlert } from "@/composables/useDialogAlert";
 import { useMask } from "vuetify";
-import { formatDate } from "@/utils/functions";
+import { formatDate, formatBooleanToText } from "@/utils/functions";
 import userType from "@/enum/userType";
 
 const page = usePage();
@@ -96,8 +96,6 @@ function _closeDialog() {
     modal_show_user.dialog = false;
     modal_show_user.user = null;
 }
-
-
 </script>
 <template>
     <Head title="Informações do Proprietário" />
@@ -216,9 +214,15 @@ function _closeDialog() {
                 <v-card-title
                     class="d-flex justify-space-between align-center pa-4"
                 >
-                    <span class="text-subtitle-1 font-weight-bold"
-                        >Dados do Desenvolvedor</span
-                    >
+                    <div>
+                        <div class="text-subtitle-1 font-weight-bold">
+                            Dados do Desenvolvedor
+                        </div>
+
+                        <div class="text-caption text-medium-emphasis">
+                            {{ modal_show_user.user.name }}
+                        </div>
+                    </div>
                     <v-btn
                         icon
                         variant="text"
@@ -251,14 +255,6 @@ function _closeDialog() {
                                     <v-list-item
                                         ><p class="mb-0">
                                             <span class="font-weight-bold"
-                                                >ID:</span
-                                            >
-                                            {{ modal_show_user.user.id }}
-                                        </p></v-list-item
-                                    >
-                                    <v-list-item
-                                        ><p class="mb-0">
-                                            <span class="font-weight-bold"
                                                 >Nome:</span
                                             >
                                             {{ modal_show_user.user.name }}
@@ -285,7 +281,7 @@ function _closeDialog() {
                                             {{
                                                 userType.getUserTypePTBR(
                                                     modal_show_user.user
-                                                        .user_type
+                                                        .user_type,
                                                 )
                                             }}
                                         </p></v-list-item
@@ -295,9 +291,22 @@ function _closeDialog() {
                                             <span class="font-weight-bold"
                                                 >Ativo:</span
                                             >
-                                            {{
-                                               modal_show_user.user.active ? 'Sim':'Não'
-                                            }}
+                                            <v-chip
+                                                :color="
+                                                    modal_show_user.user.active
+                                                        ? 'success'
+                                                        : 'error'
+                                                "
+                                                size="small"
+                                                class="ml-2"
+                                            >
+                                                {{
+                                                    formatBooleanToText(
+                                                        modal_show_user
+                                                            .user.active,
+                                                    )
+                                                }}
+                                            </v-chip>
                                         </p></v-list-item
                                     >
                                 </v-list>

@@ -39,8 +39,10 @@ return new class extends Migration
             $table->string('pix_key', 100)->nullable();
             $table->string('pix_name')->nullable();
             $table->boolean('is_have_appointment_tax')->default(false);
-            $table->double('appointment_tax_value', 5,2)->nullable();
+            $table->double('appointment_tax_value', 5, 2)->nullable();
             $table->boolean('is_percentage_appointment_tax_value')->nullable(); #porcentagem do serviço agendado
+            $table->boolean('is_fee_per_service')->default(false); #taxa é igual valor do serviço
+            $table->boolean('is_discount_fee')->default(true); #desconta taxa
             #agendamento regras
             $table->boolean('is_allowed_reviews')->default(false); #permitido avaliação
             $table->boolean('is_display_employees')->default(false); #permitido exibir funcionarios
@@ -48,10 +50,6 @@ return new class extends Migration
             $table->smallInteger('cancellation_time_allowed')->nullable();
             $table->enum('cancellation_time_unit', TimeUnit::toArrayValues())->nullable();
             $table->tinyInteger('appointment_max_days_in_advance')->nullable(); #dias máximos futuros para agendar, nulo apenas no dia
-            #taxa agendamento
-            $table->boolean('is_have_appointments_fee')->default(false); #tem taxa de agendamento
-            $table->boolean('is_fee_per_service')->default(false); #taxa é igual valor do serviço
-            $table->boolean('is_discount_fee')->default(true); #desconta taxa
             #dados
             $table->timestamps();
             $table->softDeletes();

@@ -5,7 +5,7 @@ import { Head, router, usePage } from "@inertiajs/vue3";
 import { route } from "ziggy-js";
 import { useDialogAlert } from "@/composables/useDialogAlert";
 import { useMask } from "vuetify";
-import { formatDate } from "@/utils/functions";
+import { formatDate, formatBooleanToText } from "@/utils/functions";
 import userType from "@/enum/userType";
 
 const page = usePage();
@@ -216,9 +216,15 @@ function _closeDialog() {
                 <v-card-title
                     class="d-flex justify-space-between align-center pa-4"
                 >
-                    <span class="text-subtitle-1 font-weight-bold"
-                        >Dados do Proprietário</span
-                    >
+                    <div>
+                        <div class="text-subtitle-1 font-weight-bold">
+                            Dados do Propietário
+                        </div>
+
+                        <div class="text-caption text-medium-emphasis">
+                            {{ modal_show_user.user.name }}
+                        </div>
+                    </div>
                     <v-btn
                         icon
                         variant="text"
@@ -249,14 +255,6 @@ function _closeDialog() {
                         <v-window v-model="modal_show_user.tab">
                             <v-window-item value="geral">
                                 <v-list density="compact" nav>
-                                    <v-list-item
-                                        ><p class="mb-0">
-                                            <span class="font-weight-bold"
-                                                >ID:</span
-                                            >
-                                            {{ modal_show_user.user.id }}
-                                        </p></v-list-item
-                                    >
                                     <v-list-item
                                         ><p class="mb-0">
                                             <span class="font-weight-bold"
@@ -296,9 +294,13 @@ function _closeDialog() {
                                             <span class="font-weight-bold"
                                                 >Ativo:</span
                                             >
-                                            {{
-                                               modal_show_user.user.active ? 'Sim':'Não'
-                                            }}
+                                            <v-chip
+                                            :color="modal_show_user.user.active ? 'success' : 'error'"
+                                            size="small"
+                                            class="ml-2"
+                                        >
+                                            {{ formatBooleanToText(modal_show_user.user.active) }}
+                                        </v-chip>
                                         </p></v-list-item
                                     >
                                     <v-list-item
