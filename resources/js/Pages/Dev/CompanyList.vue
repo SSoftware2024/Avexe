@@ -1,4 +1,3 @@
-
 <script setup>
 import { reactive } from "vue";
 import { useMask } from "vuetify";
@@ -6,7 +5,11 @@ import { Head, router } from "@inertiajs/vue3";
 import { route } from "ziggy-js";
 import AuthLayout from "@/layouts/AuthLayout.vue";
 import { useDialogAlert } from "@/composables/useDialogAlert";
-import { formatDate, formatBooleanToText } from "@/utils/functions";
+import {
+    formatDate,
+    formatBooleanToText,
+    formatMoneyToBrString,
+} from "@/utils/functions";
 
 const maskes = reactive({
     cnpj: useMask({ mask: "##.###.###/####-##" }),
@@ -18,9 +21,13 @@ const dialog_alert = useDialogAlert();
 
 const modal_show_company = reactive({
     company: null,
+    company_settigns: null,
     tab: "geral",
     loading: false,
     dialog: false,
+});
+const loading = reactive({
+    company_settigns: false,
 });
 
 const datatable = reactive({
@@ -69,6 +76,7 @@ function _showCompany(item) {
     modal_show_company.company = item;
     modal_show_company.tab = "geral";
     modal_show_company.dialog = true;
+    _getCompanySettings(item.id);
 }
 
 // FECHAR MODAL
@@ -109,9 +117,25 @@ function _deleteQuestion(item) {
             _delete(item.id);
         });
 
-    dialog_alert.open(
-        "Deletar empresa: " + item.name + "?",
-        "question",
+    dialog_alert.open("Deletar empresa: " + item.name + "?", "question");
+}
+
+function _getCompanySettings(company_id) {
+    loading.company_settigns = true;
+    router.get(
+        route("company.settings.getByCompany", [company_id]),
+        {},
+        {
+            only: ["response_data"],
+            preserveState: true,
+            onSuccess: (page) => {
+                modal_show_company.company_settigns =
+                    page.props.response_data?.company_system_settings;
+            },
+            onFinish: () => {
+                loading.company_settigns = false;
+            },
+        },
     );
 }
 
@@ -217,9 +241,7 @@ function _loadData({ page, itemsPerPage, sortBy }) {
                             <!-- VISUALIZAR -->
                             <v-list-item @click="_showCompany(item)">
                                 <template v-slot:prepend>
-                                    <v-icon size="small">
-                                        mdi-eye
-                                    </v-icon>
+                                    <v-icon size="small"> mdi-eye </v-icon>
                                 </template>
 
                                 <v-list-item-title>
@@ -240,25 +262,17 @@ function _loadData({ page, itemsPerPage, sortBy }) {
                                 </template>
 
                                 <v-list-item-title>
-                                    {{
-                                        item.active
-                                            ? "Desativar"
-                                            : "Ativar"
-                                    }}
+                                    {{ item.active ? "Desativar" : "Ativar" }}
                                 </v-list-item-title>
                             </v-list-item>
 
                             <!-- EDITAR -->
                             <v-list-item @click="_edit(item)">
                                 <template v-slot:prepend>
-                                    <v-icon size="small">
-                                        mdi-pencil
-                                    </v-icon>
+                                    <v-icon size="small"> mdi-pencil </v-icon>
                                 </template>
 
-                                <v-list-item-title>
-                                    Editar
-                                </v-list-item-title>
+                                <v-list-item-title> Editar </v-list-item-title>
                             </v-list-item>
 
                             <!-- DELETAR -->
@@ -273,9 +287,7 @@ function _loadData({ page, itemsPerPage, sortBy }) {
                                 </template>
 
                                 <v-list-item-title>
-                                    <span class="text-error">
-                                        Deletar
-                                    </span>
+                                    <span class="text-error"> Deletar </span>
                                 </v-list-item-title>
                             </v-list-item>
                         </v-list>
@@ -327,52 +339,67 @@ function _loadData({ page, itemsPerPage, sortBy }) {
                         show-arrows
                     >
                         <v-tab value="geral">Geral</v-tab>
-                        <v-tab value="contato">Contato</v-tab>
-                        <v-tab value="endereco">Endereço</v-tab>
-                        <v-tab value="configuracoes">
-                            Configurações
-                        </v-tab>
-                        <v-tab value="financeiro">Financeiro</v-tab>
-                        <v-tab value="datas">Datas</v-tab>
+                        <v-tab value="contact">Contato</v-tab>
+                        <v-tab value="address">Endereço</v-tab>
+                        <v-tab value="settings"> Configurações </v-tab>
+                        <v-tab value="financial">Financeiro</v-tab>
+                        <v-tab value="monthly_payment">Plano</v-tab>
+                        <v-tab value="dates">Datas</v-tab>
                     </v-tabs>
 
                     <v-window v-model="modal_show_company.tab">
                         <!-- GERAL -->
                         <v-window-item value="geral">
                             <v-list density="compact">
-
                                 <v-list-item>
                                     <p class="mb-0">
                                         <strong>Nome:</strong>
-                                        {{ modal_show_company.company.name || "N/A" }}
+                                        {{
+                                            modal_show_company.company.name ||
+                                            "N/A"
+                                        }}
                                     </p>
                                 </v-list-item>
 
                                 <v-list-item>
                                     <p class="mb-0">
                                         <strong>Razão Social:</strong>
-                                        {{ modal_show_company.company.corporate_name || "N/A" }}
+                                        {{
+                                            modal_show_company.company
+                                                .corporate_name || "N/A"
+                                        }}
                                     </p>
                                 </v-list-item>
 
                                 <v-list-item>
                                     <p class="mb-0">
                                         <strong>CNPJ:</strong>
-                                        {{ maskes.cnpj.mask(modal_show_company.company.cnpj) || "N/A" }}
+                                        {{
+                                            maskes.cnpj.mask(
+                                                modal_show_company.company.cnpj,
+                                            ) || "N/A"
+                                        }}
                                     </p>
                                 </v-list-item>
 
                                 <v-list-item>
                                     <p class="mb-0">
                                         <strong>CPF:</strong>
-                                        {{ maskes.cpf.mask(modal_show_company.company.cpf) || "N/A" }}
+                                        {{
+                                            maskes.cpf.mask(
+                                                modal_show_company.company.cpf,
+                                            ) || "N/A"
+                                        }}
                                     </p>
                                 </v-list-item>
 
                                 <v-list-item>
                                     <p class="mb-0">
                                         <strong>URL:</strong>
-                                        {{ modal_show_company.company.tag_url || "N/A" }}
+                                        {{
+                                            modal_show_company.company
+                                                .tag_url || "N/A"
+                                        }}
                                     </p>
                                 </v-list-item>
 
@@ -381,11 +408,21 @@ function _loadData({ page, itemsPerPage, sortBy }) {
                                         <strong>Ativo:</strong>
 
                                         <v-chip
-                                            :color="modal_show_company.company.active ? 'success' : 'error'"
+                                            :color="
+                                                modal_show_company.company
+                                                    .active
+                                                    ? 'success'
+                                                    : 'error'
+                                            "
                                             size="small"
                                             class="ml-2"
                                         >
-                                            {{ formatBooleanToText(modal_show_company.company.active) }}
+                                            {{
+                                                formatBooleanToText(
+                                                    modal_show_company.company
+                                                        .active,
+                                                )
+                                            }}
                                         </v-chip>
                                     </p>
                                 </v-list-item>
@@ -393,148 +430,221 @@ function _loadData({ page, itemsPerPage, sortBy }) {
                                 <v-list-item>
                                     <p class="mb-0">
                                         <strong>Logo:</strong>
-                                        {{ modal_show_company.company.logo || "N/A" }}
+                                        {{
+                                            modal_show_company.company.logo ||
+                                            "N/A"
+                                        }}
                                     </p>
                                 </v-list-item>
                             </v-list>
                         </v-window-item>
 
                         <!-- CONTATO -->
-                        <v-window-item value="contato">
+                        <v-window-item value="contact">
                             <v-list density="compact">
                                 <v-list-item>
                                     <p class="mb-0">
                                         <strong>WhatsApp:</strong>
-                                        {{ maskes.whatsapp.mask(modal_show_company.company.whatsapp) || "N/A" }}
+                                        {{
+                                            maskes.whatsapp.mask(
+                                                modal_show_company.company
+                                                    .whatsapp,
+                                            ) || "N/A"
+                                        }}
                                     </p>
                                 </v-list-item>
 
                                 <v-list-item>
                                     <p class="mb-0">
                                         <strong>Instagram:</strong>
-                                        {{ modal_show_company.company.instagram || "N/A" }}
+                                        {{
+                                            modal_show_company.company
+                                                .instagram || "N/A"
+                                        }}
                                     </p>
                                 </v-list-item>
 
                                 <v-list-item>
                                     <p class="mb-0">
                                         <strong>Telegram:</strong>
-                                        {{ modal_show_company.company.telegram || "N/A" }}
+                                        {{
+                                            modal_show_company.company
+                                                .telegram || "N/A"
+                                        }}
                                     </p>
                                 </v-list-item>
                             </v-list>
                         </v-window-item>
 
                         <!-- ENDEREÇO -->
-                        <v-window-item value="endereco">
+                        <v-window-item value="address">
                             <v-list density="compact">
                                 <v-list-item>
                                     <p class="mb-0">
                                         <strong>CEP:</strong>
-                                        {{ modal_show_company.company.cep || "N/A" }}
+                                        {{
+                                            modal_show_company.company.cep ||
+                                            "N/A"
+                                        }}
                                     </p>
                                 </v-list-item>
 
                                 <v-list-item>
                                     <p class="mb-0">
                                         <strong>Rua:</strong>
-                                        {{ modal_show_company.company.street || "N/A" }}
+                                        {{
+                                            modal_show_company.company.street ||
+                                            "N/A"
+                                        }}
                                     </p>
                                 </v-list-item>
 
                                 <v-list-item>
                                     <p class="mb-0">
                                         <strong>Número:</strong>
-                                        {{ modal_show_company.company.number || "N/A" }}
+                                        {{
+                                            modal_show_company.company.number ||
+                                            "N/A"
+                                        }}
                                     </p>
                                 </v-list-item>
 
                                 <v-list-item>
                                     <p class="mb-0">
                                         <strong>Bairro:</strong>
-                                        {{ modal_show_company.company.neighborhood || "N/A" }}
+                                        {{
+                                            modal_show_company.company
+                                                .neighborhood || "N/A"
+                                        }}
                                     </p>
                                 </v-list-item>
 
                                 <v-list-item>
                                     <p class="mb-0">
                                         <strong>Complemento:</strong>
-                                        {{ modal_show_company.company.complement || "N/A" }}
+                                        {{
+                                            modal_show_company.company
+                                                .complement || "N/A"
+                                        }}
                                     </p>
                                 </v-list-item>
 
                                 <v-list-item>
                                     <p class="mb-0">
                                         <strong>Cidade:</strong>
-                                        {{ modal_show_company.company.city || "N/A" }}
+                                        {{
+                                            modal_show_company.company.city ||
+                                            "N/A"
+                                        }}
                                     </p>
                                 </v-list-item>
 
                                 <v-list-item>
                                     <p class="mb-0">
                                         <strong>Estado:</strong>
-                                        {{ modal_show_company.company.state || "N/A" }}
+                                        {{
+                                            modal_show_company.company.state ||
+                                            "N/A"
+                                        }}
                                     </p>
                                 </v-list-item>
 
                                 <v-list-item>
                                     <p class="mb-0">
                                         <strong>Latitude:</strong>
-                                        {{ modal_show_company.company.latitude ?? "N/A" }}
+                                        {{
+                                            modal_show_company.company
+                                                .latitude ?? "N/A"
+                                        }}
                                     </p>
                                 </v-list-item>
 
                                 <v-list-item>
                                     <p class="mb-0">
                                         <strong>Longitude:</strong>
-                                        {{ modal_show_company.company.longitude ?? "N/A" }}
+                                        {{
+                                            modal_show_company.company
+                                                .longitude ?? "N/A"
+                                        }}
                                     </p>
                                 </v-list-item>
                             </v-list>
                         </v-window-item>
 
                         <!-- CONFIGURAÇÕES -->
-                        <v-window-item value="configuracoes">
+                        <v-window-item value="settings">
                             <v-list density="compact">
                                 <v-list-item>
                                     <p class="mb-0">
                                         <strong>Permite avaliações:</strong>
-                                        {{ formatBooleanToText(modal_show_company.company.is_allowed_reviews) }}
+                                        {{
+                                            formatBooleanToText(
+                                                modal_show_company.company
+                                                    .is_allowed_reviews,
+                                            )
+                                        }}
                                     </p>
                                 </v-list-item>
 
                                 <v-list-item>
                                     <p class="mb-0">
                                         <strong>Exibe funcionários:</strong>
-                                        {{ formatBooleanToText(modal_show_company.company.is_display_employees) }}
+                                        {{
+                                            formatBooleanToText(
+                                                modal_show_company.company
+                                                    .is_display_employees,
+                                            )
+                                        }}
                                     </p>
                                 </v-list-item>
 
                                 <v-list-item>
                                     <p class="mb-0">
                                         <strong>Permite cancelamento:</strong>
-                                        {{ formatBooleanToText(modal_show_company.company.is_allowed_cancellation) }}
+                                        {{
+                                            formatBooleanToText(
+                                                modal_show_company.company
+                                                    .is_allowed_cancellation,
+                                            )
+                                        }}
                                     </p>
                                 </v-list-item>
 
                                 <v-list-item>
                                     <p class="mb-0">
-                                        <strong>Tempo permitido para cancelamento:</strong>
-                                        {{ modal_show_company.company.cancellation_time_allowed ?? "N/A" }}
+                                        <strong
+                                            >Tempo permitido para
+                                            cancelamento:</strong
+                                        >
+                                        {{
+                                            modal_show_company.company
+                                                .cancellation_time_allowed ??
+                                            "N/A"
+                                        }}
                                     </p>
                                 </v-list-item>
 
                                 <v-list-item>
                                     <p class="mb-0">
                                         <strong>Unidade do tempo:</strong>
-                                        {{ modal_show_company.company.cancellation_time_unit || "N/A" }}
+                                        {{
+                                            modal_show_company.company
+                                                .cancellation_time_unit || "N/A"
+                                        }}
                                     </p>
                                 </v-list-item>
 
                                 <v-list-item>
                                     <p class="mb-0">
-                                        <strong>Dias máximos para agendamento:</strong>
-                                        {{ modal_show_company.company.appointment_max_days_in_advance ?? "N/A" }}
+                                        <strong
+                                            >Dias máximos para
+                                            agendamento:</strong
+                                        >
+                                        {{
+                                            modal_show_company.company
+                                                .appointment_max_days_in_advance ??
+                                            "N/A"
+                                        }}
                                     </p>
                                 </v-list-item>
 
@@ -542,81 +652,206 @@ function _loadData({ page, itemsPerPage, sortBy }) {
 
                                 <v-list-item>
                                     <p class="mb-0">
-                                        <strong>Possui taxa de agendamento:</strong>
-                                        {{ formatBooleanToText(modal_show_company.company.is_have_appointment_tax) }}
+                                        <strong
+                                            >Possui taxa de agendamento:</strong
+                                        >
+                                        {{
+                                            formatBooleanToText(
+                                                modal_show_company.company
+                                                    .is_have_appointment_tax,
+                                            )
+                                        }}
                                     </p>
                                 </v-list-item>
 
                                 <v-list-item>
                                     <p class="mb-0">
                                         <strong>Valor da taxa:</strong>
-                                        {{ modal_show_company.company.appointment_tax_value }}
+                                        {{
+                                            modal_show_company.company
+                                                .appointment_tax_value
+                                        }}
                                     </p>
                                 </v-list-item>
 
                                 <v-list-item>
                                     <p class="mb-0">
                                         <strong>Taxa percentual:</strong>
-                                        {{ formatBooleanToText(modal_show_company.company.is_percentage_appointment_tax_value) }}
+                                        {{
+                                            formatBooleanToText(
+                                                modal_show_company.company
+                                                    .is_percentage_appointment_tax_value,
+                                            )
+                                        }}
                                     </p>
                                 </v-list-item>
 
                                 <v-list-item>
                                     <p class="mb-0">
                                         <strong>Taxa por serviço:</strong>
-                                        {{ formatBooleanToText(modal_show_company.company.is_fee_per_service) }}
+                                        {{
+                                            formatBooleanToText(
+                                                modal_show_company.company
+                                                    .is_fee_per_service,
+                                            )
+                                        }}
                                     </p>
                                 </v-list-item>
 
                                 <v-list-item>
                                     <p class="mb-0">
                                         <strong>Desconta taxa:</strong>
-                                        {{ formatBooleanToText(modal_show_company.company.is_discount_fee) }}
+                                        {{
+                                            formatBooleanToText(
+                                                modal_show_company.company
+                                                    .is_discount_fee,
+                                            )
+                                        }}
                                     </p>
                                 </v-list-item>
                             </v-list>
                         </v-window-item>
 
                         <!-- FINANCEIRO -->
-                        <v-window-item value="financeiro">
-                            <v-list density="compact">
+                        <v-window-item value="financial">
+                            <v-list density="comfortable">
                                 <v-list-item>
                                     <p class="mb-0">
                                         <strong>Chave PIX:</strong>
-                                        {{ modal_show_company.company.pix_key || "N/A" }}
+                                        {{
+                                            modal_show_company.company
+                                                .pix_key || "Não informado"
+                                        }}
                                     </p>
                                 </v-list-item>
 
                                 <v-list-item>
                                     <p class="mb-0">
                                         <strong>Nome do PIX:</strong>
-                                        {{ modal_show_company.company.pix_name || "N/A" }}
+                                        {{
+                                            modal_show_company.company
+                                                .pix_name || "Não informado"
+                                        }}
+                                    </p>
+                                </v-list-item>
+                            </v-list>
+                        </v-window-item>
+                        <!-- PLANO -->
+                        <v-window-item value="monthly_payment">
+                            <v-list density="comfortable">
+                                <v-list-item>
+                                    <p class="mb-0">
+                                        <strong>Acessos simultâneos:</strong>
+                                        {{
+                                            modal_show_company.company_settigns
+                                                ?.simultaneous_access ?? "N/A"
+                                        }}
+                                    </p>
+                                </v-list-item>
+
+                                <v-list-item>
+                                    <p class="mb-0">
+                                        <strong
+                                            >Máximo de proprietários:</strong
+                                        >
+                                        {{
+                                            modal_show_company.company_settigns
+                                                ?.max_owners ?? "N/A"
+                                        }}
+                                    </p>
+                                </v-list-item>
+
+                                <v-list-item>
+                                    <p class="mb-0">
+                                        <strong>Máximo de funcionários:</strong>
+                                        {{
+                                            modal_show_company.company_settigns
+                                                ?.max_employees ?? "N/A"
+                                        }}
+                                    </p>
+                                </v-list-item>
+
+                                <v-list-item>
+                                    <p class="mb-0">
+                                        <strong>Data do pagamento:</strong>
+                                        {{
+                                            modal_show_company.company_settigns
+                                                ?.date_payment
+                                                ? formatDate(
+                                                      modal_show_company
+                                                          .company_settigns
+                                                          ?.date_payment,
+                                                  )
+                                                : "Não informado"
+                                        }}
+                                    </p>
+                                </v-list-item>
+
+                                <v-list-item>
+                                    <p class="mb-0">
+                                        <strong
+                                            >Intervalo da mensagem de retorno
+                                            (DIAS):</strong
+                                        >
+                                        {{
+                                            modal_show_company.company_settigns
+                                                ?.interval_return_message ??
+                                            "N/A"
+                                        }}
+                                    </p>
+                                </v-list-item>
+
+                                <v-list-item>
+                                    <p class="mb-0">
+                                        <strong>Valor da mensalidade:</strong>
+                                        {{
+                                            formatMoneyToBrString(
+                                                modal_show_company
+                                                    .company_settigns
+                                                    ?.value_monthly_fee,
+                                            ) ?? 'N/A'
+                                        }}
                                     </p>
                                 </v-list-item>
                             </v-list>
                         </v-window-item>
 
                         <!-- DATAS -->
-                        <v-window-item value="datas">
+                        <v-window-item value="dates">
                             <v-list density="compact">
                                 <v-list-item>
                                     <p class="mb-0">
                                         <strong>Criado em:</strong>
-                                        {{ formatDate(modal_show_company.company.created_at) }}
+                                        {{
+                                            formatDate(
+                                                modal_show_company.company
+                                                    .created_at,
+                                            )
+                                        }}
                                     </p>
                                 </v-list-item>
 
                                 <v-list-item>
                                     <p class="mb-0">
                                         <strong>Atualizado em:</strong>
-                                        {{ formatDate(modal_show_company.company.updated_at) }}
+                                        {{
+                                            formatDate(
+                                                modal_show_company.company
+                                                    .updated_at,
+                                            )
+                                        }}
                                     </p>
                                 </v-list-item>
 
                                 <v-list-item>
                                     <p class="mb-0">
                                         <strong>Deletado em:</strong>
-                                        {{ formatDate(modal_show_company.company.deleted_at) }}
+                                        {{
+                                            formatDate(
+                                                modal_show_company.company
+                                                    .deleted_at,
+                                            )
+                                        }}
                                     </p>
                                 </v-list-item>
                             </v-list>
@@ -630,16 +865,12 @@ function _loadData({ page, itemsPerPage, sortBy }) {
                 <v-card-actions class="pa-3">
                     <v-spacer />
 
-                    <v-btn
-                        color="primary"
-                        variant="flat"
-                        @click="_closeDialog"
-                    >
+                    <v-btn color="primary" variant="flat" @click="_closeDialog">
                         Fechar
                     </v-btn>
                 </v-card-actions>
             </v-card>
         </v-dialog>
-         <!-- #endregion MODAL VISUALIZAR EMPRESA -->
+        <!-- #endregion MODAL VISUALIZAR EMPRESA -->
     </AuthLayout>
 </template>

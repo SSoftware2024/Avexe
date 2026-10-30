@@ -59,6 +59,7 @@ Route::prefix('company')->middleware(['auth'])->name('company')->group(function 
     //configurações
     Route::prefix('settings')->name('.settings')->group(function () {
         Route::post('/save', [CompanySettingsController::class, 'save'])->name('.save');
+        Route::get('/getByCompany/{company_id}', [CompanySettingsController::class, 'getByCompany'])->name('.getByCompany'); //inertia flash_data
     });
 });
 
