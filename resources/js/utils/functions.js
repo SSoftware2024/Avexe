@@ -71,6 +71,15 @@ function formatDate(date) {
     if (!date) return "N/A";
     return new Date(date).toLocaleDateString("pt-BR");
 }
+function formatMoneyToBrString(value) {
+    if(!value){
+        return null;
+    }
+    return new Intl.NumberFormat("pt-BR", {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+    }).format(value);
+}
 
 export {
     money3Config,
@@ -78,4 +87,5 @@ export {
     copyText,
     formatDate,
     formatBooleanToText,
+    formatMoneyToBrString,
 };

@@ -24,4 +24,11 @@ class CompanySettingsController extends Controller
         (new CompanySystemSettingsService($request->company_id))->save($request->all());
         Toast::success('Operação realizada com sucesso');
     }
+
+    public function getByCompany(Request $request, int $company_id)
+    {
+        session()->flash('response_data', [
+            'company_system_settings' => (new CompanySystemSettingsService($company_id))->get()
+        ]);
+    }
 }
