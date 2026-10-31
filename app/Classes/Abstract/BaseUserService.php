@@ -67,14 +67,18 @@ abstract class BaseUserService
     # ================================================================================= #
     #                                    View
     # ================================================================================= #
-    public function getListViewData(?int $paginate = 10, array $sort_by = [])
+    public function getListViewData(?int $paginate = 10, array $sort_by = [], array $filter = [])
     {
-        $owners = User::where('id', '!=', auth()->id())->where('user_type', $this->userType->value);
-
-        if (!empty($sort_by)) { //vuetify datatable
-            $owners->orderBy($sort_by[0]['key'], $sort_by[1]['order']);
+        $users = User::where('id', '!=', auth()->id())->where('user_type', $this->userType->value);
+        if (!empty($filter['name_email'])) {
+            $users->where(function ($query) use ($filter) {
+                $query->where('name','like',"%{$filter['name_email']}%")->orWhere('email', 'like', "%{$filter['name_email']}%");
+            });
         }
-        $owners = $owners->paginate($paginate);
-        return $owners;
+        if (!empty($sort_by)) { //vuetify datatable
+            $users->orderBy($sort_by[0]['key'], $sort_by[1]['order']);
+        }
+        $users = $users->paginate($paginate);
+        return $users;
     }
 }

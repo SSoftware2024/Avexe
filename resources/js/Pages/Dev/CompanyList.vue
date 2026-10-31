@@ -36,7 +36,7 @@ const form = useForm({
 });
 const datatable = reactive({
     page: 1,
-    items_per_page: 1,
+    items_per_page: 10,
     sort_by: [],
     headers: [
         {
@@ -242,7 +242,7 @@ function _loadData() {
                 :items="$page.props.companies.data"
                 :items-length="$page.props.companies.total"
                 :loading="datatable.loading"
-                :items-per-page-options="[1, 10, 25, 50]"
+                :items-per-page-options="[10, 25, 50]"
                 gridlines="all"
                 item-value="id"
                 @update:options="_loadData"

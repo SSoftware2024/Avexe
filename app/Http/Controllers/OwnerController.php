@@ -29,7 +29,7 @@ class OwnerController extends Controller
         ]);
         $per_page = $request->has('per_page') ? $request->per_page : 10;
         $sort_by = $request->has('sort_by') ? $request->sort_by : [];
-        $owners = $service->getListViewData($per_page, $sort_by);
+        $owners = $service->getListViewData($per_page, $sort_by, $request->input('filter', []));
         return Inertia::render('Dev/OwnerList', [
             'owners' => $owners
         ]);

@@ -1,7 +1,7 @@
 <script setup>
 import { onMounted, reactive, ref } from "vue";
 import AuthLayout from "@/layouts/AuthLayout.vue";
-import { Head, router, usePage } from "@inertiajs/vue3";
+import { Head, router, useForm, usePage } from "@inertiajs/vue3";
 import { route } from "ziggy-js";
 import { useDialogAlert } from "@/composables/useDialogAlert";
 import { useMask } from "vuetify";
@@ -17,8 +17,13 @@ const modal_show_user = reactive({
     loading: false,
     dialog: false,
 });
+const form = useForm({
+    name_email: "",
+});
 const datatable = reactive({
     items_per_page: 10,
+    page: 1,
+    sort_by: [],
     headers: [
         {
             title: "Nome",
@@ -48,15 +53,21 @@ const datatable = reactive({
     loading: false,
 });
 
-function _loadData({ page, itemsPerPage, sortBy }) {
+function _search() {
+    datatable.page = 1;
+    _loadData();
+}
+
+function _loadData() {
     datatable.loading = true;
 
     router.get(
         route("owner.listView"),
         {
-            page: page,
-            per_page: itemsPerPage,
-            sort_by: sortBy,
+            page: datatable.page,
+            per_page: datatable.items_per_page,
+            sort_by: datatable.sort_by,
+            filter: form.data()
         },
         {
             preserveState: true,
@@ -96,8 +107,6 @@ function _closeDialog() {
     modal_show_user.dialog = false;
     modal_show_user.user = null;
 }
-
-
 </script>
 <template>
     <Head title="Informações do Proprietário" />
@@ -111,9 +120,44 @@ function _closeDialog() {
             Novo
         </v-btn>
         <h3>Donos</h3>
+        <v-row class="mb-3">
+            <v-col cols="12">
+                <div class="w-full">
+                    <v-form
+                        class="d-flex flex-column flex-md-row ga-4 align-md-center"
+                        @submit.prevent="_search"
+                    >
+
+                        <v-text-field
+                            class="flex-grow-1"
+                            mask="###.###.###-##"
+                            label="Nome / E-mail"
+                            variant="outlined"
+                            name="name_email"
+                            prepend-inner-icon="mdi-magnify"
+                            clearable
+                            hide-details
+                            density="compact"
+                            v-model="form.name_email"
+                        ></v-text-field>
+                        <v-btn
+                            variant="flat"
+                            text="Buscar"
+                            append-icon="mdi-magnify"
+                            color="primary"
+                            class="flex-shrink-0"
+                            type="submit"
+                        >
+                        </v-btn>
+                    </v-form>
+                </div>
+            </v-col>
+        </v-row>
         <div>
             <v-data-table-server
                 v-model:items-per-page="datatable.items_per_page"
+                v-model:page="datatable.page"
+                v-model:sort-by="datatable.sort_by"
                 :headers="datatable.headers"
                 :items="$page.props.owners.data"
                 :items-length="$page.props.owners.total"
@@ -132,6 +176,7 @@ function _closeDialog() {
                     <v-icon
                         :color="item.active ? 'success' : 'error'"
                         size="large"
+                        class="pointer"
                     >
                         {{
                             item.active
@@ -167,7 +212,7 @@ function _closeDialog() {
                                     >Visualizar</v-list-item-title
                                 >
                             </v-list-item>
-                            <v-list-item>
+                            <v-list-item @click="_toggleActiveOwner(item)">
                                 <template v-slot:prepend>
                                     <v-icon size="small">
                                         {{
@@ -179,7 +224,7 @@ function _closeDialog() {
                                 </template>
 
                                 <v-list-item-title
-                                    @click="_toggleActiveOwner(item)"
+                                   
                                 >
                                     {{ item.active ? "Desativar" : "Ativar" }}
                                 </v-list-item-title>
@@ -284,7 +329,7 @@ function _closeDialog() {
                                             {{
                                                 userType.getUserTypePTBR(
                                                     modal_show_user.user
-                                                        .user_type
+                                                        .user_type,
                                                 )
                                             }}
                                         </p></v-list-item
@@ -295,12 +340,21 @@ function _closeDialog() {
                                                 >Ativo:</span
                                             >
                                             <v-chip
-                                            :color="modal_show_user.user.active ? 'success' : 'error'"
-                                            size="small"
-                                            class="ml-2"
-                                        >
-                                            {{ formatBooleanToText(modal_show_user.user.active) }}
-                                        </v-chip>
+                                                :color="
+                                                    modal_show_user.user.active
+                                                        ? 'success'
+                                                        : 'error'
+                                                "
+                                                size="small"
+                                                class="ml-2"
+                                            >
+                                                {{
+                                                    formatBooleanToText(
+                                                        modal_show_user.user
+                                                            .active,
+                                                    )
+                                                }}
+                                            </v-chip>
                                         </p></v-list-item
                                     >
                                     <v-list-item
