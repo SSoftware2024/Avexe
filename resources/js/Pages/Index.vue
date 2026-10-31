@@ -5,6 +5,17 @@ import { ref } from "vue";
 // import { route } from 'ziggy-js'; //route ziggy
 
 const toggle = ref("left");
+
+// Dados de exemplo — troque pelos dados reais vindos do backend
+const empresas = ref(
+    Array.from({ length: 12 }, (_, i) => ({
+        id: i + 1,
+        nome: "Avexe salão",
+        endereco: "Jijoca de Jericoacoara - CE",
+        distancia: "32,8 km",
+        nota: "5,0",
+    }))
+);
 </script>
 
 <template>
@@ -35,7 +46,9 @@ const toggle = ref("left");
                         </v-btn>
                     </v-form>
                 </div>
-                <div class="w-full mt-2 d-flex flex-column flex-md-row justify-md-space-between">
+                <div
+                    class="w-full mt-2 d-flex flex-column flex-md-row justify-md-space-between"
+                >
                     <div>
                         <v-btn-toggle
                             v-model="toggle"
@@ -45,76 +58,82 @@ const toggle = ref("left");
                         >
                             <v-btn value="left">
                                 <span>Nome</span>
-
                                 <v-icon end> mdi-domain </v-icon>
                             </v-btn>
 
                             <v-btn value="center">
                                 <span>Próximas</span>
-
                                 <v-icon end> mdi-map-marker </v-icon>
                             </v-btn>
                         </v-btn-toggle>
                     </div>
                     <div v-if="true">
-                        <v-pagination :length="4" :total-visible="7" variant="flat"></v-pagination>
+                        <v-pagination
+                            :length="4"
+                            :total-visible="7"
+                            variant="flat"
+                        ></v-pagination>
                     </div>
                 </div>
             </v-col>
         </v-row>
         <!-- FIM FILTRO DE BUSCA -->
+
         <!-- LISTA DE EMPRESAS -->
         <div class="scrollable-list">
             <v-row>
-                <v-col cols="12" md="6" lg="4" v-for="i in 12">
-                    <v-card class="mx-auto pa-4" hover>
-                        <div class="content">
-                            <div class="image_content">
+                <v-col
+                    v-for="empresa in empresas"
+                    :key="empresa.id"
+                    cols="12"
+                    md="6"
+                    lg="4"
+                >
+                    <v-card class="company-card" rounded="xl" flat>
+                        <div class="company-card__top">
+                            <v-avatar
+                                size="60"
+                                rounded="lg"
+                                class="company-card__logo"
+                            >
                                 <v-img
                                     :src="images.logo_no_background"
-                                    rounded="100%"
-                                    width="70"
-                                    height="70"
+                                    cover
                                 ></v-img>
-                            </div>
-                            <div class="text">
-                                <h4>Avexe salão</h4>
-                                <p>
-                                    Jijoca de Jericoacoara - CE , 190 -
-                                    62595-000
+                            </v-avatar>
+
+                            <div class="company-card__info">
+                                <h4 class="company-card__name">
+                                    {{ empresa.nome }}
+                                </h4>
+
+                                <div class="company-card__meta">
+                                    <span class="company-card__rating">
+                                        <v-icon size="15" color="amber-darken-1">
+                                            mdi-star
+                                        </v-icon>
+                                        {{ empresa.nota }}
+                                    </span>
+                                    <span class="company-card__dot"></span>
+                                    <span>{{ empresa.distancia }}</span>
+                                </div>
+
+                                <p class="company-card__address">
+                                    {{ empresa.endereco }}
                                 </p>
                             </div>
                         </div>
-                        <div class="d-flex justify-end ma-0 pa-0">
-                            <v-chip
-                                prepend-icon="mdi-map-marker"
-                                class="ma-2"
-                                color="red"
-                            >
-                                32,8km
-                            </v-chip>
-                            <v-btn
-                                variant="flat"
-                                text="Acessar"
-                                append-icon="mdi-arrow-right-box"
-                                color="#388E3C"
-                                class="text-white align-self-center"
-                            >
-                                <template v-slot:append>
-                                    <v-icon color="white"></v-icon>
-                                </template>
-                            </v-btn>
-                        </div>
 
-                        <div class="float-rate">
-                            <v-chip
-                                append-icon="mdi-star"
-                                class="ma-2"
-                                color="primary"
-                            >
-                                5,0
-                            </v-chip>
-                        </div>
+                        <v-btn
+                            block
+                            variant="tonal"
+                            color="primary"
+                            rounded="lg"
+                            class="text-none mt-4"
+                            append-icon="mdi-arrow-right"
+                        >
+                            Acessar
+                        </v-btn>
                     </v-card>
                 </v-col>
             </v-row>
@@ -122,32 +141,81 @@ const toggle = ref("left");
         <!-- FIM LISTA DE EMPRESAS -->
     </AppLayout>
 </template>
+
 <style scoped lang="scss">
-.content {
-    display: flex;
-    // align-items: center;
-}
-.image {
-    background-color: black;
-}
-.text {
-    margin: 0 15px;
-    min-width: 0;
-    h4 {
-        margin: 0;
+.company-card {
+    padding: 18px;
+    background: rgb(var(--v-theme-surface));
+    border: 1px solid rgba(var(--v-border-color), 0.1);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    transition: box-shadow 0.2s ease, border-color 0.2s ease;
+
+    &:hover {
+        border-color: rgba(var(--v-theme-primary), 0.35);
+        box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08);
     }
-    p {
+
+    &__top {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+    }
+
+    &__logo {
+        flex-shrink: 0;
+        background: rgba(var(--v-theme-on-surface), 0.05);
+    }
+
+    &__info {
+        flex: 1;
+        min-width: 0;
+    }
+
+    &__name {
         margin: 0;
+        font-size: 1.05rem;
+        font-weight: 600;
+        line-height: 1.3;
+        color: rgb(var(--v-theme-on-surface));
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    &__meta {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin-top: 2px;
+        font-size: 0.85rem;
+        color: rgba(var(--v-theme-on-surface), 0.7);
+    }
+
+    &__rating {
+        display: inline-flex;
+        align-items: center;
+        gap: 3px;
+        font-weight: 600;
+        color: rgb(var(--v-theme-on-surface));
+    }
+
+    &__dot {
+        width: 3px;
+        height: 3px;
+        border-radius: 50%;
+        background: rgba(var(--v-theme-on-surface), 0.35);
+    }
+
+    &__address {
+        margin: 2px 0 0;
+        font-size: 0.8rem;
+        color: rgba(var(--v-theme-on-surface), 0.55);
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
     }
 }
-.float-rate {
-    position: absolute;
-    top: 2px;
-    right: 5px;
-}
+
 .scrollable-list {
     overflow-y: auto;
     max-height: calc(100vh - 200px);
