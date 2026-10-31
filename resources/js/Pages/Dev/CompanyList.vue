@@ -1,7 +1,7 @@
 <script setup>
 import { reactive } from "vue";
 import { useMask } from "vuetify";
-import { Head, router } from "@inertiajs/vue3";
+import { Head, router, useForm } from "@inertiajs/vue3";
 import { route } from "ziggy-js";
 import AuthLayout from "@/layouts/AuthLayout.vue";
 import { useDialogAlert } from "@/composables/useDialogAlert";
@@ -30,8 +30,14 @@ const loading = reactive({
     company_settigns: false,
 });
 
+const form = useForm({
+    cpf: "",
+    cnpj: "",
+});
 const datatable = reactive({
-    items_per_page: 10,
+    page: 1,
+    items_per_page: 1,
+    sort_by: [],
     headers: [
         {
             title: "Nome",
@@ -139,16 +145,21 @@ function _getCompanySettings(company_id) {
     );
 }
 
-// CARREGAR DADOS DA TABELA
-function _loadData({ page, itemsPerPage, sortBy }) {
-    datatable.loading = true;
+function _search() {
+    datatable.page = 1;
+    _loadData();
+}
 
+// CARREGAR DADOS DA TABELA
+function _loadData() {
+    datatable.loading = true;
     router.get(
         route("company.listView"),
         {
-            page: page,
-            per_page: itemsPerPage,
-            sort_by: sortBy,
+            page: datatable.page,
+            per_page: datatable.items_per_page,
+            sort_by: datatable.sort_by,
+            filter: form.data(),
         },
         {
             preserveState: true,
@@ -177,16 +188,61 @@ function _loadData({ page, itemsPerPage, sortBy }) {
         </v-btn>
 
         <h3>Empresas</h3>
-
+        <v-row class="mb-3">
+            <v-col cols="12">
+                <div class="w-full">
+                    <v-form
+                        class="d-flex flex-column flex-md-row ga-4 align-md-center"
+                        @submit.prevent="_search"
+                    >
+                        <v-mask-input
+                            class="flex-grow-1"
+                            mask="##.###.###/####-##"
+                            label="CNPJ"
+                            variant="outlined"
+                            name="cnpj"
+                            prepend-inner-icon="mdi-magnify"
+                            clearable
+                            hide-details
+                            density="compact"
+                            v-model="form.cnpj"
+                        ></v-mask-input>
+                        <v-mask-input
+                            class="flex-grow-1"
+                            mask="###.###.###-##"
+                            label="CPF"
+                            variant="outlined"
+                            name="cpf"
+                            prepend-inner-icon="mdi-magnify"
+                            clearable
+                            hide-details
+                            density="compact"
+                            v-model="form.cpf"
+                        ></v-mask-input>
+                        <v-btn
+                            variant="flat"
+                            text="Buscar"
+                            append-icon="mdi-magnify"
+                            color="primary"
+                            class="flex-shrink-0"
+                            type="submit"
+                        >
+                        </v-btn>
+                    </v-form>
+                </div>
+            </v-col>
+        </v-row>
         <!-- #region tabela lista empresas -->
         <div>
             <v-data-table-server
                 v-model:items-per-page="datatable.items_per_page"
+                v-model:page="datatable.page"
+                v-model:sort-by="datatable.sort_by"
                 :headers="datatable.headers"
                 :items="$page.props.companies.data"
                 :items-length="$page.props.companies.total"
                 :loading="datatable.loading"
-                :items-per-page-options="[10, 25, 50]"
+                :items-per-page-options="[1, 10, 25, 50]"
                 gridlines="all"
                 item-value="id"
                 @update:options="_loadData"
@@ -809,7 +865,7 @@ function _loadData({ page, itemsPerPage, sortBy }) {
                                                 modal_show_company
                                                     .company_settigns
                                                     ?.value_monthly_fee,
-                                            ) ?? 'N/A'
+                                            ) ?? "N/A"
                                         }}
                                     </p>
                                 </v-list-item>

@@ -25,7 +25,7 @@ class CompanyController extends Controller
         ]);
         $per_page = $request->has('per_page') ? $request->per_page : 10;
         $sort_by = $request->has('sort_by') ? $request->sort_by : [];
-        $companies = $service->listViewData($per_page, $sort_by);
+        $companies = $service->listViewData($per_page, $sort_by, $request->input('filter', []));
         return Inertia::render('Dev/CompanyList', [
             'companies' => $companies
         ]);

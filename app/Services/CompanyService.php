@@ -89,9 +89,11 @@ final class CompanyService
     # ================================================================================= #
     #                                    View
     # ================================================================================= #
-    public function listViewData(?int $paginate = 10, array $sort_by = [])
+    public function listViewData(?int $paginate = 10, array $sort_by = [], array $filter = [])
     {
         $company = Company::query();
+        !empty($filter['cpf']) ? $company->where('cpf', 'like', "%{$filter['cpf']}%"):null;
+        !empty($filter['cnpj']) ? $company->where('cnpj', 'like', "%{$filter['cnpj']}%"):null;
         if (!empty($sort_by)) { //vuetify datatable
             $company->orderBy($sort_by[0]['key'], $sort_by[1]['order']);
         }
