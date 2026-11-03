@@ -17,7 +17,7 @@ class DeveloperController extends Controller
 {
     public function index()
     {
-        return Inertia::render('Owner/Index');
+        return Inertia::render('Dev/Index');
     }
 
     public function listView(Request $request, DeveloperService $service)

@@ -27,12 +27,7 @@ class PaymentMethodController extends Controller
     {
         $validator = Validator::make($request->all(), [
             'json_content' => ['required', 'array'],
-            'json_content.*' => ['required', 'array:name,account_type'],
-            'json_content.*.account_type' => [
-                'required',
-                'string',
-                Rule::in(AccountType::toArrayValues()),
-            ],
+            'json_content.*' => ['required', 'array:name'],
             'json_content.*.name' => [
                 'required',
                 'string',
@@ -41,8 +36,7 @@ class PaymentMethodController extends Controller
         ], [
             'json_content.required' => 'O conteúdo JSON é obrigatório.',
             'json_content.array' => 'O conteúdo JSON deve ser uma lista de objetos.',
-            'json_content.*.array' => 'Cada item do JSON deve ser um objeto com os campos account_type e name.',
-            'json_content.*.type.in' => 'O campo type deve ser receivable ou payable.',
+            'json_content.*.array' => 'Cada item do JSON deve ser um objeto com o campo: name.',
             'json_content.*.name.string' => 'O campo name deve ser um texto.',
             'json_content.*.name.regex' => 'Campo name só aceita palavras maiúsculas.',
         ]);

@@ -1,10 +1,8 @@
 [
     {
-        "name": "DINHEIRO",
-        "account_type": "receivable"
+        "name": "DINHEIRO"
     },
     {
-        "name": "PIX",
-        "account_type": "receivable"
+        "name": "PIX"
     }
 ]

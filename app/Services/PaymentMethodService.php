@@ -26,7 +26,6 @@ class PaymentMethodService
     {
         return PaymentMethod::create([
             'name' => strtoupper($data['name']),
-            'account_type' => $data['account_type'],
             'company_id' => $this->getCompanyId()
         ]);
     }

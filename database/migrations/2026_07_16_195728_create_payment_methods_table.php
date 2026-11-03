@@ -16,7 +16,6 @@ return new class extends Migration
         Schema::create('payment_methods', function (Blueprint $table) {
             $table->id();
             $table->string('name');
-            $table->enum('account_type', AccountType::toArrayValues());
             $table->boolean('is_active')->default(true);
             $table->foreignIdFor(Company::class)->constrained();
             $table->timestamps();
