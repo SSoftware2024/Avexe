@@ -49,10 +49,6 @@ watch(
     <Head title="Informações do Proprietário" />
     <AuthLayout>
         <h3>Métodos de pagamento (BASE)</h3>
-        <ul>
-            <li>Conta a receber → receivable</li>
-            <li>Conta a pagar → payable</li>
-        </ul>
         <div class="mb-3">
             <SectionCard title="Ações" width="100%">
                 <div class="d-flex flex-row ga-2">

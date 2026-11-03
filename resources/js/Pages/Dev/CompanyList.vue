@@ -190,6 +190,7 @@ function _loadData() {
 
         <h3>Empresas</h3>
 
+        <!-- #region formulário de filtro -->
         <v-row class="mb-3">
             <v-col cols="12">
                 <v-form @submit.prevent="_search">
@@ -281,6 +282,7 @@ function _loadData() {
                 </v-form>
             </v-col>
         </v-row>
+        <!-- #endregion formulário de filtro -->
 
         <!-- #region tabela lista empresas -->
         <div>
@@ -750,6 +752,35 @@ function _loadData() {
                                             modal_show_company.company
                                                 .appointment_max_days_in_advance ??
                                             "N/A"
+                                        }}
+                                    </p>
+                                </v-list-item>
+                                <v-divider class="my-2" />
+                                <v-list-item>
+                                    <p class="mb-0">
+                                        <strong
+                                            >Funcionário modifica horário de
+                                            trabalho:</strong
+                                        >
+                                        {{
+                                            formatBooleanToText(
+                                                modal_show_company.company
+                                                    .employee_can_change_appointment,
+                                            )
+                                        }}
+                                    </p>
+                                </v-list-item>
+                                <v-list-item>
+                                    <p class="mb-0">
+                                        <strong
+                                            >Funcionário troca
+                                            agendamento:</strong
+                                        >
+                                        {{
+                                            formatBooleanToText(
+                                                modal_show_company.company
+                                                    .employee_can_change_schedule,
+                                            )
                                         }}
                                     </p>
                                 </v-list-item>
