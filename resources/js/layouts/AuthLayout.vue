@@ -73,7 +73,7 @@ const dashboard_link = computed(() => {
 
     return route("owner");
 });
-
+// #region SEÇÃO SIDEBAR
 const nav_sections = computed(() => {
     return {
         developer: [
@@ -225,7 +225,7 @@ const nav_sections = computed(() => {
         ],
     };
 });
-
+//#endregion SEÇÃO SIDEBAR
 watch(
     () => page.url,
     () => {

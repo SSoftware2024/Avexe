@@ -10,4 +10,5 @@ enum TypeUser: string
     case CUSTOMER   = 'customer'; #cliente
     case OWNER   = 'owner'; #dono
     case DEVELOPER   = 'developer'; #desenvolvedor
+    case EMPLOYEE   = 'employee'; #funcionário
 }

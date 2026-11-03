@@ -18,7 +18,7 @@ class DatabaseSeeder extends Seeder
     public function run(): void
     {
         //user raiz
-        if (false) {
+        if (true) {
             User::create([
                 'name' => 'Tiago Alves',
                 'whatsapp' => '88994135616',

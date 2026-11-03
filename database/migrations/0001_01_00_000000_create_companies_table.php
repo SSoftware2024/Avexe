@@ -50,6 +50,8 @@ return new class extends Migration
             $table->smallInteger('cancellation_time_allowed')->nullable();
             $table->enum('cancellation_time_unit', TimeUnit::toArrayValues())->nullable();
             $table->tinyInteger('appointment_max_days_in_advance')->nullable(); #dias máximos futuros para agendar, nulo apenas no dia
+            $table->boolean('employee_can_change_appointment')->default(false); #funcionario troca agendamento
+            $table->boolean('employee_can_change_schedule')->default(false); #funcionario modifica horario de trabalho
             #dados
             $table->timestamps();
             $table->softDeletes();
