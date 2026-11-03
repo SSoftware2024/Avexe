@@ -165,7 +165,7 @@ function _closeDialog() {
                                     >Visualizar</v-list-item-title
                                 >
                             </v-list-item>
-                            <v-list-item>
+                            <v-list-item @click="_toggleActiveDeveloper(item)">
                                 <template v-slot:prepend>
                                     <v-icon size="small">
                                         {{
@@ -176,9 +176,7 @@ function _closeDialog() {
                                     </v-icon>
                                 </template>
 
-                                <v-list-item-title
-                                    @click="_toggleActiveDeveloper(item)"
-                                >
+                                <v-list-item-title>
                                     {{ item.active ? "Desativar" : "Ativar" }}
                                 </v-list-item-title>
                             </v-list-item>

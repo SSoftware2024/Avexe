@@ -19,6 +19,7 @@ const modal_show_user = reactive({
 });
 const form = useForm({
     name_email: "",
+    active: null
 });
 const datatable = reactive({
     items_per_page: 10,
@@ -67,7 +68,7 @@ function _loadData() {
             page: datatable.page,
             per_page: datatable.items_per_page,
             sort_by: datatable.sort_by,
-            filter: form.data()
+            filter: form.data(),
         },
         {
             preserveState: true,
@@ -120,39 +121,82 @@ function _closeDialog() {
             Novo
         </v-btn>
         <h3>Donos</h3>
+
         <v-row class="mb-3">
             <v-col cols="12">
-                <div class="w-full">
-                    <v-form
-                        class="d-flex flex-column flex-md-row ga-4 align-md-center"
-                        @submit.prevent="_search"
-                    >
+                <v-form @submit.prevent="_search">
+                    <v-row dense>
+                        <!-- Primeira linha: Nome / E-mail -->
+                        <v-col cols="12">
+                            <v-text-field
+                                class="w-full"
+                                label="Nome / E-mail"
+                                variant="outlined"
+                                name="name_email"
+                                prepend-inner-icon="mdi-magnify"
+                                clearable
+                                hide-details
+                                density="compact"
+                                v-model="form.name_email"
+                            />
+                        </v-col>
 
-                        <v-text-field
-                            class="flex-grow-1"
-                            mask="###.###.###-##"
-                            label="Nome / E-mail"
-                            variant="outlined"
-                            name="name_email"
-                            prepend-inner-icon="mdi-magnify"
-                            clearable
-                            hide-details
-                            density="compact"
-                            v-model="form.name_email"
-                        ></v-text-field>
-                        <v-btn
-                            variant="flat"
-                            text="Buscar"
-                            append-icon="mdi-magnify"
-                            color="primary"
-                            class="flex-shrink-0"
-                            type="submit"
-                        >
-                        </v-btn>
-                    </v-form>
-                </div>
+                        <!-- Segunda linha: Situação e botão -->
+                        <v-col cols="12">
+                            <div
+                                class="d-flex flex-column flex-sm-row align-sm-center justify-start ga-3 mt-2"
+                            >
+                                <div class="d-flex flex-column ga-1">
+                                    <span
+                                        class="text-caption text-medium-emphasis"
+                                    >
+                                        Situação
+                                    </span>
+
+                                    <v-btn-toggle
+                                        v-model="form.active"
+                                        mandatory
+                                        divided
+                                        density="compact"
+                                        color="primary"
+                                        variant="outlined"
+                                        rounded="lg"
+                                    >
+                                        <v-btn :value="null" size="small">
+                                            Todos
+                                        </v-btn>
+
+                                        <v-btn :value="true" size="small">
+                                            <v-icon start color="success">
+                                                mdi-check-circle
+                                            </v-icon>
+                                            Ativos
+                                        </v-btn>
+
+                                        <v-btn :value="false" size="small">
+                                            <v-icon start color="error">
+                                                mdi-close-circle
+                                            </v-icon>
+                                            Inativos
+                                        </v-btn>
+                                    </v-btn-toggle>
+                                </div>
+
+                                <v-btn
+                                    variant="flat"
+                                    text="Buscar"
+                                    append-icon="mdi-magnify"
+                                    color="primary"
+                                    type="submit"
+                                    class="align-self-sm-end"
+                                />
+                            </div>
+                        </v-col>
+                    </v-row>
+                </v-form>
             </v-col>
         </v-row>
+
         <div>
             <v-data-table-server
                 v-model:items-per-page="datatable.items_per_page"
@@ -223,9 +267,7 @@ function _closeDialog() {
                                     </v-icon>
                                 </template>
 
-                                <v-list-item-title
-                                   
-                                >
+                                <v-list-item-title>
                                     {{ item.active ? "Desativar" : "Ativar" }}
                                 </v-list-item-title>
                             </v-list-item>

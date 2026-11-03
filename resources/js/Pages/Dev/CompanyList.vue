@@ -33,6 +33,7 @@ const loading = reactive({
 const form = useForm({
     cpf: "",
     cnpj: "",
+    active: null,
 });
 const datatable = reactive({
     page: 1,
@@ -188,50 +189,99 @@ function _loadData() {
         </v-btn>
 
         <h3>Empresas</h3>
+
         <v-row class="mb-3">
             <v-col cols="12">
-                <div class="w-full">
-                    <v-form
-                        class="d-flex flex-column flex-md-row ga-4 align-md-center"
-                        @submit.prevent="_search"
-                    >
-                        <v-mask-input
-                            class="flex-grow-1"
-                            mask="##.###.###/####-##"
-                            label="CNPJ"
-                            variant="outlined"
-                            name="cnpj"
-                            prepend-inner-icon="mdi-magnify"
-                            clearable
-                            hide-details
-                            density="compact"
-                            v-model="form.cnpj"
-                        ></v-mask-input>
-                        <v-mask-input
-                            class="flex-grow-1"
-                            mask="###.###.###-##"
-                            label="CPF"
-                            variant="outlined"
-                            name="cpf"
-                            prepend-inner-icon="mdi-magnify"
-                            clearable
-                            hide-details
-                            density="compact"
-                            v-model="form.cpf"
-                        ></v-mask-input>
-                        <v-btn
-                            variant="flat"
-                            text="Buscar"
-                            append-icon="mdi-magnify"
-                            color="primary"
-                            class="flex-shrink-0"
-                            type="submit"
-                        >
-                        </v-btn>
-                    </v-form>
-                </div>
+                <v-form @submit.prevent="_search">
+                    <v-row dense>
+                        <!-- Primeira linha: CNPJ e CPF -->
+                        <v-col cols="12" md="6">
+                            <v-mask-input
+                                class="w-full"
+                                mask="##.###.###/####-##"
+                                label="CNPJ"
+                                variant="outlined"
+                                name="cnpj"
+                                prepend-inner-icon="mdi-magnify"
+                                clearable
+                                hide-details
+                                density="compact"
+                                v-model="form.cnpj"
+                            />
+                        </v-col>
+
+                        <v-col cols="12" md="6">
+                            <v-mask-input
+                                class="w-full"
+                                mask="###.###.###-##"
+                                label="CPF"
+                                variant="outlined"
+                                name="cpf"
+                                prepend-inner-icon="mdi-magnify"
+                                clearable
+                                hide-details
+                                density="compact"
+                                v-model="form.cpf"
+                            />
+                        </v-col>
+
+                        <!-- Segunda linha: Situação e botão -->
+                        <v-col cols="12">
+                            <div
+                                class="d-flex flex-column flex-sm-row align-sm-center justify-start ga-3 mt-2"
+                            >
+                                <div class="d-flex flex-column ga-1">
+                                    <span
+                                        class="text-caption text-medium-emphasis"
+                                    >
+                                        Situação
+                                    </span>
+
+                                    <v-btn-toggle
+                                        v-model="form.active"
+                                        mandatory
+                                        divided
+                                        density="compact"
+                                        color="primary"
+                                        variant="outlined"
+                                        rounded="lg"
+                                        @change="_search"
+                                    >
+                                        <v-btn :value="null" size="small">
+                                            Todos
+                                        </v-btn>
+
+                                        <v-btn :value="true" size="small">
+                                            <v-icon start color="success">
+                                                mdi-check-circle
+                                            </v-icon>
+                                            Ativos
+                                        </v-btn>
+
+                                        <v-btn :value="false" size="small">
+                                            <v-icon start color="error">
+                                                mdi-close-circle
+                                            </v-icon>
+                                            Inativos
+                                        </v-btn>
+                                    </v-btn-toggle>
+                                </div>
+
+                                <v-btn
+                                    variant="flat"
+                                    text="Buscar"
+                                    append-icon="mdi-magnify"
+                                    color="primary"
+                                    type="submit"
+                                    class="align-self-sm-end"
+                                />
+                            </div>
+                        </v-col>
+                    </v-row>
+                </v-form>
             </v-col>
         </v-row>
+
         <!-- #region tabela lista empresas -->
         <div>
             <v-data-table-server

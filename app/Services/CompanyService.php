@@ -94,6 +94,7 @@ final class CompanyService
         $company = Company::query();
         !empty($filter['cpf']) ? $company->where('cpf', 'like', "%{$filter['cpf']}%"):null;
         !empty($filter['cnpj']) ? $company->where('cnpj', 'like', "%{$filter['cnpj']}%"):null;
+        isset($filter['active']) ? $company->where('active', filter_var($filter['active'], FILTER_VALIDATE_BOOLEAN)  ? 1 : 0):null;
         if (!empty($sort_by)) { //vuetify datatable
             $company->orderBy($sort_by[0]['key'], $sort_by[1]['order']);
         }
