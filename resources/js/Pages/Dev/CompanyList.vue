@@ -1,12 +1,16 @@
 <script setup>
-import { reactive } from "vue";
+import { reactive, ref, computed } from "vue";
 import { useMask } from "vuetify";
 import { Head, router, useForm } from "@inertiajs/vue3";
 import { route } from "ziggy-js";
-import AuthLayout from "@/layouts/AuthLayout.vue";
 import { useDialogAlert } from "@/composables/useDialogAlert";
+import { useDate } from "vuetify";
+import AuthLayout from "@/layouts/AuthLayout.vue";
+import DateMonth from "@/components/DateMonth.vue";
+
+const date_util = useDate();
 import {
-    formatDate,
+    formatDateBrString,
     formatBooleanToText,
     formatMoneyToBrString,
 } from "@/utils/functions";
@@ -34,6 +38,8 @@ const form = useForm({
     cpf: "",
     cnpj: "",
     active: null,
+    date_payment: "",
+    date_payment_type: "month",
 });
 const datatable = reactive({
     page: 1,
@@ -78,6 +84,16 @@ const datatable = reactive({
     loading: false,
 });
 
+const date_format_computed = computed(() => {
+    if (form.date_payment_type === "month") {
+        return form.date_payment;
+    } else if (form.date_payment && form.date_payment_type === "day") {
+        return date_util.format(form.date_payment, "keyboardDate");
+    } else {
+        return null;
+    }
+});
+
 // VISUALIZAR EMPRESA
 function _showCompany(item) {
     modal_show_company.company = item;
@@ -91,6 +107,7 @@ function _closeDialog() {
     modal_show_company.dialog = false;
     modal_show_company.company = null;
 }
+
 // EDITAR EMPRESA
 function _edit(item) {
     router.get(route("company.createOrUpdateView", [item.id]));
@@ -160,7 +177,10 @@ function _loadData() {
             page: datatable.page,
             per_page: datatable.items_per_page,
             sort_by: datatable.sort_by,
-            filter: form.data(),
+            filter: {
+                ...form.data(),
+                date_payment: date_format_computed.value,
+            },
         },
         {
             preserveState: true,
@@ -194,7 +214,7 @@ function _loadData() {
         <v-row class="mb-3">
             <v-col cols="12">
                 <v-form @submit.prevent="_search">
-                    <v-row dense>
+                    <v-row density="compact">
                         <!-- Primeira linha: CNPJ e CPF -->
                         <v-col cols="12" md="6">
                             <v-mask-input
@@ -224,6 +244,58 @@ function _loadData() {
                                 density="compact"
                                 v-model="form.cpf"
                             />
+                        </v-col>
+
+                        <v-col cols="12" md="6">
+                            <div class="d-flex flex-column ga-2">
+                                <!-- Tipo de busca -->
+                                <div class="d-flex flex-row justify-end">
+                                    <v-btn-toggle
+                                        v-model="form.date_payment_type"
+                                        mandatory
+                                        density="compact"
+                                        color="primary"
+                                        variant="outlined"
+                                        rounded="lg"
+                                        divided
+                                        @update:model-value="
+                                            form.date_payment = null
+                                        "
+                                    >
+                                        <v-btn value="month" size="small">
+                                            <v-icon start size="small"
+                                                >mdi-calendar-month</v-icon
+                                            >
+                                            Mês
+                                        </v-btn>
+
+                                        <v-btn value="day" size="small">
+                                            <v-icon start size="small"
+                                                >mdi-calendar</v-icon
+                                            >
+                                            Dia
+                                        </v-btn>
+                                    </v-btn-toggle>
+                                </div>
+                                <v-date-input
+                                    v-if="form.date_payment_type === 'day'"
+                                    variant="outlined"
+                                    label="Data pagamento"
+                                    autocomplete="false"
+                                    v-model="form.date_payment"
+                                    density="compact"
+                                    :error-messages="form.errors.date_payment"
+                                    :hide-details="!form.errors.date_payment"
+                                ></v-date-input>
+
+                                <DateMonth
+                                    v-else
+                                    v-model="form.date_payment"
+                                    label="Mês do pagamento"
+                                    :error-messages="form.errors.date_payment"
+                                    :hide-details="!form.errors.date_payment"
+                                />
+                            </div>
                         </v-col>
 
                         <!-- Segunda linha: Situação e botão -->
@@ -914,7 +986,7 @@ function _loadData() {
                                         {{
                                             modal_show_company.company_settigns
                                                 ?.date_payment
-                                                ? formatDate(
+                                                ? formatDateBrString(
                                                       modal_show_company
                                                           .company_settigns
                                                           ?.date_payment,
@@ -960,7 +1032,7 @@ function _loadData() {
                                     <p class="mb-0">
                                         <strong>Criado em:</strong>
                                         {{
-                                            formatDate(
+                                            formatDateBrString(
                                                 modal_show_company.company
                                                     .created_at,
                                             )
@@ -972,7 +1044,7 @@ function _loadData() {
                                     <p class="mb-0">
                                         <strong>Atualizado em:</strong>
                                         {{
-                                            formatDate(
+                                            formatDateBrString(
                                                 modal_show_company.company
                                                     .updated_at,
                                             )
@@ -984,7 +1056,7 @@ function _loadData() {
                                     <p class="mb-0">
                                         <strong>Deletado em:</strong>
                                         {{
-                                            formatDate(
+                                            formatDateBrString(
                                                 modal_show_company.company
                                                     .deleted_at,
                                             )

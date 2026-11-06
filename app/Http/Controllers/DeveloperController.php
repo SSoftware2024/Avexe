@@ -17,6 +17,11 @@ class DeveloperController extends Controller
 {
     public function index()
     {
+        //empresas ativas e inativas
+        //usuarios ativos e inativos
+        //valor mensal especulação mes
+        //empresas pagar este mes
+        //fazer url de filtro
         return Inertia::render('Dev/Index');
     }
 

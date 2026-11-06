@@ -67,7 +67,7 @@ function copyText(value) {
 function formatBooleanToText(value) {
     return value ? "SIM" : "NÃO";
 }
-function formatDate(date) {
+function formatDateBrString(date) {
     if (!date) return "N/A";
     return new Date(date).toLocaleDateString("pt-BR");
 }
@@ -85,7 +85,7 @@ export {
     money3Config,
     getCurrentLocation,
     copyText,
-    formatDate,
+    formatDateBrString,
     formatBooleanToText,
     formatMoneyToBrString,
 };

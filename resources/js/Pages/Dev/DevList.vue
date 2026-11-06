@@ -5,7 +5,7 @@ import { Head, router, usePage } from "@inertiajs/vue3";
 import { route } from "ziggy-js";
 import { useDialogAlert } from "@/composables/useDialogAlert";
 import { useMask } from "vuetify";
-import { formatDate, formatBooleanToText } from "@/utils/functions";
+import { formatDateBrString, formatBooleanToText } from "@/utils/functions";
 import userType from "@/enum/userType";
 
 const page = usePage();
@@ -328,7 +328,7 @@ function _closeDialog() {
                                                 >E-mail Verif.:</span
                                             >
                                             {{
-                                                formatDate(
+                                                formatDateBrString(
                                                     modal_show_user.user
                                                         .email_verified_at,
                                                 )
@@ -364,7 +364,7 @@ function _closeDialog() {
                                                 >Data Nasc.:</span
                                             >
                                             {{
-                                                formatDate(
+                                                formatDateBrString(
                                                     modal_show_user.user
                                                         .date_of_birth,
                                                 )
@@ -377,7 +377,7 @@ function _closeDialog() {
                                                 >Criado em:</span
                                             >
                                             {{
-                                                formatDate(
+                                                formatDateBrString(
                                                     modal_show_user.user
                                                         .created_at,
                                                 )
@@ -390,7 +390,7 @@ function _closeDialog() {
                                                 >Atualizado em:</span
                                             >
                                             {{
-                                                formatDate(
+                                                formatDateBrString(
                                                     modal_show_user.user
                                                         .updated_at,
                                                 )
@@ -403,7 +403,7 @@ function _closeDialog() {
                                                 >Deletado em:</span
                                             >
                                             {{
-                                                formatDate(
+                                                formatDateBrString(
                                                     modal_show_user.user
                                                         .deleted_at,
                                                 )

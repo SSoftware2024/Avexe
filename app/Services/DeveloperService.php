@@ -14,4 +14,8 @@ final class DeveloperService extends BaseUserService
     {
         $this->userType = TypeUser::DEVELOPER;
     }  
+    /* ========================================================================== */
+    /*                                  VIEW DATA                                 */
+    /* ========================================================================== */
+    public function dashboardDataView(){}
 }

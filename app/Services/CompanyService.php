@@ -92,9 +92,21 @@ final class CompanyService
     public function listViewData(?int $paginate = 10, array $sort_by = [], array $filter = [])
     {
         $company = Company::query();
-        !empty($filter['cpf']) ? $company->where('cpf', 'like', "%{$filter['cpf']}%"):null;
-        !empty($filter['cnpj']) ? $company->where('cnpj', 'like', "%{$filter['cnpj']}%"):null;
-        isset($filter['active']) ? $company->where('active', filter_var($filter['active'], FILTER_VALIDATE_BOOLEAN)  ? 1 : 0):null;
+        !empty($filter['cpf']) ? $company->where('cpf', 'like', "%{$filter['cpf']}%") : null;
+        !empty($filter['cnpj']) ? $company->where('cnpj', 'like', "%{$filter['cnpj']}%") : null;
+        isset($filter['active']) ? $company->where('active', filter_var($filter['active'], FILTER_VALIDATE_BOOLEAN)  ? 1 : 0) : null;
+        if (!empty($filter['date_payment']) && $filter['date_payment_type'] === 'month') {
+            $time = strtotime($filter['date_payment']);
+            $month = date('m', $time);
+            $year = date('Y', $time);
+            $company->whereHas('companySystemSettings', function ($query) use ($month, $year) {
+                $query->whereMonth('date_payment', $month)->whereYear('date_payment', $year);
+            });
+        } else if (!empty($filter['date_payment']) && $filter['date_payment_type'] === 'day') { //day
+            $company->whereHas('companySystemSettings', function ($query) use($filter) {
+                $query->whereDate('date_payment', \DateTime::createFromFormat('d/m/Y', $filter['date_payment'])->format('Y-m-d'));
+            });
+        }
         if (!empty($sort_by)) { //vuetify datatable
             $company->orderBy($sort_by[0]['key'], $sort_by[1]['order']);
         }

@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
 class Company extends Model
 {
@@ -14,6 +15,10 @@ class Company extends Model
     #                                    Relacionamentos
     # ================================================================================= #
 
+    public function companySystemSettings(): HasOne
+    {
+        return $this->hasOne(CompanySystemSetting::class);
+    }
     public function owners(): HasMany
     {
         return $this->hasMany(User::class);
