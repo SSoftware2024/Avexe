@@ -11,7 +11,10 @@ class CompanySystemSetting extends Model
 {
     use SoftDeletes;
     protected $guarded = [];
-
+    
+    /* ========================================================================== */
+    /*                               RELACIONAMENTOS                              */
+    /* ========================================================================== */
 
     public function company(): BelongsTo
     {

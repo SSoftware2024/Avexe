@@ -29,10 +29,6 @@ class PaymentMethodService
             'company_id' => $this->getCompanyId()
         ]);
     }
-    public function delete(int $id): int
-    {
-        return PaymentMethod::where('id', $id)->delete();
-    }
     #region METÓDOS JSON
     public function getJsonFilePath(string $path = 'storage', bool $decoded = false): mixed
     {
@@ -78,6 +74,13 @@ class PaymentMethodService
         return $is_valid;
     }
     #endregion FIM METÓDOS JSON
+    /* ========================================================================== */
+    /*                             STATIC PREFIXO 'S'                             */
+    /* ========================================================================== */
+    public static function s_delete(int $id): int
+    {
+        return PaymentMethod::where('id', $id)->delete();
+    }
     /* ========================================================================== */
     /*                                  PRIVADOS                                  */
     /* ========================================================================== */

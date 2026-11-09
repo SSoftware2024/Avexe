@@ -76,7 +76,7 @@ class DeveloperController extends Controller
         $data = $request->all();
         is_null($id) ?
             $service->create($data) :
-            $service->update($data, $id);
+            $service::s_update($data, $id);
         Toast::success('Operação realizada com sucesso!');
     }
 
@@ -92,7 +92,7 @@ class DeveloperController extends Controller
         if ($validator->fails()) {
             DialogAlert::warning($validator->errors()->get('id')[0]);
         } else {
-            $service->delete($id);
+            $service::s_delete($id);
             Toast::success('Operação realizada com sucesso!');
         }
     }

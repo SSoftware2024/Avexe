@@ -9,6 +9,14 @@ use Illuminate\Support\Facades\Hash;
 abstract class BaseUserService
 {
     protected TypeUser $userType;
+
+    /**
+     * create
+     *
+     * @param array $data
+     *
+     * @return User
+     */
     public function create(array $data): User
     {
         $user = User::create([
@@ -24,8 +32,25 @@ abstract class BaseUserService
         //futuramente colocar envio de email aq
         return $user;
     }
+    /**
+     * count
+     *
+     * @param string $column [coluna da tabela]
+     * @param string $operator [operadores lógicos]
+     * @param mixed $value [valor da coluna a contar]
+     *
+     * @return int
+     */
+    public function count(string $column, string $operator, mixed $value): int
+    {
+        return User::where('user_type', $this->userType->value)
+            ->where($column, $operator, $value)->count();
+    }
+    /* ========================================================================== */
+    /*                              STATIC PREFIX 'S'                             */
+    /* ========================================================================== */
 
-    public function update(array $data, int $id): int
+    public static function s_update(array $data, int $id): int
     {
         $values = [
             'name' => $data['name'],
@@ -44,37 +69,40 @@ abstract class BaseUserService
 
         return $updated;
     }
-    public function delete(int $id): int
+
+    public static function s_delete(int $id): int
     {
         //futuramente deletar suas relações primeiro, caso use forceDelete
         $deleted = User::where('id', $id)->forceDelete();
         return $deleted;
     }
-    public function toggleActive(int $id): int
+
+    public static function s_toggleActive(int $id): int
     {
         $user = User::find($id);
         $user->active = !$user->active;
         return $user->save();
     }
 
-    public function getUserData(int $id): ?User //dado
+    public static function s_getUserData(int $id): ?User
     {
         $user = User::find($id);
         return $user;
     }
-    public function count(string $column, string $operator, mixed $value)
-    {
-        return User::where('user_type', $this->userType->value)
-            ->where($column, $operator, $value)->count();
-    }
-    /* ========================================================================== */
-    /*                                   STATIC                                   */
-    /* ========================================================================== */
 
-    # ================================================================================= #
-    #                                    View
-    # ================================================================================= #
-    public function getListViewData(?int $paginate = 10, array $sort_by = [], array $filter = [])
+    /* ========================================================================== */
+    /*                                    VIEW                                    */
+    /* ========================================================================== */    
+    /**
+     *  getListViewData
+     *
+     * @param ?int $paginate
+     * @param array $sort_by
+     * @param array $filter [name_email, active]
+     *
+     * @return mixed UserPaginate<App\Models\User>
+     */
+    public function getListViewData(?int $paginate = 10, array $sort_by = [], array $filter = []): mixed
     {
         $users = User::where('id', '!=', auth()->id())->where('user_type', $this->userType->value);
         isset($filter['active']) ? $users->where('active', filter_var($filter['active'], FILTER_VALIDATE_BOOLEAN)  ? 1 : 0) : null;

@@ -80,7 +80,7 @@ class FortifyServiceProvider extends ServiceProvider
             $rule_email_whatsapp = [];
             $column_name = 'email';
 
-            if (! Str::contains($username, '@') && preg_match('/\d/', $username)) {
+            if (!Str::contains($username, '@') && preg_match('/\d/', $username)) { //verifica se é numero whatsapp
                 $rule_email_whatsapp = ['string', 'digits:11', 'exists:users,whatsapp'];
                 $column_name = 'whatsapp';
             } else {

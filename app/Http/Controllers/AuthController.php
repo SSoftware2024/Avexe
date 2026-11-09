@@ -12,6 +12,12 @@ use Inertia\Inertia;
 
 class AuthController extends Controller
 {
+    /**
+     * index
+     * 
+     * Redirecionamento para dashbord por usuário
+     * @return mixed redirect
+     */
     public function index()
     {
         $user_type = Auth::user()->user_type;
@@ -25,7 +31,6 @@ class AuthController extends Controller
             case TypeUser::OWNER->value:
                 return redirect()->route('owner');
                 break;
-
             default:
                 # code...
                 break;

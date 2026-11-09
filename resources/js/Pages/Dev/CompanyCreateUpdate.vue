@@ -13,7 +13,7 @@ const new_owner_dialog = ref(false);
 const tab = ref("company");
 function _ownersByCompanyIds() {
     const owners = page.props?.ownersByCompany ?? [];
-    return owners.map((owner) => owner.id);
+    return owners.map((owner) => owner.id); //filtrando apenas o id
 }
 
 onMounted(() => {});

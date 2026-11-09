@@ -25,7 +25,7 @@ class CompanyController extends Controller
         ]);
         $per_page = $request->has('per_page') ? $request->per_page : 10;
         $sort_by = $request->has('sort_by') ? $request->sort_by : [];
-        $companies = $service->listViewData($per_page, $sort_by, $request->input('filter', []));
+        $companies = $service::s_listViewData($per_page, $sort_by, $request->input('filter', []));
         return Inertia::render('Dev/CompanyList', [
             'companies' => $companies
         ]);
@@ -35,7 +35,7 @@ class CompanyController extends Controller
         CompanyService $service,
         ?int $id = null
     ) {
-        $data = $service->createOrUpdateViewData($id);
+        $data = $service::s_createOrUpdateViewData($id);
         return Inertia::render('Dev/CompanyCreateUpdate', $data);
     }
 
@@ -68,14 +68,14 @@ class CompanyController extends Controller
         ]);
         $data = $request->all();
         if (empty($data['id'])) {
-            $company = $service->create($data, $data['owners_ids']);
+            $company = $service::s_create($data, $data['owners_ids']);
             Toast::success('Empresa cadastrada com sucesso!');
             Toast::info('Tela de edição empresa');
             return redirect()->route('company.createOrUpdateView', [
                 'id' => $company->id
             ]);
         } else {
-            $total_rows = $service->updateByDeveloper($data['id'], $data, $data['old_owners_id']);
+            $total_rows = $service::s_updateByDeveloper($data['id'], $data, $data['old_owners_id']);
             Toast::success("$total_rows registros atualizados com sucesso");
         }
 
@@ -87,7 +87,7 @@ class CompanyController extends Controller
         $request->validate([
             'id' => ['required', 'integer', Rule::exists('companies', 'id')]
         ]);
-        $service->toggleActive($request->id);
+        $service::s_toggleActive($request->id);
     }
 
     public function delete(CompanyService $service, int $id)
@@ -98,7 +98,7 @@ class CompanyController extends Controller
         if ($validator->fails()) {
             DialogAlert::warning($validator->errors()->get('id')[0]);
         } else {
-            $owners_disassociated_total = $service->delete($id);
+            $owners_disassociated_total = $service::s_delete($id);
             Toast::success("$owners_disassociated_total donos desassociados");
         }
     }

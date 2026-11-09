@@ -1,5 +1,5 @@
 <script setup>
-import { computed } from "vue";
+import { computed, watch } from "vue";
 import { useForm } from "@inertiajs/vue3";
 import { onMounted } from "vue";
 import { route } from "ziggy-js";
@@ -63,7 +63,7 @@ function _save() {
     } else {
         form.transform((data) => ({
             ...data,
-            old_owners_id: props.owners_selected_ids 
+            old_owners_id: props.owners_selected_ids,
         })).patch(url, {
             onSuccess: () => {
                 is_update.value ? null : form.reset();
@@ -72,11 +72,17 @@ function _save() {
     }
 }
 
-onMounted(() => {
-    if (props.company) {
-        _load();
-    }
-});
+//usado para redirect no backend, prop não atualizava no front tinah delay (carregava front e depois o back)
+watch(
+    () => props.company,
+    (newValue) => {
+        if (props.company) {
+            _load();
+        }
+    },
+    { immediate: true },
+);
+
 </script>
 
 <template>

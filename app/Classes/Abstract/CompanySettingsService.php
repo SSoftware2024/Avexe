@@ -4,6 +4,9 @@ namespace App\Classes\Abstract;
 
 use App\Models\CompanyOperatingHours;
 
+/**
+ * CompanySettingsService - relacionamentos 1-1 com empresa(company)
+ */
 abstract class CompanySettingsService
 {
     private int $company_id = 0;
@@ -17,17 +20,30 @@ abstract class CompanySettingsService
     public function getCompanyId()
     {
         return $this->company_id;
-    }
+    }    
+    /**
+     * save
+     * 
+     * Cadastra ou atualiza registro
+     * @param array $data
+     *
+     * @return void
+     */
     public function save(array $data)
     {
         $this->exists() ? $this->update($data) : $this->create($data);
-    }
-    public function exists()
+    }    
+    public function exists():bool
     {
         $model = $this->getModel()::query()->where($this->column_id, $this->company_id);
         return $this->getModel() === CompanyOperatingHours::class ? $model->count() == 7 : $model->exists();
-    }
-    public function get()
+    }    
+    /**
+     * get
+     *
+     * @return mixed CompanyOperatingHoursList|CompanySystemSetting
+     */
+    public function get():mixed
     {
         $model = $this->getModel()::query()->where($this->column_id, $this->company_id);
         return $this->getModel() === CompanyOperatingHours::class ? $model->get() : $model->first();
@@ -45,7 +61,7 @@ abstract class CompanySettingsService
     {
         $model = $this->getModel()::query();
         $model->where($this->column_id, $this->company_id);
-        if (array_key_exists('day_of_week', $data)) {
+        if (array_key_exists('day_of_week', $data)) { //atualiza o horário de funcionamento modificado
             $model->where('day_of_week', $data['day_of_week']);
         }
         $model->update($data);

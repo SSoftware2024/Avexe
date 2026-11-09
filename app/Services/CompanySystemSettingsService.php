@@ -27,7 +27,14 @@ final class CompanySystemSettingsService extends CompanySettingsService
             'value_monthly_fee' => $data['value_monthly_fee'],
         ]);
     }
-
+    
+    /**
+     * s_monthlyAmount
+     * Retorna quantidade de empresas e valor total a receber no mês
+     * @param string $month
+     *
+     * @return array [count,value_total_month]
+     */
     public static function s_monthlyAmount(string $month): array
     {
         $time = strtotime($month);
@@ -39,7 +46,14 @@ final class CompanySystemSettingsService extends CompanySettingsService
             'count' => $companySystemSettings->count(),
             'value_total_month' => $companySystemSettings->sum('value_monthly_fee')
         ];
-    }
+    }    
+    /**
+     * s_dateExpired
+     * Retorna quantidade de empresas e as empresas que não pagaram na data
+     * @param string $date
+     *
+     * @return array [count, company_ids]
+     */
     public static function s_dateExpired(string $date): array
     {
         $companySystemSettings = CompanySystemSetting::select('company_id', 'date_payment')

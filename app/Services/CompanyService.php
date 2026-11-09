@@ -11,8 +11,20 @@ use App\Services\PaymentMethodService;
 use Illuminate\Database\Eloquent\Collection;
 
 final class CompanyService
-{
-    public function create(array $data, array $owners_id): Company
+{    
+    /* ========================================================================== */
+    /*                              STATIC PREFIXO 'S'                            */
+    /* ========================================================================== */
+    /**
+     * create
+     * 
+     * Cadastra empresa, associa donos e formas de pagamento
+     * @param array $data
+     * @param array $owners_id
+     *
+     * @return Company
+     */
+    public static function s_create(array $data, array $owners_id): Company
     {
         $company = Company::create([
             'cpf' => $data['cpf'],
@@ -21,13 +33,22 @@ final class CompanyService
             'corporate_name' => $data['corporate_name'],
             'tag_url' => $data['tag_url'],
         ]);
-        $this->associateOwners($owners_id, $company->id);
-        $this->associatePaymentMethods($company->id);
-
+        self::s_associateOwners($owners_id, $company->id);
+        self::s_associatePaymentMethods($company->id);
         return $company;
-    }
-
-    public function updateByDeveloper(int $id, array $data, array $old_owners_id): int
+    }    
+    /**
+     * s_updateByDeveloper
+     *
+     * @param int $id 
+     * @param array $data 
+     * @param array $old_owners_id - donos relacionados antes de atualizar
+     *
+     * @return int 
+     * 
+     * Total de linha afetas empresa e donos
+     */
+    public static function s_updateByDeveloper(int $id, array $data, array $old_owners_id): int
     {
 
         $total_rows = Company::where('id', $id)->update([
@@ -39,53 +60,63 @@ final class CompanyService
         ]);
         $owners_id = $data['owners_ids'];
         $new_owners_id = array_values(array_diff($owners_id, $old_owners_id));
-        $remove_owners_id = array_values(array_diff($old_owners_id, $owners_id));
+        $remove_owners_id = array_values(array_diff($old_owners_id, $owners_id)); //antigos donos não encontrados na atualização, remover
         if (!empty($remove_owners_id)) {
-            $total_rows += $this->removeOwners($id, $remove_owners_id);
+            $total_rows += self::s_removeOwners($id, $remove_owners_id);
         }
         if (!empty($new_owners_id)) {
-            $total_rows += $this->associateOwners($new_owners_id, $id);
+            $total_rows += self::s_associateOwners($new_owners_id, $id);
         }
         return $total_rows;
     }
 
-    public function getOwnersNotSelected(): Collection
+    public static function s_getOwnersNotSelected(): Collection
     {
         return User::where('user_type', TypeUser::OWNER->value)
             ->whereNull('company_id')->get(['id', 'name', 'user_type']);
-    }
-    public function getAllOwnersAvailable(?array $ids = []): Collection
+    }    
+    /**
+     * s_getAllOwnersAvailable
+     * 
+     * Donos disponiveis para vinculação
+     * Donos que não estão associados a uma empresa e podem ser vinculados e em caso de atualização, passar donos já vinculados a ela
+     *
+     * @param ?array $owners_ids [explicite description]
+     *
+     * @return Collection UserGet(id, name, user_type)
+     */
+    public static function s_getAllOwnersAvailable(?array $owners_ids = []): Collection
     {
         $user = User::where('user_type', TypeUser::OWNER->value)
             ->whereNull('company_id');
-        if (!empty($ids)) { //caso de edição, mostra os relacionados
-            $user->orWhereIn('id', $ids);
+        if (!empty($owners_ids)) { //caso de edição, mostra os relacionados
+            $user->orWhereIn('id', $owners_ids);
         }
         return $user->get(['id', 'name', 'user_type']);
     }
-    public function getOwnersSelectedByCompany(int $id): Collection
+    public static function s_getOwnersSelectedByCompany(int $id): Collection
     {
         return User::where('user_type', TypeUser::OWNER->value)
             ->where('company_id', $id)->get(['id', 'name', 'user_type']);
     }
 
-    public function toggleActive(int $id)
+    public static function s_toggleActive(int $id):void
     {
         $company = Company::select('id', 'active')->find($id);
         $company->active = !$company->active;
         $company->save();
     }
 
-    public function delete(int $id)
+    public static function s_delete(int $id):int
     {
-        $owners_disassociated_total = $this->removeOwners($id);
-        $this->removePaymentMethods($id);
+        $owners_disassociated_total = self::s_removeOwners($id);
+        self::s_removePaymentMethods($id);
         (new CompanyOperatingHoursService($id))->delete();
         (new CompanySystemSettingsService($id))->delete();
         Company::where('id', $id)->forceDelete();
         return $owners_disassociated_total;
     }
-    public function count(string $column, string $operator, mixed $value)
+    public static function s_count(string $column, string $operator, mixed $value):int
     {
         return Company::where($column, $operator, $value)->count();
     }
@@ -93,9 +124,10 @@ final class CompanyService
     # ================================================================================= #
     #                                    View
     # ================================================================================= #
-    public function listViewData(?int $paginate = 10, array $sort_by = [], array $filter = [])
+    public static function s_listViewData(?int $paginate = 10, array $sort_by = [], array $filter = [])
     {
         $company = Company::query();
+        #region filtro empresa
         !empty($filter['cpf']) ? $company->where('cpf', 'like', "%{$filter['cpf']}%") : null;
         !empty($filter['cnpj']) ? $company->where('cnpj', 'like', "%{$filter['cnpj']}%") : null;
         isset($filter['active']) ? $company->where('active', filter_var($filter['active'], FILTER_VALIDATE_BOOLEAN)  ? 1 : 0) : null;
@@ -114,23 +146,24 @@ final class CompanyService
         if (!empty($sort_by)) { //vuetify datatable
             $company->orderBy($sort_by[0]['key'], $sort_by[1]['order']);
         }
+        #endregion filtro empresa
         $company = $company->paginate($paginate);
         return $company;
     }
-    public function createOrUpdateViewData(?int $id = null): array
+    public static function s_createOrUpdateViewData(?int $id = null): array
     {
 
         $ownersByCompany = [];
         $company = $owners_avalable = $operatingHours = $systemSettings = null;
         if (!empty($id)) {
-            $ownersByCompany = $this->getOwnersSelectedByCompany($id);
+            $ownersByCompany = self::s_getOwnersSelectedByCompany($id);
             $company = Company::select('id', 'name', 'corporate_name', 'cpf', 'cnpj', 'tag_url', 'active')->find($id);
             $owners_avalable = $ownersByCompany->pluck('id')->toArray();
             $operatingHours = (new CompanyOperatingHoursService($id))->get();
             $systemSettings = (new CompanySystemSettingsService($id))->get();
             empty($systemSettings) ? null : $systemSettings->value_monthly_fee_formated = getMoneyToStringBr($systemSettings->value_monthly_fee);
         }
-        $ownersAvalable = $this->getAllOwnersAvailable($owners_avalable);
+        $ownersAvalable = self::s_getAllOwnersAvailable($owners_avalable);
 
         return compact('ownersAvalable', 'ownersByCompany', 'operatingHours', 'systemSettings', 'company');
     }
@@ -138,13 +171,13 @@ final class CompanyService
     # ================================================================================= #
     #                                    PRIVADOS
     # ================================================================================= #
-    private function associateOwners(array $owners_id, int $id): int
+    private static function s_associateOwners(array $owners_id, int $id): int
     {
         return User::whereIn('id', $owners_id)->update([
             'company_id' => $id
         ]);
     }
-    private function removeOwners(int $id, ?array $owners_id = null): int
+    private static function s_removeOwners(int $id, ?array $owners_id = null): int
     {
         $user = User::where('company_id', $id);
         !empty($owners_id) ? $user->whereIn('id', $owners_id) : null;
@@ -152,7 +185,7 @@ final class CompanyService
             'company_id' => null
         ]);
     }
-    private function associatePaymentMethods(int $id)
+    private static function s_associatePaymentMethods(int $id)
     {
         $paymentMethodsService = new PaymentMethodService()->setCompanyId($id);
         $paymentMethodsJson = $paymentMethodsService->getJsonFilePath(decoded: true);
@@ -162,7 +195,7 @@ final class CompanyService
             }
         }
     }
-    private function removePaymentMethods(int $id): int
+    private static function s_removePaymentMethods(int $id): int
     {
         return PaymentMethod::where('company_id', $id)->forceDelete();
     }
