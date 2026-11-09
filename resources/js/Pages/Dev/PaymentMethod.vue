@@ -20,7 +20,7 @@ function createJson(overwrite = false) {
         },
         {
             onSuccess: () => {
-                if (page.props.response_data?.json_overwrite) {
+                if (page.props[window.RESPONSE_DATA_KEY_INERTIA]?.json_overwrite) {
                     dialog_alert
                         .setButtons({
                             question_buttons: true,

@@ -150,11 +150,11 @@ function _getCompanySettings(company_id) {
         route("company.settings.getByCompany", [company_id]),
         {},
         {
-            only: ["response_data"],
+            only: [window.RESPONSE_DATA_KEY_INERTIA],
             preserveState: true,
             onSuccess: (page) => {
                 modal_show_company.company_settigns =
-                    page.props.response_data?.company_system_settings;
+                    page.props[window.RESPONSE_DATA_KEY_INERTIA]?.company_system_settings;
             },
             onFinish: () => {
                 loading.company_settigns = false;

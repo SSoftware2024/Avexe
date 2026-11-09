@@ -275,7 +275,7 @@ function _syncOpenedGroups() {
 }
 
 function _showToast(event) {
-    let messageToast = event.detail.page.props.response_data?.toast;
+    let messageToast = event.detail.page.props[window.RESPONSE_DATA_KEY_INERTIA]?.toast;
     if (messageToast) {
         messageToast.forEach((value) => {
             toast.open({
@@ -287,7 +287,7 @@ function _showToast(event) {
     }
 }
 function _showAlert(event) {
-    let alert_dialog = event.detail.page.props.response_data?.alert_dialog;
+    let alert_dialog = event.detail.page.props[window.RESPONSE_DATA_KEY_INERTIA]?.alert_dialog;
     if (alert_dialog) {
         alertDialog.open(alert_dialog.message, alert_dialog.type);
     }

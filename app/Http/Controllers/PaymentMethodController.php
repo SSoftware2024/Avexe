@@ -52,7 +52,7 @@ class PaymentMethodController extends Controller
         } else {
             if ($service->exists()) {
                 if ($request->overwrite == false) {
-                    session()->flash('response_data', [
+                    session()->flash(RESPONSE_DATA_KEY_INERTIA, [
                         'json_overwrite' => true
                     ]);
                 } else {

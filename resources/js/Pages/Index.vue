@@ -19,6 +19,7 @@ const empresas = ref(
 </script>
 
 <template>
+    <Head title="Início" />
     <AppLayout>
         <!-- FILTRO DE BUSCA -->
         <v-row>

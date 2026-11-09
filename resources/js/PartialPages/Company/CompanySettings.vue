@@ -41,7 +41,7 @@ function _save() {
         ...data,
         value_monthly_fee: unformat(data.value_monthly_fee, money3Config),
     })).post(route("company.settings.save"), {
-        only: ["response_data",'systemSettings'],
+        only: [window.RESPONSE_DATA_KEY_INERTIA,'systemSettings'],
     });
 }
 onMounted(() => {

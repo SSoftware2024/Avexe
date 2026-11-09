@@ -137,7 +137,7 @@ function _load() {
 
 function _save() {
     form.post(route("company.operating_hours.save"), {
-        only: ["operatingHours", "response_data"],
+        only: ["operatingHours", window.RESPONSE_DATA_KEY_INERTIA],
     });
 }
 onMounted(() => {

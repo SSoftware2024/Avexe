@@ -27,7 +27,7 @@ class CompanySettingsController extends Controller
 
     public function getByCompany(Request $request, int $company_id)
     {
-        session()->flash('response_data', [
+        session()->flash(RESPONSE_DATA_KEY_INERTIA, [
             'company_system_settings' => (new CompanySystemSettingsService($company_id))->get()
         ]);
     }
