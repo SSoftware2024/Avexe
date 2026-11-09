@@ -82,7 +82,7 @@ onMounted(() => {
 <template>
     <v-form @submit.prevent="_save">
         <v-row>
-            <v-col cols="6">
+            <v-col cols="12" md="6">
                 <v-text-field
                     label="Nome *"
                     variant="outlined"
@@ -92,7 +92,7 @@ onMounted(() => {
                     :hide-details="!form.errors.name"
                 ></v-text-field>
             </v-col>
-            <v-col cols="6">
+            <v-col cols="12" md="6">
                 <v-text-field
                     label="Razão Social"
                     variant="outlined"
@@ -104,7 +104,7 @@ onMounted(() => {
             </v-col>
         </v-row>
         <v-row>
-            <v-col cols="6">
+            <v-col cols="12" md="6">
                 <v-mask-input
                     mask="##.###.###/####-##"
                     label="CNPJ *"
@@ -115,7 +115,7 @@ onMounted(() => {
                     :hide-details="!form.errors.cnpj"
                 ></v-mask-input>
             </v-col>
-            <v-col cols="6">
+            <v-col cols="12" md="6">
                 <v-mask-input
                     mask="###.###.###-##"
                     label="CPF *"
@@ -128,7 +128,7 @@ onMounted(() => {
             </v-col>
         </v-row>
         <v-row>
-            <v-col cols="6">
+            <v-col cols="12" md="6">
                 <v-text-field
                     label="TAG URL"
                     variant="outlined"
@@ -139,7 +139,7 @@ onMounted(() => {
                     :hide-details="!form.errors.tag_url"
                 ></v-text-field>
             </v-col>
-            <v-col cols="6">
+            <v-col cols="12" md="6">
                 <v-autocomplete
                     v-model="form.owners_ids"
                     label="Donos"

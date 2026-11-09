@@ -52,7 +52,7 @@ onMounted(() => {
 <template>
     <v-form @submit.prevent="_save">
         <v-row>
-            <v-col cols="6">
+            <v-col cols="12" md="6">
                 <v-text-field
                     label="Acessos simultâneos *"
                     variant="outlined"
@@ -64,7 +64,7 @@ onMounted(() => {
                     :hide-details="!form.errors.simultaneous_access"
                 ></v-text-field>
             </v-col>
-            <v-col cols="6">
+            <v-col cols="12" md="6">
                 <v-text-field
                     label="Mensagem de retorno (intervalo) *"
                     variant="outlined"
@@ -78,7 +78,7 @@ onMounted(() => {
             </v-col>
         </v-row>
         <v-row>
-            <v-col cols="6">
+            <v-col cols="12" md="6">
                 <v-text-field
                     label="Máximo donos *"
                     variant="outlined"
@@ -90,7 +90,7 @@ onMounted(() => {
                     :hide-details="!form.errors.max_owners"
                 ></v-text-field>
             </v-col>
-            <v-col cols="6">
+            <v-col cols="12" md="6">
                 <v-text-field
                     label="Máximo empregados *"
                     type="number"
@@ -104,7 +104,7 @@ onMounted(() => {
             </v-col>
         </v-row>
         <v-row>
-            <v-col cols="6">
+            <v-col cols="12" md="6">
                 <v-date-input
                     variant="outlined"
                     label="Data pagamento"
@@ -114,7 +114,7 @@ onMounted(() => {
                     :hide-details="!form.errors.date_payment"
                 ></v-date-input>
             </v-col>
-            <v-col cols="6">
+            <v-col cols="12" md="6">
                 <v-text-field
                     label="Mensalidade (R$)"
                     type="text"

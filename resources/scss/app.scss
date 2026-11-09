@@ -18,34 +18,19 @@ div {
     box-sizing: border-box;
 }
 
-
 .dialog-auth-responsive {
-    width: 500px;
-
-    @media (max-width: 532px) {
-        width: 450px;
-    }
-
-    @media (max-width: 476px) {
-        width: 380px;
-    }
-
-    @media (max-width: 406px) {
-        width: 320px;
-    }
-
-    @media (max-width: 344px) {
-        width: 290px;
-    }
-}
-.dialog-auth-responsive-800 {
     width: 800px;
 
-    @media (max-width: 532px) {
-        width: 450px;
+    @media (max-width: 831px) {
+        width: 700px;
     }
-
-    @media (max-width: 476px) {
+    @media (max-width: 731px) {
+        width: 600px;
+    }
+    @media (max-width: 631px) {
+        width: 510px;
+    }
+    @media (max-width: 537px) {
         width: 380px;
     }
 

@@ -54,7 +54,7 @@ onMounted(() => {
 <template>
     <v-form @submit.prevent="_save">
         <v-row>
-            <v-col cols="6">
+            <v-col cols="12" md="6">
                 <v-text-field
                     label="Nome *"
                     variant="outlined"
@@ -64,7 +64,7 @@ onMounted(() => {
                     :hide-details="!form.errors.name"
                 ></v-text-field>
             </v-col>
-            <v-col cols="6">
+            <v-col cols="12" md="6">
                 <v-text-field
                     label="E-mail *"
                     variant="outlined"
@@ -76,7 +76,7 @@ onMounted(() => {
             </v-col>
         </v-row>
         <v-row>
-            <v-col cols="6">
+            <v-col cols="12" md="6">
                 <v-mask-input
                     mask="(##) # ####-####"
                     label="Whatsapp *"
@@ -87,7 +87,7 @@ onMounted(() => {
                     :hide-details="!form.errors.whatsapp"
                 ></v-mask-input>
             </v-col>
-            <v-col cols="6">
+            <v-col cols="12" md="6">
                 <v-text-field
                     label="Senha"
                     variant="outlined"

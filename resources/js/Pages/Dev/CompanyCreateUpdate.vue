@@ -92,7 +92,7 @@ onMounted(() => {});
             <v-card
                 prepend-icon="mdi-account"
                 title="Novo dono"
-                class="dialog-auth-responsive-800 pa-3"
+                class="dialog-auth-responsive pa-3"
             >
                 <OwnerCreateUpdate
                     @success="new_owner_dialog = false"

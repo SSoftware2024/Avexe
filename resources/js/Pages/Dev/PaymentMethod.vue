@@ -90,7 +90,7 @@ watch(
             <v-card
                 prepend-icon="mdi-code-json"
                 title="Json de exemplo, base."
-                class="dialog-auth-responsive-800 pa-3"
+                class="dialog-auth-responsive pa-3"
             >
                 <JsonEditorVue
                     v-model="$page.props.json_database_base"
