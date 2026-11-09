@@ -15,14 +15,10 @@ use Inertia\Inertia;
 
 class DeveloperController extends Controller
 {
-    public function index()
+    public function index(DeveloperService $service)
     {
-        //empresas ativas e inativas
-        //usuarios ativos e inativos
-        //valor mensal especulação mes
-        //empresas pagar este mes
-        //fazer url de filtro
-        return Inertia::render('Dev/Index');
+        $data = $service->dashboardDataView();
+        return Inertia::render('Dev/Index', $data);
     }
 
     public function listView(Request $request, DeveloperService $service)

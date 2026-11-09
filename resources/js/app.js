@@ -1,7 +1,7 @@
 import './bootstrap.js';
 import { createApp, h } from 'vue';
 import { createInertiaApp } from '@inertiajs/vue3';
-import { Link } from '@inertiajs/vue3';
+import { Link, Head } from '@inertiajs/vue3';
 import vuetify from './vuetify';
 //css json editor - package: json-editor-vue
 import "vanilla-jsoneditor/themes/jse-theme-dark.css";
@@ -12,7 +12,9 @@ import 'vue-toast-notification/dist/theme-bootstrap.css'; //theme-default - them
 import money from 'v-money3'
 import { Money3Component } from 'v-money3'
 
+const appName = import.meta.env.VITE_APP_NAME ?? 'Avexe';
 createInertiaApp({
+     title: (title) => `${title} - ${appName}`,
     resolve: name => {
         const pages = import.meta.glob('./Pages/**/*.vue')
         return pages[`./Pages/${name}.vue`]()
@@ -24,6 +26,7 @@ createInertiaApp({
             .use(ToastPlugin)
             .use(money)
             .component('Link', Link)
+            .component('Head', Head)
             .component('v-input-money', Money3Component)
             .mount(el)
     },

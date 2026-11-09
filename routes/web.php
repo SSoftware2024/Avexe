@@ -34,8 +34,6 @@ Route::prefix('customer')->name('customer')->group(function () {
 // dono
 Route::prefix('owner')->middleware(['auth'])->name('owner')->group(function () {
     Route::get('/dashboard', [OwnerController::class, 'index']);
-
-
     // operações owner
     Route::get('/listView', [OwnerController::class, 'listView'])->name('.listView');
     Route::get('/createOrUpdate/{user?}', [OwnerController::class, 'createUpdateView'])->name('.createUpdateView');

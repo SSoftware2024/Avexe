@@ -1,5 +1,5 @@
 <script setup>
-import { reactive, ref, computed } from "vue";
+import { reactive, ref, computed, onMounted } from "vue";
 import { useMask } from "vuetify";
 import { Head, router, useForm } from "@inertiajs/vue3";
 import { route } from "ziggy-js";
@@ -168,9 +168,18 @@ function _search() {
     _loadData();
 }
 
+function _loadFilterUrl() {
+    const url = new URL(window.location.href);
+    if (!form.date_payment) { //valor vazio
+        form.date_payment = url.searchParams.get("date_payment") ?? form.date_payment;
+        form.date_payment_type = url.searchParams.get("date_payment_type") ?? form.date_payment_type;
+    }
+}
+
 // CARREGAR DADOS DA TABELA
 function _loadData() {
     datatable.loading = true;
+    _loadFilterUrl();
     router.get(
         route("company.listView"),
         {
@@ -193,6 +202,9 @@ function _loadData() {
         },
     );
 }
+onMounted(() => {
+
+});
 </script>
 
 <template>

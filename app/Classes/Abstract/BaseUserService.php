@@ -62,7 +62,14 @@ abstract class BaseUserService
         $user = User::find($id);
         return $user;
     }
-
+    public function count(string $column, string $operator, mixed $value)
+    {
+        return User::where('user_type', $this->userType->value)
+            ->where($column, $operator, $value)->count();
+    }
+    /* ========================================================================== */
+    /*                                   STATIC                                   */
+    /* ========================================================================== */
 
     # ================================================================================= #
     #                                    View
@@ -70,10 +77,10 @@ abstract class BaseUserService
     public function getListViewData(?int $paginate = 10, array $sort_by = [], array $filter = [])
     {
         $users = User::where('id', '!=', auth()->id())->where('user_type', $this->userType->value);
-        isset($filter['active']) ? $users->where('active', filter_var($filter['active'], FILTER_VALIDATE_BOOLEAN)  ? 1 : 0):null;
+        isset($filter['active']) ? $users->where('active', filter_var($filter['active'], FILTER_VALIDATE_BOOLEAN)  ? 1 : 0) : null;
         if (!empty($filter['name_email'])) {
             $users->where(function ($query) use ($filter) {
-                $query->where('name','like',"%{$filter['name_email']}%")->orWhere('email', 'like', "%{$filter['name_email']}%");
+                $query->where('name', 'like', "%{$filter['name_email']}%")->orWhere('email', 'like', "%{$filter['name_email']}%");
             });
         }
         if (!empty($sort_by)) { //vuetify datatable

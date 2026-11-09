@@ -85,6 +85,10 @@ final class CompanyService
         Company::where('id', $id)->forceDelete();
         return $owners_disassociated_total;
     }
+    public function count(string $column, string $operator, mixed $value)
+    {
+        return Company::where($column, $operator, $value)->count();
+    }
 
     # ================================================================================= #
     #                                    View
@@ -103,7 +107,7 @@ final class CompanyService
                 $query->whereMonth('date_payment', $month)->whereYear('date_payment', $year);
             });
         } else if (!empty($filter['date_payment']) && $filter['date_payment_type'] === 'day') { //day
-            $company->whereHas('companySystemSettings', function ($query) use($filter) {
+            $company->whereHas('companySystemSettings', function ($query) use ($filter) {
                 $query->whereDate('date_payment', \DateTime::createFromFormat('d/m/Y', $filter['date_payment'])->format('Y-m-d'));
             });
         }

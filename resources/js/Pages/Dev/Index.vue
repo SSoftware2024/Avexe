@@ -1,30 +1,28 @@
 <script setup>
-import { computed, reactive } from 'vue';
-import AuthLayout from '@/layouts/AuthLayout.vue';
+import { computed, reactive } from "vue";
+import { router } from "@inertiajs/vue3";
+import { route } from "ziggy-js";
+import AuthLayout from "@/layouts/AuthLayout.vue";
 
-/**
- * DADOS DO DASHBOARD
- * Valores de exemplo: troque pela resposta da sua API (ex.: onMounted + axios/fetch).
- * Estrutura sugerida para o retorno do Laravel:
- * { users: {active, inactive}, companies: {active, inactive},
- *   expected_monthly_value, paying_companies, overdue_companies }
- */
-const stats = reactive({
-    users: { active: 128, inactive: 14 },
-    companies: { active: 42, inactive: 6 },
-    expectedMonthlyValue: 18450.9,
-    payingCompanies: 31,
-    overdueCompanies: 5,
+const props = defineProps({
+    companies: Object,
+    owners: Object,
 });
 
 // Mês atual calculado automaticamente (ex.: "11/2026"), não precisa editar todo mês
 const currentMonth = computed(() =>
-    new Date().toLocaleDateString('pt-BR', { month: '2-digit', year: 'numeric' })
+    new Date().toLocaleDateString("pt-BR", {
+        month: "2-digit",
+        year: "numeric",
+    }),
 );
 
-// Formata o valor em reais: R$ 18.450,90
-const money = (value) =>
-    new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value);
+const currentDateToFilter = computed(() => {
+    const date = new Date();
+    const month = String(date.getMonth() + 1).padStart(2, "0");
+    const year = date.getFullYear();
+    return `${year}-${month}`;
+});
 
 /**
  * Cada card é descrito por um objeto; o template só percorre a lista.
@@ -34,78 +32,106 @@ const money = (value) =>
  */
 const cards = computed(() => [
     {
-        key: 'users',
-        title: 'Usuários',
-        icon: 'mdi-account-group-outline',
-        color: '#4b5563',
-        to: '/usuarios',
+        key: "users",
+        title: "Usuários(Donos)",
+        icon: "mdi-account-group-outline",
+        color: "#4b5563",
+        to: route("owner.listView"),
         values: [
-            { label: 'Ativos', value: stats.users.active },
-            { label: 'Inativos', value: stats.users.inactive, muted: true },
+            { label: "Ativos", value: props.owners.active },
+            { label: "Inativos", value: props.owners.inactive, muted: true },
         ],
     },
     {
-        key: 'companies',
-        title: 'Empresas',
-        icon: 'mdi-office-building-outline',
-        color: '#f26a21',
-        to: '/empresas',
+        key: "companies",
+        title: "Empresas",
+        icon: "mdi-office-building-outline",
+        color: "#f26a21",
+        to: route("company.listView"),
         values: [
-            { label: 'Ativas', value: stats.companies.active },
-            { label: 'Inativas', value: stats.companies.inactive, muted: true },
+            { label: "Ativas", value: props.companies.active },
+            {
+                label: "Inativas(vencidas)",
+                value: props.companies.inactive,
+                muted: true,
+            },
         ],
     },
     {
-        key: 'expected',
+        key: "expected",
         title: `Expectativa mensal · ${currentMonth.value}`,
-        icon: 'mdi-cash-multiple',
-        color: '#2e7d32',
-        to: '/financeiro',
-        values: [{ label: 'Valor previsto', value: money(stats.expectedMonthlyValue), big: true }],
+        icon: "mdi-cash-multiple",
+        color: "#2e7d32",
+        to: route("company.listView", {
+            date_payment_type: "month",
+            date_payment: currentDateToFilter.value,
+        }),
+        values: [
+            {
+                label: "Valor previsto",
+                value: "R$ " + props.companies.monthlyAmount.value_total_month,
+                big: true,
+            },
+        ],
     },
     {
-        key: 'paying',
-        title: 'Empresas que pagam este mês',
-        icon: 'mdi-check-decagram-outline',
-        color: '#1976d2',
-        to: { path: '/empresas', query: { status: 'pagando' } },
-        values: [{ label: 'Empresas', value: stats.payingCompanies, big: true }],
-    },
-    {
-        key: 'overdue',
-        title: 'Empresas vencidas',
-        icon: 'mdi-alert-circle-outline',
-        color: '#b00020',
-        to: { path: '/empresas', query: { status: 'vencidas' } },
-        values: [{ label: 'Empresas', value: stats.overdueCompanies, big: true }],
+        key: "paying",
+        title: "Empresas que pagam este mês",
+        icon: "mdi-check-decagram-outline",
+        color: "#1976d2",
+        to: route("company.listView", {
+            date_payment_type: "month",
+            date_payment: currentDateToFilter.value,
+        }),
+        values: [
+            {
+                label: "Empresas",
+                value: props.companies.monthlyAmount.count,
+                big: true,
+            },
+        ],
     },
 ]);
 </script>
 
 <template>
     <AuthLayout>
+        <Head title="Dashboard Developer" />
         <div class="dashboard">
             <header class="dashboard__header">
                 <h3 class="dashboard__title">Dashboard</h3>
-                <span class="dashboard__subtitle">Visão geral · {{ currentMonth }}</span>
+                <span class="dashboard__subtitle"
+                    >Visão geral · {{ currentMonth }}</span
+                >
             </header>
 
             <v-row>
-                <v-col v-for="card in cards" :key="card.key" cols="12" sm="6" lg="4">
+                <v-col
+                    v-for="card in cards"
+                    :key="card.key"
+                    cols="12"
+                    sm="6"
+                    lg="4"
+                >
                     <!-- :to transforma o v-card em link (clicável); hover dá o efeito de elevação -->
                     <v-card
                         class="stat-card"
-                        :to="card.to"
                         hover
                         elevation="1"
                         :style="{ '--accent': card.color }"
+                        @click="router.get(card.to)"
                     >
                         <div class="stat-card__header">
                             <span class="stat-card__icon">
                                 <v-icon :icon="card.icon" size="22" />
                             </span>
-                            <span class="stat-card__title">{{ card.title }}</span>
-                            <v-icon icon="mdi-chevron-right" class="stat-card__arrow" />
+                            <span class="stat-card__title">{{
+                                card.title
+                            }}</span>
+                            <v-icon
+                                icon="mdi-chevron-right"
+                                class="stat-card__arrow"
+                            />
                         </div>
 
                         <div class="stat-card__values">
@@ -123,7 +149,9 @@ const cards = computed(() => [
                                 >
                                     {{ item.value }}
                                 </span>
-                                <span class="stat-card__label">{{ item.label }}</span>
+                                <span class="stat-card__label">{{
+                                    item.label
+                                }}</span>
                             </div>
                         </div>
                     </v-card>
@@ -162,11 +190,13 @@ const cards = computed(() => [
     overflow: hidden;
     cursor: pointer;
     /* transição suave para o efeito de hover */
-    transition: transform 0.15s ease, box-shadow 0.15s ease;
+    transition:
+        transform 0.15s ease,
+        box-shadow 0.15s ease;
 }
 .stat-card::before {
     /* barra lateral colorida */
-    content: '';
+    content: "";
     position: absolute;
     inset: 0 auto 0 0;
     width: 5px;
