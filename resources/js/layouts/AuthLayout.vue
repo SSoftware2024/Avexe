@@ -415,7 +415,7 @@ onUnmounted(() => {
                     @click="router.visit(route('index'))"
                 />
                 <v-spacer />
-                <!-- DROPDOWN NOTIFICAÇÕES -->
+                <!-- #region DROPDOWN NOTIFICAÇÕES -->
                 <v-menu
                     location="bottom end"
                     offset-y
@@ -517,7 +517,8 @@ onUnmounted(() => {
                         </div>
                     </v-card>
                 </v-menu>
-                <!-- DROPDOWN PERFIL -->
+                <!-- #endregion DROPDOWN NOTIFICAÇÕES -->
+                <!-- #region DROPDOWN PERFIL -->
                 <v-menu offset-y location="bottom end">
                     <template v-slot:activator="{ props }">
                         <v-avatar
@@ -577,6 +578,7 @@ onUnmounted(() => {
                         </v-list-item>
                     </v-list>
                 </v-menu>
+                <!-- #endregion DROPDOWN PERFIL -->
             </v-app-bar>
             <!-- #endregion APP BAR -->
             <v-main>

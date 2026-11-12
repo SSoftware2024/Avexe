@@ -21,8 +21,8 @@ final class DeveloperService extends BaseUserService
         $date_now = now();
         $monthlyAmount = CompanySystemSettingsService::s_monthlyAmount($date_now);
         $companies = [
-            'active' => (new CompanyService())->count('active','=', 1),
-            'inactive' => (new CompanyService())->count('active','=', 0),
+            'active' => CompanyService::s_count('active','=', 1),
+            'inactive' => CompanyService::s_count('active','=', 0),
             'monthlyAmount' => [
                 'count' => $monthlyAmount['count'],
                 'value_total_month' => getMoneyToStringBr($monthlyAmount['value_total_month'])
