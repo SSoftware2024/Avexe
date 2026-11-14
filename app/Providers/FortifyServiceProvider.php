@@ -15,7 +15,6 @@ use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Str;
 use Inertia\Inertia;
 use Laravel\Fortify\Actions\RedirectIfTwoFactorAuthenticatable;
-use Laravel\Fortify\Contracts\PasswordConfirmedResponse;
 use Laravel\Fortify\Fortify;
 
 class FortifyServiceProvider extends ServiceProvider
@@ -23,10 +22,7 @@ class FortifyServiceProvider extends ServiceProvider
     /**
      * Register any application services.
      */
-    public function register(): void
-    {
-
-    }
+    public function register(): void {}
 
     /**
      * Bootstrap any application services.
@@ -96,6 +92,11 @@ class FortifyServiceProvider extends ServiceProvider
 
             $user = User::where($column_name, $username)->first();
             if ($user && Hash::check($request->password, $user->password)) {
+                if (!$user->active) {
+                    throw \Illuminate\Validation\ValidationException::withMessages([
+                        'email' => 'Registro inativo.',
+                    ]);
+                }
                 return $user;
             }
         });

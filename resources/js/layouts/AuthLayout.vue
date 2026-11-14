@@ -142,13 +142,25 @@ const nav_sections = computed(() => {
         ],
         owner: [
             {
-                title: "Gerenciamento owner",
+                title: "Gerenciamento dono",
                 items: [
                     {
                         title: "Dashboard",
                         icon: "mdi-view-dashboard-outline",
                         to: dashboard_link.value,
                         active_names: ["owner", "developer"],
+                    },
+                    {
+                        title: "Empresa",
+                        icon: "mdi-view-dashboard-outline",
+                        to: dashboard_link.value,
+                        active_names: [],
+                    },
+                    {
+                        title: "Funcionário",
+                        icon: "mdi-view-dashboard-outline",
+                        to: dashboard_link.value,
+                        active_names: [],
                     },
                     {
                         title: "Agendamentos",
@@ -201,7 +213,7 @@ const nav_sections = computed(() => {
             {
                 title: "Relatórios",
                 items: [
-                    { title: "Relatórios", icon: "mdi-chart-box-outline" },
+                    { title: "Agendamento", icon: "mdi-chart-box-outline" },
                     { title: "Financeiro", icon: "mdi-cash-multiple" },
                 ],
             },
