@@ -5,6 +5,7 @@ import { createVuetify } from "vuetify";
 import { pt } from 'vuetify/locale'
 import { VMaskInput } from 'vuetify/labs/VMaskInput' //máscaras 
 import { VMonthPicker } from 'vuetify/labs/VMonthPicker'
+import { VPie } from 'vuetify/labs/VPie'
 import * as components from "vuetify/components";
 import * as directives from "vuetify/directives";
 
@@ -18,7 +19,8 @@ const vuetify = createVuetify({
     components: {
         ...components,
         VMaskInput,
-        VMonthPicker
+        VMonthPicker,
+        VPie
     },
     directives,
     theme: { //para deixar o sistema escolher, basta comentar o default theme

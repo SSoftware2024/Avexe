@@ -152,13 +152,13 @@ const nav_sections = computed(() => {
                     },
                     {
                         title: "Empresa",
-                        icon: "mdi-view-dashboard-outline",
+                        icon: "mdi-domain",
                         to: dashboard_link.value,
                         active_names: [],
                     },
                     {
-                        title: "Funcionário",
-                        icon: "mdi-view-dashboard-outline",
+                        title: "Funcionários",
+                        icon: "mdi-account-group-outline",
                         to: dashboard_link.value,
                         active_names: [],
                     },

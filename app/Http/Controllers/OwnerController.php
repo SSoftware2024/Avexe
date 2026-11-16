@@ -15,9 +15,10 @@ use Inertia\Inertia;
 
 class OwnerController extends Controller
 {
-    public function index()
+    public function index(OwnerService $service)
     {
-        return Inertia::render('Owner/Index');
+        $data = $service->indexViewData();
+        return Inertia::render('Owner/Index', $data);
     }
 
     public function listView(Request $request, OwnerService $service)

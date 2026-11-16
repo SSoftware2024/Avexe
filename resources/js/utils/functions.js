@@ -69,7 +69,7 @@ function formatBooleanToText(value) {
 }
 function formatDateBrString(date) {
     if (!date) return "N/A";
-    return new Date(date).toLocaleDateString("pt-BR");
+    return new Date(date).toLocaleDateString("pt-BR", {timeZone: 'UTC'});
 }
 function formatMoneyToBrString(value) {
     if(!value){

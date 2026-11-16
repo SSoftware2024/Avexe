@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Classes\Abstract\CompanySettingsService;
 use App\Models\CompanySystemSetting;
+use Carbon\Carbon;
 use Override;
 
 final class CompanySystemSettingsService extends CompanySettingsService
@@ -12,8 +13,6 @@ final class CompanySystemSettingsService extends CompanySettingsService
     {
         return CompanySystemSetting::class;
     }
-
-
 
     #[Override]
     public function save(array $data)
@@ -27,7 +26,25 @@ final class CompanySystemSettingsService extends CompanySettingsService
             'value_monthly_fee' => $data['value_monthly_fee'],
         ]);
     }
-    
+
+    /**
+     * getDaysToExpireDatePayment
+     * 
+     * Retorna diferença de dias até a data de validade, caso 0 ou valores negativos, validade vencida.
+     * Valores negativos, dias passados do prazo.
+     * @return int
+     */
+    public function getDaysToExpireDatePayment(): int
+    {
+        $companySystemSettings = $this->get();
+        $carbonDate = Carbon::createFromFormat('Y-m-d', $companySystemSettings->date_payment)->startOfDay();
+        $carbonNow = Carbon::today()->startOfDay();
+        $diferenceInDays = $carbonNow->diffInDays($carbonDate);
+        return (int) $diferenceInDays;
+    }
+    /* ========================================================================== */
+    /*                              STATIC PREFIX 'S'                             */
+    /* ========================================================================== */
     /**
      * s_monthlyAmount
      * Retorna quantidade de empresas e valor total a receber no mês
@@ -46,7 +63,7 @@ final class CompanySystemSettingsService extends CompanySettingsService
             'count' => $companySystemSettings->count(),
             'value_total_month' => $companySystemSettings->sum('value_monthly_fee')
         ];
-    }    
+    }
     /**
      * s_dateExpired
      * Retorna quantidade de empresas e as empresas que não pagaram na data
